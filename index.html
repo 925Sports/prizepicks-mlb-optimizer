@@ -1140,8 +1140,11 @@
         contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
 
         // ================== REPLACE THESE URLs WITH YOUR MLB GOOGLE SHEETS ==================
-        const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSLw3UZqoWqheDXCENlKhAGk8adRqvYH8LFik2LFAhKV4785KLw3a4e6jACDYPoKzqfquYDn5Tg1pB0/pub?gid=0&single=true&output=csv'; 
-        // Example: https://docs.google.com/spreadsheets/d/e/2PACX-1v.../pub?gid=0&single=true&output=csv
+                // Load local CSV from the repo (no CORS issues)
+        const url = 'data/prizepicks-mlb.csv';
+
+        // gameLogUrl remains empty for now
+        const gameLogUrl = '';
 
         const gameLogUrl = ''; // ← Leave empty or add your MLB game-log sheet later
 
