@@ -1158,8 +1158,11 @@
 
         const bases = { 2: 33.3, 3: 20, 4: 10, 5: 13.8, 6: 4.9 };
 
-        fetch(url)
-            .then(response => response.text())
+                fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load data.csv');
+                return response.text();
+            })
             .then(csv => {
                 allData = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
 
