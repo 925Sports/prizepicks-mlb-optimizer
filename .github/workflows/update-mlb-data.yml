@@ -3,11 +3,13 @@ name: Update MLB PrizePicks Data
 on:
   schedule:
     - cron: '*/15 * * * *'   # Every 15 minutes
-  workflow_dispatch:         # Allows manual "Run workflow" button
+  workflow_dispatch:         # Manual trigger button
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # Explicitly grant write permission
 
     steps:
       - name: Checkout repository
