@@ -1,0 +1,26 @@
+name: Update MLB PrizePicks Data
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # Every 15 minutes
+  workflow_dispatch:         # Allows manual trigger
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch latest CSV from Google Sheets
+        run: |
+          curl -L -o data/prizepicks-mlb.csv \
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vSLw3UZqoWqheDXCENlKhAGk8adRqvYH8LFik2LFAhKV4785KLw3a4e6jACDYPoKzqfquYDn5Tg1pB0/pub?gid=0&single=true&output=csv"
+
+      - name: Commit and push changes if updated
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-update MLB PrizePicks data"
+          file_pattern: data/prizepicks-mlb.csv
+          branch: main
