@@ -25,6 +25,7 @@
         ::-webkit-scrollbar-track { background: #1a1a1a; }
         ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #777; }
+
         .title-header {
             display: flex;
             align-items: center;
@@ -39,6 +40,7 @@
         .title-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
         .title-header .info-icon { margin-left: 8px; cursor: pointer; font-size: 20px; color: #00ffcc; transition: color 0.2s; }
         .title-header .info-icon:hover { color: #00e6b3; }
+
         .controls {
             display: flex;
             justify-content: space-between;
@@ -61,6 +63,7 @@
             transition: border-color 0.2s;
         }
         #search:focus { border-color: #00ffcc; outline: none; }
+
         .toggle { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .toggle button {
             padding: 8px 20px;
@@ -74,14 +77,17 @@
         }
         .toggle button:hover { background: #333; }
         .toggle button.active { background: #00ffcc; color: #000; }
-        .view-switch { display: flex; align-items: center; gap: 8px; margin-left: 20px; }
-        .view-switch span { font-size: 12px; font-weight: 500; }
+
+        .view-switch, .selected-switch { display: flex; align-items: center; gap: 8px; margin-left: 20px; }
+        .view-switch span, .selected-switch span { font-size: 12px; font-weight: 500; }
+
         .switch { position: relative; display: inline-block; width: 40px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #00ffcc; }
         input:checked + .slider:before { transform: translateX(16px); }
+
         .tabs {
             display: flex;
             flex-wrap: wrap;
@@ -100,10 +106,17 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         .tab:hover { background: #333; }
         .tab.active { background: #00ffcc; color: #000; }
+        .tab.inactive {
+            opacity: 0.45;
+            pointer-events: none;
+            background: #1a1a1a;
+            color: #666;
+        }
+
         #content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -115,6 +128,7 @@
         }
         #content.table-view { display: block; max-width: 100%; grid-template-columns: none; overflow-x: auto; }
         #content.table-view table { width: 100%; }
+
         .card {
             background: #1a1a1a;
             border-radius: 16px;
@@ -127,6 +141,7 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover { transform: translateY(-4px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); }
+
         .header { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #888; }
         .pop { color: #00ffcc; font-size: 16px; font-weight: 600; }
         .headshot { width: 80px; height: 80px; border-radius: 50%; margin: 12px 0; border: 2px solid #333; }
@@ -134,6 +149,7 @@
         .name { font-weight: 600; font-size: 18px; }
         .game { font-size: 14px; color: #888; margin-bottom: 8px; }
         .stat { margin-top: 10px; font-size: 20px; font-weight: 700; }
+
         .buttons { display: flex; margin-top: 8px; background: #121212; border-radius: 9999px; overflow: hidden; }
         .button {
             flex: 1;
@@ -152,10 +168,13 @@
         .red-outline { outline: 3px solid #ff4d4d; }
         .button.selected.selected-more { background-color: #4dff4d; color: #000; }
         .button.selected.selected-less { background-color: #ff4d4d; color: #000; }
+
         .info-icon { position: absolute; top: 16px; right: 16px; cursor: pointer; font-size: 18px; color: #00ffcc; transition: color 0.2s; }
         .info-icon:hover { color: #00e6b3; }
         .icon { position: absolute; top: 40px; right: 16px; font-size: 20px; }
-        .loading { text-align: center; padding: 20px; font-size: 18px; color: #00ffcc; }
+
+        .loading { text-align: center; padding: 40px 20px; font-size: 18px; color: #00ffcc; line-height: 1.5; }
+
         #popup, #betslipPopup, #calloutPopup, #toolInfoPopup {
             display: none;
             position: fixed;
@@ -173,54 +192,7 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
             -webkit-overflow-scrolling: touch;
         }
-        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3 { margin-top: 20px; font-weight: 600; }
-        #popup label, #calloutPopup label { display: block; font-size: 14px; }
-        #filterBtn, #betslipBtn, #calloutFilterBtn {
-            padding: 8px 20px;
-            background: #00ffcc;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover { background: #00e6b3; }
-        #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo {
-            margin-bottom: 20px;
-            padding: 8px 20px;
-            background: #4dff4d;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover { background: #66ff66; }
-        .select-btn {
-            margin: 5px 0;
-            padding: 6px 12px;
-            background: #333;
-            border: none;
-            border-radius: 9999px;
-            color: #f0f0f0;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .select-btn:hover { background: #444; }
-        .payout-filter-container { display: flex; align-items: center; gap: 0.5rem; }
-        #payoutFilter { padding: 0.5rem 1rem; background: #1a1a1a; color: #f0f0f0; border: 1px solid #333; border-radius: 9999px; cursor: pointer; }
-        .betslips-container { background: #121212; border-radius: 16px; padding: 12px; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; -webkit-overflow-scrolling: touch; }
-        th, td { padding: 0.75rem; text-align: center; border: 1px solid #333; }
-        th { background: #222; font-weight: 500; cursor: pointer; position: sticky; top: 0; color: #f0f0f0; }
-        tr:nth-child(even) { background: #181818; }
-        th.asc::after { content: ' ↑'; }
-        th.desc::after { content: ' ↓'; }
-        .error-message { color: #ff4d4d; text-align: center; margin: 1rem; }
-        .expanded-details td { background-color: #121212; padding: 1rem; text-align: left; }
+
         #playerPopup {
             display: none;
             position: fixed;
@@ -234,59 +206,35 @@
             z-index: 50;
             width: 95%;
             max-width: 900px;
-            height: auto;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            font-size: 1rem;
             -webkit-overflow-scrolling: touch;
         }
-        #playerPopup .header { display: flex; flex-direction: column; align-items: flex-start; background: linear-gradient(to right, #0a0a0a, #142a2e); padding: 8px; border-radius: 16px 16px 0 0; }
-        #playerPopup .bottom-header { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
-        #playerPopup .left-header { display: flex; align-items: center; }
-        #playerPopup .headshot { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #333; }
-        #playerPopup .player-info { margin-left: 12px; flex: 1; }
-        #playerPopup .tabs { display: flex; background: #0a0a0a; position: relative; top: auto; padding: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        #playerPopup .tab-content { padding: 12px; -webkit-overflow-scrolling: touch; }
-        #playerPopup table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.7rem; }
-        #playerPopup th, #playerPopup td { border: 1px solid #333; padding: 4px; text-align: center; word-wrap: break-word; }
-        #playerPopup th { font-size: 0.7rem; font-weight: 600; background-color: #222; }
-        #playerPopup td { font-size: 0.65rem; }
-        #betHeader { text-align: center; margin: 12px 0; font-weight: 600; }
-        #chartContainer { margin: 20px 0; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 35; }
-        #popupName { font-size: 24px; font-weight: 700; color: #f0f0f0; display: inline-flex; align-items: center; word-break: break-word; width: 100%; text-align: left; }
-        #popupGame, #popupScheduledAt { font-size: 14px; font-weight: 600; }
-        .stats-boxes { display: flex; justify-content: space-between; flex-wrap: nowrap; }
-        .stat-box { background: #222; padding: 6px 8px; border-radius: 8px; text-align: center; min-width: 60px; margin: 3px; }
-        .stat-label { font-size: 10px; color: #ccc; }
-        .stat-value { font-size: 12px; font-weight: 600; }
-        .dvp-green { color: #4dff4d; }
-        .dvp-yellow { color: #ffd700; }
-        .dvp-red { color: #ff4d4d; }
-        .spread-red { color: #ff4d4d; }
-        .ou-red { color: #ff4d4d; }
-        .ou-green { color: #4dff4d; }
-        #prevPlayer { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        #nextPlayer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        #prevPlayer:hover, #nextPlayer:hover { background: #333; }
-        .popup-buttons { display: flex; margin-top: 10px; background: #121212; border-radius: 9999px; overflow: hidden; width: fit-content; margin: 10px auto 10px; }
-        .popup-buttons .button { flex: 1; padding: 4px 40px; font-size: 14px; font-weight: 600; white-space: nowrap; }
-        #betTypeSelect, #oddsSelect, #viewSelect { padding: 10px; border-radius: 9999px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; margin: 10px 0; width: 100%; display: none; font-weight: 500; }
-        #closePlayerPopup { position: absolute; top: 10px; right: 20px; cursor: pointer; font-size: 24px; color: #f0f0f0; z-index: 52; }
-        #closePlayerPopup:hover { color: #ff4d4d; }
-        #gameLogSearch { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 9999px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; }
-        .averages-row td { font-weight: bold; background-color: #333; }
-        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .selected-switch { display: flex; align-items: center; gap: 8px; margin-left: 20px; }
-        .selected-switch span { font-size: 12px; font-weight: 500; }
+        #playerPopup .header { background: linear-gradient(to right, #0a0a0a, #142a2e); padding: 12px; border-radius: 16px 16px 0 0; }
+        #popupName { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        #prevPlayer, #nextPlayer {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 12px 18px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 51;
+        }
+        #prevPlayer { left: 15px; }
+        #nextPlayer { right: 15px; }
+        #prevPlayer:hover, #nextPlayer:hover { background: #00ffcc; color: #000; }
+
         @media (max-width: 600px) {
-            #content { grid-template-columns: 1fr; max-width: 100%; }
             .controls { flex-direction: column; align-items: stretch; }
             .toggle, .view-switch, .selected-switch { display: none; }
             .tabs { display: none; }
-            #betTypeSelect, #oddsSelect, #viewSelect { display: block; }
-            #popup, #betslipPopup, #calloutPopup, #toolInfoPopup { width: 100%; max-width: none; padding: 5px; top: 0; left: 0; transform: none; height: auto; max-height: 90vh; border-radius: 16px; }
+            #betTypeSelect, #oddsSelect, #viewSelect { display: block; margin: 8px 0; }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -328,29 +276,27 @@
     <div class="tabs"></div>
     <div id="content"></div>
 
-    <!-- Popups -->
+    <!-- Player Popup -->
     <div id="playerPopup">
-        <span id="closePlayerPopup">×</span>
+        <span id="closePlayerPopup" style="position:absolute;top:12px;right:20px;font-size:28px;cursor:pointer;color:#f0f0f0;">×</span>
         <div class="header">
             <div id="popupName"></div>
-            <div class="bottom-header">
-                <div class="left-header">
-                    <img id="popupHeadshot" class="headshot" src="" alt="">
-                    <div class="player-info">
-                        <div id="popupTeamPos"></div>
-                        <div id="popupGame"></div>
-                        <div id="popupScheduledAt"></div>
-                        <div id="popupSpreadOU"></div>
-                    </div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;width:100%;margin-top:8px;">
+                <div>
+                    <div id="popupTeamPos" style="font-size:15px;font-weight:500;"></div>
+                    <div id="popupGame" style="font-size:14px;"></div>
+                    <div id="popupScheduledAt" style="font-size:13px;color:#aaa;"></div>
                 </div>
-                <div id="statsBoxes" class="stats-boxes"></div>
+                <div id="popupSpreadOU" style="font-size:15px;font-weight:500;text-align:right;"></div>
             </div>
         </div>
-        <button id="prevPlayer"><</button>
-        <button id="nextPlayer">></button>
+        <button id="prevPlayer">‹ Previous</button>
+        <button id="nextPlayer">Next ›</button>
         <div class="tabs" id="popupTabs"></div>
         <div class="tab-content" id="popupContent"></div>
     </div>
+
+    <!-- Filter Popups -->
     <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
         <h3>Games</h3>
@@ -362,6 +308,7 @@
         <button id="deselectAllTeams" class="select-btn">Deselect All</button>
         <div id="teamsList"></div>
     </div>
+
     <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
         <h3>Callout Bet Tags</h3>
@@ -369,6 +316,7 @@
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
         <div id="calloutsList"></div>
     </div>
+
     <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
         <h3>Generated Bet Slips</h3>
@@ -391,6 +339,7 @@
             </table>
         </div>
     </div>
+
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
@@ -398,16 +347,14 @@
         <ul>
             <li>Use the search bar to find players or stats.</li>
             <li>Filter by games, teams, or callout tags using the buttons.</li>
-            <li>Select odds type: All, Standard, Demon, or Goblin.</li>
-            <li>Stat tabs are generated automatically from your data.</li>
-            <li>Click 'More' or 'Less' on cards to add to bet slip.</li>
-            <li>View generated bet slips with edge and payout calculations.</li>
+            <li>Only stat types with available data are active — others are greyed out.</li>
+            <li>Click 'More' or 'Less' on cards to add to your bet slip.</li>
+            <li>Use the arrows in the player popup to navigate between players.</li>
         </ul>
     </div>
 
     <script>
         let allData = [];
-        let gameLogs = [];
         let currentFiltered = [];
         let currentTab = 'All';
         let currentOddsType = 'standard';
@@ -425,8 +372,7 @@
         let betSlipsSortDirection = 'desc';
         let contentSortColumn = 'Edge';
         let contentSortDirection = 'desc';
-        let expandedCombinations = new Set();
-        let currentRow = null;
+        let currentRowIndex = 0;
         let gameToTime = new Map();
         let showSelectedOnly = false;
 
@@ -434,7 +380,6 @@
         contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
 
         const url = './data/prizepicks-mlb.csv';
-        const gameLogUrl = '';
 
         const predefinedCombinations = {
             2: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],[1,10],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8],[2,9],[2,10],[3,4],[3,5],[3,6],[3,7],[3,8],[3,9],[3,10],[4,5],[4,6],[4,7],[4,8],[4,9],[4,10],[5,6],[5,7],[5,8],[5,9],[5,10],[6,7],[6,8],[6,9],[6,10],[7,8],[7,9],[7,10],[8,9],[8,10],[9,10]],
@@ -460,12 +405,9 @@
                     }
                 });
 
-                uniqueGames = Array.from(gameToTime.entries())
-                    .sort((a, b) => new Date(a[1]) - new Date(b[1]))
-                    .map(entry => entry[0]);
-
-                uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
-                uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
+                uniqueGames = Array.from(gameToTime.entries()).sort((a,b) => new Date(a[1]) - new Date(b[1])).map(e => e[0]);
+                uniqueTeams = [...new Set(allData.map(r => r.Team).filter(Boolean))].sort();
+                uniqueCallouts = [...new Set(allData.map(r => r['Callout Bet Tag']).filter(Boolean))].sort();
 
                 selectedGames = new Set(uniqueGames);
                 selectedTeams = new Set(uniqueTeams);
@@ -482,6 +424,7 @@
                     if (index === 0) btn.classList.add('active');
                     btn.textContent = tab;
                     btn.onclick = () => {
+                        if (btn.classList.contains('inactive')) return;
                         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                         btn.classList.add('active');
                         currentTab = tab;
@@ -491,18 +434,13 @@
                     tabsDiv.appendChild(btn);
                 });
 
+                // View switch
                 const viewSwitch = document.createElement('div');
                 viewSwitch.classList.add('view-switch');
-                viewSwitch.innerHTML = `
-                    <span>Cards</span>
-                    <label class="switch">
-                        <input type="checkbox" id="viewToggle">
-                        <span class="slider"></span>
-                    </label>
-                    <span>Table</span>
-                `;
+                viewSwitch.innerHTML = `<span>Cards</span><label class="switch"><input type="checkbox" id="viewToggle"><span class="slider"></span></label><span>Table</span>`;
                 tabsDiv.appendChild(viewSwitch);
 
+                // Bet Type Select (mobile)
                 const betTypeSelect = document.getElementById('betTypeSelect');
                 betTypeSelect.innerHTML = '';
                 uniqueStatTypes.forEach(tab => {
@@ -520,6 +458,7 @@
                     renderContent();
                 });
 
+                // Odds Select
                 const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
                 const oddsSelect = document.getElementById('oddsSelect');
                 oddsSelect.innerHTML = '';
@@ -546,11 +485,8 @@
                     renderContent();
                 });
 
-                document.getElementById('search').addEventListener('input', (e) => {
-                    searchTerm = e.target.value.toLowerCase();
-                    renderContent();
-                });
-
+                // Event listeners
+                document.getElementById('search').addEventListener('input', e => { searchTerm = e.target.value.toLowerCase(); renderContent(); });
                 document.querySelectorAll('.toggle-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
@@ -560,22 +496,20 @@
                         renderContent();
                     });
                 });
-
-                document.getElementById('viewToggle').addEventListener('change', (e) => {
+                document.getElementById('viewToggle').addEventListener('change', e => {
                     currentView = e.target.checked ? 'table' : 'cards';
                     viewSelect.value = currentView;
                     renderContent();
                 });
-
-                document.getElementById('selectedToggle').addEventListener('change', (e) => {
+                document.getElementById('selectedToggle').addEventListener('change', e => {
                     showSelectedOnly = e.target.checked;
                     renderContent();
                 });
 
+                // Filter buttons (full implementation)
                 document.getElementById('filterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('popup');
                     popup.style.display = 'block';
-
                     const gamesList = document.getElementById('gamesList');
                     gamesList.innerHTML = '';
                     uniqueGames.forEach(game => {
@@ -596,7 +530,6 @@
                         gamesList.appendChild(label);
                         gamesList.appendChild(document.createElement('br'));
                     });
-
                     const teamsList = document.getElementById('teamsList');
                     teamsList.innerHTML = '';
                     uniqueTeams.forEach(team => {
@@ -610,7 +543,6 @@
                         teamsList.appendChild(label);
                         teamsList.appendChild(document.createElement('br'));
                     });
-
                     document.getElementById('selectAllGames').onclick = () => gamesList.querySelectorAll('input').forEach(cb => cb.checked = true);
                     document.getElementById('deselectAllGames').onclick = () => gamesList.querySelectorAll('input').forEach(cb => cb.checked = false);
                     document.getElementById('selectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = true);
@@ -627,7 +559,6 @@
                 document.getElementById('calloutFilterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('calloutPopup');
                     popup.style.display = 'block';
-
                     const calloutsList = document.getElementById('calloutsList');
                     calloutsList.innerHTML = '';
                     uniqueCallouts.forEach(callout => {
@@ -641,7 +572,6 @@
                         calloutsList.appendChild(label);
                         calloutsList.appendChild(document.createElement('br'));
                     });
-
                     document.getElementById('selectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                     document.getElementById('deselectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = false);
                 });
@@ -657,7 +587,6 @@
                     document.getElementById('betslipPopup').style.display = 'block';
                     filterBetSlips();
                 });
-
                 document.getElementById('closeBetSlip').addEventListener('click', () => {
                     document.getElementById('betslipPopup').style.display = 'none';
                     document.getElementById('overlay').style.display = 'none';
@@ -667,7 +596,6 @@
                     document.getElementById('overlay').style.display = 'block';
                     document.getElementById('toolInfoPopup').style.display = 'block';
                 });
-
                 document.getElementById('closeToolInfo').addEventListener('click', () => {
                     document.getElementById('toolInfoPopup').style.display = 'none';
                     document.getElementById('overlay').style.display = 'none';
@@ -817,13 +745,9 @@
 
             const combinations = generateCombinations(selectedBets);
             let outputData = [];
-            for (let pickcount = 2; pickcount <= 6; pickcount++) {
-                outputData.push(...combinations[pickcount]);
-            }
+            for (let pickcount = 2; pickcount <= 6; pickcount++) outputData.push(...combinations[pickcount]);
 
-            if (selectedPayout !== 'all') {
-                outputData = outputData.filter(combo => combo.payout === selectedPayout);
-            }
+            if (selectedPayout !== 'all') outputData = outputData.filter(combo => combo.payout === selectedPayout);
 
             if (outputData.length === 0) {
                 body.innerHTML = '<tr><td colspan="5" class="error-message">No valid combinations.</td></tr>';
@@ -850,72 +774,62 @@
                         a.textContent = 'Place Bet';
                         a.target = '_blank';
                         td.appendChild(a);
-                    } else if (col === 'Players') {
-                        td.textContent = combo.players;
-                    } else if (['edge', 'cashlikelihood'].includes(key)) {
-                        td.textContent = (combo[key] || 0).toFixed(1) + '%';
-                    } else {
-                        td.textContent = combo[key] || '-';
-                    }
+                    } else if (col === 'Players') td.textContent = combo.players;
+                    else if (['edge', 'cashlikelihood'].includes(key)) td.textContent = (combo[key] || 0).toFixed(1) + '%';
+                    else td.textContent = combo[key] || '-';
                     tr.appendChild(td);
                 });
                 body.appendChild(tr);
             });
         }
 
-        function showPlayerPopup(row, currentIndex) {
-            currentRow = row;
+        function showPlayerPopup(row, index) {
+            currentRowIndex = index;
             const popup = document.getElementById('playerPopup');
-            const overlay = document.getElementById('overlay');
             popup.style.display = 'block';
-            overlay.style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
 
-            document.getElementById('popupHeadshot').src = row['Headshot URL'] || row['Player Image'] || '';
             const betTagColor = (row['Bet Tag'] || '').toLowerCase() === 'under' ? '#ff4d4d' : '#4dff4d';
             const betArrow = (row['Bet Tag'] || '').toLowerCase() === 'under' ? '↓' : ((row['Bet Tag'] || '').toLowerCase() === 'over' ? '↑' : '');
-            document.getElementById('popupName').innerHTML = `${row['Player Name']}: <span style="color: ${betTagColor};">${betArrow}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
+            document.getElementById('popupName').innerHTML = `${row['Player Name']}: <span style="color:${betTagColor};">${betArrow}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
 
             document.getElementById('popupTeamPos').textContent = `${row.Team} | ${row.Position || ''}`;
             document.getElementById('popupGame').textContent = `${row['Game Short Title'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
 
-            const popupTabs = document.getElementById('popupTabs');
-            popupTabs.innerHTML = '';
-            const tabNames = ['Overview', 'Game Log', 'Splits', 'News', 'Other Bets', 'Matchup'];
-            tabNames.forEach((tabName, index) => {
-                const btn = document.createElement('div');
-                btn.classList.add('tab');
-                if (index === 0) btn.classList.add('active');
-                btn.textContent = tabName;
-                btn.onclick = () => {
-                    document.querySelectorAll('#popupTabs .tab').forEach(t => t.classList.remove('active'));
-                    btn.classList.add('active');
-                    renderPopupContent(tabName, row);
-                };
-                popupTabs.appendChild(btn);
-            });
+            // Spread & O/U (fixed)
+            const spread = parseFloat(row.Spread) || 0;
+            const ou = parseFloat(row['O/U']) || 0;
+            document.getElementById('popupSpreadOU').innerHTML = `
+                Spread: <span style="color:${Math.abs(spread) >= 7 ? '#ff4d4d' : '#00ffcc'}">${spread}</span> | 
+                O/U: <span style="color:${ou < 230 ? '#ff4d4d' : '#00ffcc'}">${ou}</span>
+            `;
 
-            renderPopupContent('Overview', row);
+            // Prev / Next arrows
+            document.getElementById('prevPlayer').onclick = () => {
+                if (currentRowIndex > 0) showPlayerPopup(currentFiltered[currentRowIndex - 1], currentRowIndex - 1);
+            };
+            document.getElementById('nextPlayer').onclick = () => {
+                if (currentRowIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentRowIndex + 1], currentRowIndex + 1);
+            };
 
             document.getElementById('closePlayerPopup').onclick = () => {
                 popup.style.display = 'none';
-                overlay.style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
             };
         }
 
-        function renderPopupContent(tab, row) {
-            const content = document.getElementById('popupContent');
-            content.innerHTML = `<p>${tab} content for ${row['Player Name']} (full game-log and splits available in future updates).</p>`;
-        }
+        function updateTabStates() {
+            const tabs = document.querySelectorAll('.tab');
+            const activeStats = new Set(currentFiltered.map(r => (r['Stat Type'] || '').trim()));
 
-        function sortContentTable(column) {
-            if (contentSortColumn === column) {
-                contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                contentSortColumn = column;
-                contentSortDirection = 'asc';
-            }
-            renderContent();
+            tabs.forEach(tab => {
+                if (tab.textContent === 'All') {
+                    tab.classList.remove('inactive');
+                } else {
+                    tab.classList.toggle('inactive', !activeStats.has(tab.textContent));
+                }
+            });
         }
 
         function renderContent() {
@@ -923,12 +837,8 @@
             setTimeout(() => {
                 let filtered = allData;
 
-                if (currentTab !== 'All') {
-                    filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
-                }
-                if (currentOddsType !== 'all') {
-                    filtered = filtered.filter(row => (row['Odds Type'] || '').toLowerCase() === currentOddsType);
-                }
+                if (currentTab !== 'All') filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
+                if (currentOddsType !== 'all') filtered = filtered.filter(row => (row['Odds Type'] || '').toLowerCase() === currentOddsType);
 
                 if (searchTerm) {
                     filtered = filtered.filter(row =>
@@ -956,6 +866,7 @@
 
                 if (filtered.length === 0) {
                     contentDiv.innerHTML = '<div class="loading">No data available for this selection. Try changing filters or odds type.</div>';
+                    updateTabStates();
                     return;
                 }
 
@@ -1016,13 +927,15 @@
                             <td>${row['Stat Type']}</td>
                             <td>${row['Line Score']}</td>
                             <td>${(parseFloat(row['Edge %']) || 0).toFixed(1)}%</td>
-                            <td><button onclick="showPlayerPopup(allData.find(r => r['Player Name']==='${row['Player Name']}'), ${index})">Info</button></td>
+                            <td><button onclick="showPlayerPopup(currentFiltered[${index}], ${index})">Info</button></td>
                         `;
                         tbody.appendChild(tr);
                     });
                     contentDiv.appendChild(table);
                 }
-            }, 100);
+
+                updateTabStates();
+            }, 80);
         }
     </script>
 </body>
