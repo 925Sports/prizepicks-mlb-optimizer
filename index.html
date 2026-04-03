@@ -448,7 +448,7 @@
 
         fetch(url)
             .then(response => {
-                if (!response.ok) throw new Error(`HTTP ${response.status}: Could not load ./data/prizepicks-mlb.csv`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return response.text();
             })
             .then(csv => {
