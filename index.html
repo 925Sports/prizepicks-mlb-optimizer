@@ -877,22 +877,47 @@
             popup.style.display = 'block';
             overlay.style.display = 'block';
 
+            // Headshot and name with Bet Tag
             document.getElementById('popupHeadshot').src = row['Headshot URL'] || row['Player Image'] || '';
             const betTagColor = (row['Bet Tag'] || '').toLowerCase() === 'under' ? '#ff4d4d' : '#4dff4d';
             const betArrow = (row['Bet Tag'] || '').toLowerCase() === 'under' ? '↓' : ((row['Bet Tag'] || '').toLowerCase() === 'over' ? '↑' : '');
             document.getElementById('popupName').innerHTML = `${row['Player Name']}: <span style="color: ${betTagColor};">${betArrow}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
 
+            // Team / Position
             document.getElementById('popupTeamPos').textContent = `${row.Team} | ${row.Position || ''}`;
+
+            // Game and time
             document.getElementById('popupGame').textContent = `${row['Game Short Title'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
 
-            // Spread & O/U (only this part added)
+            // Spread & O/U (restored)
             const spread = parseFloat(row.Spread) || 0;
             const ou = parseFloat(row['O/U']) || 0;
             let spreadColor = Math.abs(spread) >= 7 ? 'spread-red' : '';
             let ouColor = (ou < 230) ? 'ou-red' : 'ou-green';
             document.getElementById('popupSpreadOU').innerHTML = `<span class="${spreadColor}">Spread: ${spread}</span> <span class="${ouColor}">O/U: ${ou}</span>`;
 
+            // Stats boxes - replaced MIN with Opportunities
+            const statsBoxes = document.getElementById('statsBoxes');
+            statsBoxes.innerHTML = '';
+            const stats = [
+                {label: 'Line', value: parseFloat(row['Line Score']).toFixed(1)},
+                {label: 'Proj', value: parseFloat(row['Average Projected']).toFixed(1)},
+                {label: 'DVP', value: parseFloat(row['DVP Adjusted']).toFixed(1)},
+                {label: 'Total', value: parseFloat(row['Total Projection']).toFixed(1)},
+                {label: 'Opp', value: parseFloat(row['Opportunities'] || 0).toFixed(1)}   // MLB replacement for MIN
+            ];
+            stats.forEach(stat => {
+                const box = document.createElement('div');
+                box.classList.add('stat-box');
+                box.innerHTML = `
+                    <div class="stat-label">${stat.label}</div>
+                    <div class="stat-value">${stat.value}</div>
+                `;
+                statsBoxes.appendChild(box);
+            });
+
+            // Tabs
             const popupTabs = document.getElementById('popupTabs');
             popupTabs.innerHTML = '';
             const tabNames = ['Overview', 'Game Log', 'Splits', 'News', 'Other Bets', 'Matchup'];
@@ -909,9 +934,7 @@
                 popupTabs.appendChild(btn);
             });
 
-            renderPopupContent('Overview', row);
-
-            // Prev / Next buttons (only this part added)
+            // Prev / Next buttons
             const prevBtn = document.getElementById('prevPlayer');
             const nextBtn = document.getElementById('nextPlayer');
             prevBtn.disabled = currentIndex <= 0;
@@ -923,6 +946,8 @@
                 if (currentIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
             };
 
+            renderPopupContent('Overview', row);
+
             document.getElementById('closePlayerPopup').onclick = () => {
                 popup.style.display = 'none';
                 overlay.style.display = 'none';
@@ -931,7 +956,172 @@
 
         function renderPopupContent(tab, row) {
             const content = document.getElementById('popupContent');
-            content.innerHTML = `<p>${tab} content for ${row['Player Name']} (full game-log and splits available in future updates).</p>`;
+            content.innerHTML = '';
+
+            if (tab === 'Overview') {
+                const chartContainer = document.createElement('div');
+                chartContainer.id = 'chartContainer';
+                const canvas = document.createElement('canvas');
+                canvas.id = 'projectionChart';
+                chartContainer.appendChild(canvas);
+                content.appendChild(chartContainer);
+
+                const lineScore = parseFloat(row['Line Score']) || 0;
+                const avgProjected = parseFloat(row['Average Projected']) || 0;
+                const dvpAdjusted = parseFloat(row['DVP Adjusted']) || 0;
+                const totalProjection = parseFloat(row['Total Projection']) || 0;
+                const trueAvgLine = parseFloat(row['True Point Average Line']) || 0;
+                const avgLine = parseFloat(row['Average Line']) || 0;
+                const udLine = parseFloat(row['Underdog Line']) || 0;
+                const opportunities = parseFloat(row['Opportunities']) || 0;
+
+                let projections = [
+                    {name: 'Avg Proj', value: avgProjected, definition: 'Average Projected'},
+                    {name: 'DVP Adj', value: dvpAdjusted, definition: 'DVP Adjusted'},
+                    {name: 'Total Proj', value: totalProjection, definition: 'Total Projection'},
+                    {name: 'True Avg Line', value: trueAvgLine, definition: 'True Point Average Line'},
+                    {name: 'Avg Line', value: avgLine, definition: 'Average Line'},
+                    {name: 'Opp', value: opportunities, definition: 'Opportunities (Projected AB/IP)'}
+                ].filter(p => p.value > 0);
+
+                if (udLine > 0) projections.push({name: 'UD Line', value: udLine, definition: 'Underdog Line'});
+
+                const overProjs = projections.filter(p => p.value > lineScore);
+                const underProjs = projections.filter(p => p.value < lineScore);
+                const equalProjs = projections.filter(p => p.value === lineScore);
+
+                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name));
+                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value));
+
+                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)')
+                    .concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)')
+                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
+
+                const ctx = canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Projections',
+                            data: dataPoints,
+                            backgroundColor: colors,
+                            borderColor: colors.map(c => c.replace('0.6', '1')),
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#fff' } },
+                            x: { grid: { color: '#333' }, ticks: { color: '#fff' } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            annotation: {
+                                annotations: {
+                                    line1: {
+                                        type: 'line',
+                                        yMin: lineScore,
+                                        yMax: lineScore,
+                                        borderColor: '#808080',
+                                        borderWidth: 2,
+                                        borderDash: [5, 5]
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'end',
+                                color: '#fff',
+                                font: { weight: 'bold', size: 12 },
+                                formatter: (value) => value.toFixed(1)
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+
+                // Popup buttons (More/Less)
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.classList.add('popup-buttons');
+                let lessClass = 'button less';
+                let moreClass = 'button more';
+                const key = `${row['Player Name']}-${row['Stat Type']}`;
+                const selectedBet = selectedBets.find(b => b.key === key);
+                if (selectedBet) {
+                    if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
+                    else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
+                } else {
+                    if ((row['Bet Tag'] || '').toLowerCase() === 'over') moreClass += ' green-outline';
+                    else if ((row['Bet Tag'] || '').toLowerCase() === 'under') lessClass += ' red-outline';
+                }
+                buttonsDiv.innerHTML = `
+                    <button id="popupLess" class="${lessClass}" data-choice="Less">↓ Less</button>
+                    <button id="popupMore" class="${moreClass}" data-choice="More">↑ More</button>
+                `;
+                content.appendChild(buttonsDiv);
+
+                const popupLess = document.getElementById('popupLess');
+                const popupMore = document.getElementById('popupMore');
+                [popupLess, popupMore].forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const choice = btn.dataset.choice;
+                        const existingIndex = selectedBets.findIndex(b => b.key === key);
+                        let prob = choice === 'More' ? parseFloat(row['Average No-Vig Over %']) / 100 : parseFloat(row['Average No-Vig Under %']) / 100;
+                        if (isNaN(prob)) prob = 0.5;
+
+                        const betData = {
+                            key, player: row['Player Name'], choice, line: row['Line Score'],
+                            stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob,
+                            game: row['Game Short Title'], team: row.Team
+                        };
+
+                        if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
+                            selectedBets.splice(existingIndex, 1);
+                        } else {
+                            if (existingIndex > -1) selectedBets[existingIndex] = betData;
+                            else selectedBets.push(betData);
+                        }
+                        updateBetSlip();
+                        renderPopupContent('Overview', row);
+                        renderContent();
+                    });
+                });
+            } 
+            else if (tab === 'News') {
+                content.innerHTML = `
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tr><th style="text-align:left;">EST. Return Date</th><td>${row['EST. Return Date'] || '-'}</td></tr>
+                        <tr><th style="text-align:left;">Injury Status</th><td>${row['Injury Status'] || '-'}</td></tr>
+                        <tr><th style="text-align:left;">Comment</th><td>${row.Comment || '-'}</td></tr>
+                    </table>
+                `;
+            } 
+            else if (tab === 'Other Bets') {
+                const otherBets = allData.filter(r => r['Player Name'] === row['Player Name'] && r['Stat Type'] !== row['Stat Type']);
+                if (otherBets.length === 0) {
+                    content.innerHTML = '<p>No other bets available for this player.</p>';
+                } else {
+                    let html = `<table style="width:100%;"><thead><tr><th>Stat Type</th><th>Line</th><th>Edge %</th></tr></thead><tbody>`;
+                    otherBets.forEach(b => {
+                        html += `<tr><td>${b['Stat Type']}</td><td>${b['Line Score']}</td><td>${parseFloat(b['Edge %'] || 0).toFixed(1)}%</td></tr>`;
+                    });
+                    html += `</tbody></table>`;
+                    content.innerHTML = html;
+                }
+            } 
+            else if (tab === 'Matchup') {
+                content.innerHTML = `
+                    <p><strong>DVP Bet:</strong> ${row['DVP Bet'] || '-'}</p>
+                    <p><strong>DVP Rank:</strong> ${row['DVP Rank'] || '-'}</p>
+                    <p><strong>DVP Adjusted:</strong> ${parseFloat(row['DVP Adjusted'] || 0).toFixed(1)}</p>
+                    <p><strong>Opponent:</strong> ${row.Opp || '-'}</p>
+                `;
+            } 
+            else if (tab === 'Game Log' || tab === 'Splits') {
+                content.innerHTML = `<p>Game Log and Splits data coming soon (requires full game-log CSV).</p>`;
+            }
         }
 
         function updateTabStates() {
