@@ -117,10 +117,8 @@
             padding: 16px;
             max-width: calc(300px * 4 + 16px * 3);
             margin: 0 auto;
-            -webkit-overflow-scrolling: touch;
         }
         #content.table-view { display: block; max-width: 100%; grid-template-columns: none; overflow-x: auto; }
-        #content.table-view table { width: 100%; }
         .card {
             background: #1a1a1a;
             border-radius: 16px;
@@ -176,7 +174,6 @@
             width: 90%;
             max-width: 800px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            -webkit-overflow-scrolling: touch;
         }
         #playerPopup {
             display: none;
@@ -195,43 +192,20 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            font-size: 1rem;
-            -webkit-overflow-scrolling: touch;
         }
         #playerPopup .header { display: flex; flex-direction: column; align-items: flex-start; background: linear-gradient(to right, #0a0a0a, #142a2e); padding: 8px; border-radius: 16px 16px 0 0; }
         #playerPopup .bottom-header { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; }
         #playerPopup .left-header { display: flex; align-items: center; }
         #playerPopup .headshot { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #333; }
         #playerPopup .player-info { margin-left: 12px; flex: 1; }
-        #playerPopup .tabs { display: flex; background: #0a0a0a; position: relative; top: auto; padding: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
-        #playerPopup .tab-content { padding: 12px; -webkit-overflow-scrolling: touch; }
-        #playerPopup table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.7rem; }
-        #playerPopup th, #playerPopup td { border: 1px solid #333; padding: 4px; text-align: center; word-wrap: break-word; }
-        #playerPopup th { font-size: 0.7rem; font-weight: 600; background-color: #222; }
-        #playerPopup td { font-size: 0.65rem; }
-        #prevPlayer { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        #nextPlayer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        #prevPlayer:hover, #nextPlayer:hover { background: #333; }
-        .popup-buttons { display: flex; margin-top: 10px; background: #121212; border-radius: 9999px; overflow: hidden; width: fit-content; margin: 10px auto 10px; }
-        .popup-buttons .button { flex: 1; padding: 4px 40px; font-size: 14px; font-weight: 600; white-space: nowrap; }
-        #betTypeSelect, #oddsSelect, #viewSelect { padding: 10px; border-radius: 9999px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; margin: 10px 0; width: 100%; display: none; font-weight: 500; }
+        #playerPopup .tabs { display: flex; background: #0a0a0a; position: relative; top: auto; padding: 8px; overflow-x: auto; white-space: nowrap; }
+        #playerPopup .tab-content { padding: 12px; }
+        #prevPlayer { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; }
+        #nextPlayer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; }
         #closePlayerPopup { position: absolute; top: 10px; right: 20px; cursor: pointer; font-size: 24px; color: #f0f0f0; z-index: 52; }
-        #closePlayerPopup:hover { color: #ff4d4d; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 35; }
-        .stats-boxes { display: flex; justify-content: space-between; flex-wrap: nowrap; }
-        .stat-box { background: #222; padding: 6px 8px; border-radius: 8px; text-align: center; min-width: 60px; margin: 3px; }
-        .stat-label { font-size: 10px; color: #ccc; }
-        .stat-value { font-size: 12px; font-weight: 600; }
-        .dvp-green { color: #4dff4d; }
-        .dvp-yellow { color: #ffd700; }
-        .dvp-red { color: #ff4d4d; }
-        .spread-red { color: #ff4d4d; }
-        .ou-red { color: #ff4d4d; }
-        .ou-green { color: #4dff4d; }
         @media (max-width: 600px) {
-            #content { grid-template-columns: 1fr; max-width: 100%; }
+            #content { grid-template-columns: 1fr; }
             .controls { flex-direction: column; align-items: stretch; }
-            .toggle, .view-switch { display: none; }
             .tabs { display: none; }
             #betTypeSelect, #oddsSelect, #viewSelect { display: block; }
         }
@@ -264,7 +238,7 @@
             <button class="toggle-btn" data-type="demon">Demon</button>
             <button class="toggle-btn" data-type="goblin">Goblin</button>
         </div>
-        <div class="selected-switch" style="display:flex;align-items:center;gap:8px;margin-left:20px;">
+        <div class="selected-switch">
             <span>Selected Only</span>
             <label class="switch">
                 <input type="checkbox" id="selectedToggle">
@@ -275,7 +249,6 @@
     <div class="tabs"></div>
     <div id="content"></div>
 
-    <!-- Player Popup -->
     <div id="playerPopup">
         <span id="closePlayerPopup">×</span>
         <div class="header">
@@ -299,8 +272,7 @@
         <div class="tab-content" id="popupContent"></div>
     </div>
 
-    <!-- Filter Popup -->
-    <div id="popup" class="popup" style="display:none;">
+    <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
         <h3>Games</h3>
         <button id="selectAllGames" class="select-btn">Select All</button>
@@ -312,8 +284,7 @@
         <div id="teamsList"></div>
     </div>
 
-    <!-- Callout Popup -->
-    <div id="calloutPopup" class="popup" style="display:none;">
+    <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
         <h3>Callout Bet Tags</h3>
         <button id="selectAllCallouts" class="select-btn">Select All</button>
@@ -321,8 +292,7 @@
         <div id="calloutsList"></div>
     </div>
 
-    <!-- Bet Slip Popup -->
-    <div id="betslipPopup" class="popup" style="display:none;">
+    <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
         <h3>Generated Bet Slips</h3>
         <div class="payout-filter-container">
@@ -345,20 +315,23 @@
         </div>
     </div>
 
-    <!-- Tool Info -->
-    <div id="toolInfoPopup" class="popup" style="display:none;">
+    <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
-        <p>This tool shows **only bets with Edge % > 0** (positive edge only).</p>
+        <p>This tool helps you optimize your MLB bets on PrizePicks.</p>
         <ul>
-            <li>Hitter Fantasy Score, Pitcher Fantasy Score, and every other stat type with positive edge are now included.</li>
-            <li>Use filters, search, and odds type toggles as usual.</li>
-            <li>Click any card for the full player popup (chart, injury, matchup, etc.).</li>
+            <li>Use the search bar to find players or stats.</li>
+            <li>Filter by games, teams, or callout tags using the buttons.</li>
+            <li>Select odds type: All, Standard, Demon, or Goblin.</li>
+            <li>Only stat types with available data are active (others are greyed out).</li>
+            <li>Click 'More' or 'Less' on cards to add to bet slip.</li>
+            <li>View generated bet slips with edge and payout calculations.</li>
         </ul>
     </div>
 
     <script>
         let allData = [];
+        let gameLogs = [];
         let currentFiltered = [];
         let currentTab = 'All';
         let currentOddsType = 'standard';
@@ -1035,9 +1008,9 @@
                 `;
             } 
             else if (tab === 'Other Bets') {
-                const otherBets = allData.filter(r => r['Player Name'] === row['Player Name'] && r['Stat Type'] !== row['Stat Type'] && parseFloat(r['Edge %'] || 0) > 0);
+                const otherBets = allData.filter(r => r['Player Name'] === row['Player Name'] && r['Stat Type'] !== row['Stat Type']);
                 if (otherBets.length === 0) {
-                    content.innerHTML = '<p>No other bets with positive edge available for this player.</p>';
+                    content.innerHTML = '<p>No other bets available for this player.</p>';
                 } else {
                     let html = `<table style="width:100%;"><thead><tr><th>Stat Type</th><th>Line</th><th>Edge %</th></tr></thead><tbody>`;
                     otherBets.forEach(b => {
@@ -1081,12 +1054,9 @@
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
-                let filtered = allData;
-
-                // === NEW FILTER: ONLY SHOW BETS WITH Edge % > 0 ===
-                filtered = filtered.filter(row => {
-                    const edge = parseFloat(row['Edge %']) || 0;
-                    return edge > 0;
+                let filtered = allData.filter(row => {
+                    const edge = parseFloat(row['Edge %']);
+                    return !isNaN(edge) && edge > 0;
                 });
 
                 if (currentTab !== 'All') {
@@ -1183,7 +1153,7 @@
                             <td>${row['Stat Type']}</td>
                             <td>${row['Line Score']}</td>
                             <td>${(parseFloat(row['Edge %']) || 0).toFixed(1)}%</td>
-                            <td><button onclick="showPlayerPopup(currentFiltered[${index}], ${index})">Info</button></td>
+                            <td><button onclick="showPlayerPopup(allData.find(r => r['Player Name']==='${row['Player Name']}'), ${index})">Info</button></td>
                         `;
                         tbody.appendChild(tr);
                     });
