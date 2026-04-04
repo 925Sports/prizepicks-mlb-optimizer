@@ -1066,7 +1066,7 @@
 
         function updateTabStates() {
             const tabs = document.querySelectorAll('.tab');
-            const activeStatTypes = new Set(allData.map(row => (row['Stat Type'] || '').trim()));
+            const activeStatTypes = new Set(currentFiltered.map(row => (row['Stat Type'] || '').trim()));
 
             tabs.forEach(tab => {
                 const tabText = tab.textContent.trim();
@@ -1088,7 +1088,8 @@
                 let filtered = allData.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const lineScore = (row['Line Score'] || '').trim();
-                    return statType !== '' && lineScore !== '';
+                    const edge = parseFloat(row['Edge %']) || 0;
+                    return statType !== '' && lineScore !== '' && edge > 0 && edge < 100;
                 });
 
                 if (currentTab !== 'All') {
