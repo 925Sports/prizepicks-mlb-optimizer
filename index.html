@@ -178,54 +178,6 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
             -webkit-overflow-scrolling: touch;
         }
-        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3 { margin-top: 20px; font-weight: 600; }
-        #popup label, #calloutPopup label { display: block; font-size: 14px; }
-        #filterBtn, #betslipBtn, #calloutFilterBtn {
-            padding: 8px 20px;
-            background: #00ffcc;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover { background: #00e6b3; }
-        #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo {
-            margin-bottom: 20px;
-            padding: 8px 20px;
-            background: #4dff4d;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover { background: #66ff66; }
-        .select-btn {
-            margin: 5px 0;
-            padding: 6px 12px;
-            background: #333;
-            border: none;
-            border-radius: 9999px;
-            color: #f0f0f0;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .select-btn:hover { background: #444; }
-        .payout-filter-container { display: flex; align-items: center; gap: 0.5rem; }
-        #payoutFilter { padding: 0.5rem 1rem; background: #1a1a1a; color: #f0f0f0; border: 1px solid #333; border-radius: 9999px; cursor: pointer; }
-        .betslips-container { background: #121212; border-radius: 16px; padding: 12px; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; -webkit-overflow-scrolling: touch; }
-        th, td { padding: 0.75rem; text-align: center; border: 1px solid #333; }
-        th { background: #222; font-weight: 500; cursor: pointer; position: sticky; top: 0; color: #f0f0f0; }
-        tr:nth-child(even) { background: #181818; }
-        th.asc::after { content: ' ↑'; }
-        th.desc::after { content: ' ↓'; }
-        .error-message { color: #ff4d4d; text-align: center; margin: 1rem; }
-        .expanded-details td { background-color: #121212; padding: 1rem; text-align: left; }
         #playerPopup {
             display: none;
             position: fixed;
@@ -253,12 +205,6 @@
         #playerPopup .player-info { margin-left: 12px; flex: 1; }
         #playerPopup .tabs { display: flex; background: #0a0a0a; position: relative; top: auto; padding: 8px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
         #playerPopup .tab-content { padding: 12px; -webkit-overflow-scrolling: touch; }
-        #playerPopup table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.7rem; }
-        #playerPopup th, #playerPopup td { border: 1px solid #333; padding: 4px; text-align: center; word-wrap: break-word; }
-        #playerPopup th { font-size: 0.7rem; font-weight: 600; background-color: #222; }
-        #playerPopup td { font-size: 0.65rem; }
-        #betHeader { text-align: center; margin: 12px 0; font-weight: 600; }
-        #chartContainer { margin: 20px 0; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 35; }
         #popupName { font-size: 24px; font-weight: 700; color: #f0f0f0; display: inline-flex; align-items: center; word-break: break-word; width: 100%; text-align: left; }
         #popupGame, #popupScheduledAt { font-size: 14px; font-weight: 600; }
@@ -266,23 +212,15 @@
         .stat-box { background: #222; padding: 6px 8px; border-radius: 8px; text-align: center; min-width: 60px; margin: 3px; }
         .stat-label { font-size: 10px; color: #ccc; }
         .stat-value { font-size: 12px; font-weight: 600; }
-        .dvp-green { color: #4dff4d; }
-        .dvp-yellow { color: #ffd700; }
-        .dvp-red { color: #ff4d4d; }
         .spread-red { color: #ff4d4d; }
         .ou-red { color: #ff4d4d; }
         .ou-green { color: #4dff4d; }
-        #prevPlayer { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        #nextPlayer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        #prevPlayer:hover, #nextPlayer:hover { background: #333; }
+        #prevPlayer { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; }
+        #nextPlayer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; }
         .popup-buttons { display: flex; margin-top: 10px; background: #121212; border-radius: 9999px; overflow: hidden; width: fit-content; margin: 10px auto 10px; }
         .popup-buttons .button { flex: 1; padding: 4px 40px; font-size: 14px; font-weight: 600; white-space: nowrap; }
         #betTypeSelect, #oddsSelect, #viewSelect { padding: 10px; border-radius: 9999px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; margin: 10px 0; width: 100%; display: none; font-weight: 500; }
         #closePlayerPopup { position: absolute; top: 10px; right: 20px; cursor: pointer; font-size: 24px; color: #f0f0f0; z-index: 52; }
-        #closePlayerPopup:hover { color: #ff4d4d; }
-        #gameLogSearch { width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 9999px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; }
-        .averages-row td { font-weight: bold; background-color: #333; }
-        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .selected-switch { display: flex; align-items: center; gap: 8px; margin-left: 20px; }
         .selected-switch span { font-size: 12px; font-weight: 500; }
         @media (max-width: 600px) {
@@ -291,7 +229,6 @@
             .toggle, .view-switch, .selected-switch { display: none; }
             .tabs { display: none; }
             #betTypeSelect, #oddsSelect, #viewSelect { display: block; }
-            #popup, #betslipPopup, #calloutPopup, #toolInfoPopup { width: 100%; max-width: none; padding: 5px; top: 0; left: 0; transform: none; height: auto; max-height: 90vh; border-radius: 16px; }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -1136,8 +1073,9 @@
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
                 let filtered = allData.filter(row => {
-                    const edge = parseFloat(row['Edge %']) || 0;
-                    return edge > 0;
+                    const statType = (row['Stat Type'] || '').trim();
+                    const lineScore = (row['Line Score'] || '').trim();
+                    return statType !== '' && lineScore !== '';
                 });
 
                 if (currentTab !== 'All') {
@@ -1182,6 +1120,17 @@
                         const card = document.createElement('div');
                         card.classList.add('card');
                         const edge = parseFloat(row['Edge %']) || 0;
+
+                        // ONLY CHANGE: color coding exactly like NBA version
+                        const betTag = (row['Bet Tag'] || '').toLowerCase();
+                        let lessClass = 'button';
+                        let moreClass = 'button';
+                        if (betTag === 'over' || betTag === 'great bet' || betTag === 'ideal bet') {
+                            moreClass += ' green-outline';
+                        } else if (betTag === 'under') {
+                            lessClass += ' red-outline';
+                        }
+
                         card.innerHTML = `
                             <div class="header"><span class="pop">${edge.toFixed(1)}%</span></div>
                             <img class="headshot" src="${row['Headshot URL'] || ''}" alt="">
@@ -1190,8 +1139,8 @@
                             <div class="game">${row['Game Short Title'] || ''}</div>
                             <div class="stat">${row['Line Score']} ${row['Stat Type']}</div>
                             <div class="buttons">
-                                <button class="button" data-choice="Less">↓ Less</button>
-                                <button class="button" data-choice="More">↑ More</button>
+                                <button class="${lessClass}" data-choice="Less">↓ Less</button>
+                                <button class="${moreClass}" data-choice="More">↑ More</button>
                             </div>
                             <div class="info-icon" data-index="${index}">ℹ️</div>
                         `;
