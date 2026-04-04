@@ -230,6 +230,19 @@
             .tabs { display: none; }
             #betTypeSelect, #oddsSelect, #viewSelect { display: block; }
         }
+        #filterBtn, #betslipBtn, #calloutFilterBtn {
+            padding: 8px 20px;
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
+            background: #00e6b3;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -244,9 +257,9 @@
     </div>
     <div class="controls">
         <input id="search" type="text" placeholder="Search players or stats...">
-        <button id="filterBtn" style="background:#00ffcc;color:#000;padding:8px 20px;border:none;border-radius:9999px;cursor:pointer;font-weight:500;">Filter Games/Teams</button>
-        <button id="calloutFilterBtn" style="background:#00ffcc;color:#000;padding:8px 20px;border:none;border-radius:9999px;cursor:pointer;font-weight:500;">Filter Callouts</button>
-        <button id="betslipBtn" style="background:#00ffcc;color:#000;padding:8px 20px;border:none;border-radius:9999px;cursor:pointer;font-weight:500;">Generated Bet Slips</button>
+        <button id="filterBtn">Filter Games/Teams</button>
+        <button id="calloutFilterBtn">Filter Callouts</button>
+        <button id="betslipBtn">Generated Bet Slips</button>
         <select id="oddsSelect"></select>
         <select id="betTypeSelect"></select>
         <select id="viewSelect">
@@ -1053,7 +1066,7 @@
 
         function updateTabStates() {
             const tabs = document.querySelectorAll('.tab');
-            const activeStatTypes = new Set(currentFiltered.map(row => (row['Stat Type'] || '').trim()));
+            const activeStatTypes = new Set(allData.map(row => (row['Stat Type'] || '').trim()));
 
             tabs.forEach(tab => {
                 const tabText = tab.textContent.trim();
