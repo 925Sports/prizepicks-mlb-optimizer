@@ -105,7 +105,10 @@
         .tab:hover { background: #333; }
         .tab.active { background: #00ffcc; color: #000; }
         .tab.inactive {
-            display: none; /* Only show stat types that have data */
+            opacity: 0.45;
+            pointer-events: none;
+            background: #1a1a1a;
+            color: #666;
         }
         #content {
             display: grid;
@@ -227,20 +230,6 @@
             .tabs { display: none; }
             #betTypeSelect, #oddsSelect, #viewSelect { display: block; }
         }
-        /* Fixed button styling for main controls */
-        #filterBtn, #calloutFilterBtn, #betslipBtn {
-            padding: 8px 20px;
-            background: #00ffcc;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #filterBtn:hover, #calloutFilterBtn:hover, #betslipBtn:hover {
-            background: #00e6b3;
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -255,9 +244,9 @@
     </div>
     <div class="controls">
         <input id="search" type="text" placeholder="Search players or stats...">
-        <button id="filterBtn">Filter Games/Teams</button>
-        <button id="calloutFilterBtn">Filter Callouts</button>
-        <button id="betslipBtn">Generated Bet Slips</button>
+        <button id="filterBtn" style="background:#00ffcc;color:#000;padding:8px 20px;border:none;border-radius:9999px;cursor:pointer;font-weight:500;">Filter Games/Teams</button>
+        <button id="calloutFilterBtn" style="background:#00ffcc;color:#000;padding:8px 20px;border:none;border-radius:9999px;cursor:pointer;font-weight:500;">Filter Callouts</button>
+        <button id="betslipBtn" style="background:#00ffcc;color:#000;padding:8px 20px;border:none;border-radius:9999px;cursor:pointer;font-weight:500;">Generated Bet Slips</button>
         <select id="oddsSelect"></select>
         <select id="betTypeSelect"></select>
         <select id="viewSelect">
@@ -351,6 +340,7 @@
             <li>Use the search bar to find players or stats.</li>
             <li>Filter by games, teams, or callout tags using the buttons.</li>
             <li>Select odds type: All, Standard, Demon, or Goblin.</li>
+            <li>Only stat types with available data are active (others are greyed out).</li>
             <li>Click 'More' or 'Less' on cards to add to bet slip.</li>
             <li>View generated bet slips with edge and payout calculations.</li>
         </ul>
