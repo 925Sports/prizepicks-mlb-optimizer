@@ -1001,6 +1001,7 @@
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
+                // ONLY UPDATED PART: removed ALL edge-based filtering so every stat type in the CSV appears
                 let filtered = allData.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const lineScore = (row['Line Score'] || '').trim();
