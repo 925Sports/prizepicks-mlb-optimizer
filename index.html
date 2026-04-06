@@ -120,7 +120,10 @@
             -webkit-overflow-scrolling: touch;
         }
         #content.table-view { display: block; max-width: 100%; grid-template-columns: none; overflow-x: auto; }
-        #content.table-view table { width: 100%; }
+        #content.table-view table { width: 100%; border-collapse: collapse; background: #111; }
+        #content.table-view th, #content.table-view td { padding: 12px 8px; text-align: left; border-bottom: 1px solid #222; }
+        #content.table-view th { background: #1a1a1a; font-weight: 600; font-size: 13px; color: #ccc; }
+        #content.table-view tr:hover { background: #1f1f1f; }
         .card {
             background: #1a1a1a;
             border-radius: 16px;
@@ -242,6 +245,61 @@
         }
         #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
             background: #00e6b3;
+        }
+        /* Table view specific styles to match NBA tool */
+        .details-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .details-cell img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .player-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #00ffcc;
+        }
+        .player-sub {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .bet-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        .bet-tag.best { background: #00ffcc; color: #000; }
+        .bet-tag.great { background: #00cc99; color: #000; }
+        .bet-tag.good { background: #ffcc00; color: #000; }
+        .bet-tag.push { background: #888; color: #fff; }
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        .action-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn.less {
+            background: #ff4d4d;
+            color: #fff;
+        }
+        .action-btn.more {
+            background: #4dff4d;
+            color: #000;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -849,8 +907,7 @@
                     {name: 'DVP Adj', value: dvpAdjusted, definition: 'DVP Adjusted'},
                     {name: 'Total Proj', value: totalProjection, definition: 'Total Projection'},
                     {name: 'True Avg Line', value: trueAvgLine, definition: 'True Point Average Line'},
-                    {name: 'Avg Line', value: avgLine, definition: 'Average Line'},
-                    {name: 'Opp', value: opportunities, definition: 'Opportunities (Projected AB/IP)'}
+                    {name: 'Avg Line', value: avgLine, definition: 'Average Line'}
                 ].filter(p => p.value > 0);
                 if (udLine > 0) projections.push({name: 'UD Line', value: udLine, definition: 'Underdog Line'});
                 const overProjs = projections.filter(p => p.value > lineScore);
@@ -1001,7 +1058,6 @@
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
-                // ONLY UPDATED PART: removed ALL edge-based filtering so every stat type in the CSV appears
                 let filtered = allData.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const lineScore = (row['Line Score'] || '').trim();
@@ -1019,7 +1075,6 @@
                         (row['Stat Type'] || '').toLowerCase().includes(searchTerm)
                     );
                 }
-                // CORRECTED PART (only change): lenient filter so rows with missing/empty Callout Bet Tag, Team, or Game Short Title (common for Hitter/Pitcher Fantasy Score and other stat types) are NOT filtered out
                 filtered = filtered.filter(row => {
                     const gameTitle = (row['Game Short Title'] || '').trim();
                     const teamVal = (row.Team || '').trim();
@@ -1033,6 +1088,14 @@
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
+
+                // NEW: Default sort by Edge % (highest first) - applied to both cards and table
+                filtered.sort((a, b) => {
+                    const edgeA = parseFloat(a['Edge %']) || 0;
+                    const edgeB = parseFloat(b['Edge %']) || 0;
+                    return edgeB - edgeA;
+                });
+
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
                 contentDiv.classList.remove('table-view');
@@ -1093,19 +1156,86 @@
                         card.querySelector('.info-icon').addEventListener('click', () => showPlayerPopup(row, index));
                     });
                 } else {
+                    // UPDATED TABLE VIEW - now matches NBA Optimizer style exactly
                     const table = document.createElement('table');
-                    table.innerHTML = `<thead><tr><th>Player</th><th>Stat</th><th>Line</th><th>Edge</th><th>Actions</th></tr></thead><tbody></tbody>`;
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Details</th>
+                                <th>Stat</th>
+                                <th>Edge</th>
+                                <th>Line</th>
+                                <th>Avg Proj</th>
+                                <th>DVP Adj</th>
+                                <th>Total Proj</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    `;
                     const tbody = table.querySelector('tbody');
                     filtered.forEach((row, index) => {
+                        const edge = parseFloat(row['Edge %']) || 0;
+                        const betTag = (row['Bet Tag'] || '').toLowerCase();
+                        let tagHTML = '';
+                        if (betTag.includes('great') || betTag.includes('ideal')) {
+                            tagHTML = `<span class="bet-tag great">Great Bet</span>`;
+                        } else if (betTag.includes('good')) {
+                            tagHTML = `<span class="bet-tag good">Good Bet</span>`;
+                        } else if (betTag.includes('best')) {
+                            tagHTML = `<span class="bet-tag best">Best Bet</span>`;
+                        } else if (betTag.includes('push')) {
+                            tagHTML = `<span class="bet-tag push">Push</span>`;
+                        }
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td>${row['Player Name']}</td>
+                            <td class="details-cell">
+                                <img src="${row['Headshot URL'] || ''}" alt="">
+                                <div class="player-info">
+                                    <span class="player-name">${row['Player Name']}</span>
+                                    <span class="player-sub">${row.Team} - ${row.Position || ''} • ${row['Game Short Title'] || ''}</span>
+                                    ${tagHTML}
+                                </div>
+                            </td>
                             <td>${row['Stat Type']}</td>
+                            <td style="color:#00ffcc; font-weight:600;">${edge.toFixed(1)}%</td>
                             <td>${row['Line Score']}</td>
-                            <td>${(parseFloat(row['Edge %']) || 0).toFixed(1)}%</td>
-                            <td><button onclick="showPlayerPopup(allData.find(r => r['Player Name']==='${row['Player Name']}'), ${index})">Info</button></td>
+                            <td>${parseFloat(row['Average Projected'] || 0).toFixed(1)}</td>
+                            <td>${parseFloat(row['DVP Adjusted'] || 0).toFixed(1)}</td>
+                            <td>${parseFloat(row['Total Projection'] || 0).toFixed(1)}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn less" data-choice="Less">↓ Less</button>
+                                    <button class="action-btn more" data-choice="More">↑ More</button>
+                                </div>
+                            </td>
                         `;
                         tbody.appendChild(tr);
+
+                        // Add button listeners
+                        const lessBtn = tr.querySelector('.action-btn.less');
+                        const moreBtn = tr.querySelector('.action-btn.more');
+                        [lessBtn, moreBtn].forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const choice = btn.dataset.choice;
+                                const key = `${row['Player Name']}-${row['Stat Type']}`;
+                                const existingIndex = selectedBets.findIndex(b => b.key === key);
+                                const prob = choice === 'More' ? (parseFloat(row['Average No-Vig Over %']) || 50) / 100 : (parseFloat(row['Average No-Vig Under %']) || 50) / 100;
+                                const betData = {
+                                    key, player: row['Player Name'], choice, line: row['Line Score'],
+                                    stat: row['Stat Type'], edge: edge, prob, game: row['Game Short Title'],
+                                    team: row.Team
+                                };
+                                if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
+                                    selectedBets.splice(existingIndex, 1);
+                                } else {
+                                    if (existingIndex > -1) selectedBets[existingIndex] = betData;
+                                    else selectedBets.push(betData);
+                                }
+                                updateBetSlip();
+                                renderContent();
+                            });
+                        });
                     });
                     contentDiv.appendChild(table);
                 }
