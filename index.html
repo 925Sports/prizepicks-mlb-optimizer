@@ -1019,11 +1019,16 @@
                         (row['Stat Type'] || '').toLowerCase().includes(searchTerm)
                     );
                 }
-                filtered = filtered.filter(row =>
-                    selectedGames.has(row['Game Short Title']) &&
-                    selectedTeams.has(row.Team) &&
-                    selectedCallouts.has(row['Callout Bet Tag'] || '')
-                );
+                // CORRECTED PART (only change): lenient filter so rows with missing/empty Callout Bet Tag, Team, or Game Short Title (common for Hitter/Pitcher Fantasy Score and other stat types) are NOT filtered out
+                filtered = filtered.filter(row => {
+                    const gameTitle = (row['Game Short Title'] || '').trim();
+                    const teamVal = (row.Team || '').trim();
+                    const calloutTag = (row['Callout Bet Tag'] || '').trim();
+                    const gameMatch = !gameTitle || selectedGames.has(gameTitle);
+                    const teamMatch = !teamVal || selectedTeams.has(teamVal);
+                    const calloutMatch = !calloutTag || selectedCallouts.has(calloutTag);
+                    return gameMatch && teamMatch && calloutMatch;
+                });
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
