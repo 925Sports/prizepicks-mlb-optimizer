@@ -263,7 +263,7 @@
         #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
             background: #00e6b3;
         }
-        /* Table view - matches NBA style */
+        /* Table view - exact match to NBA tool */
         .details-cell {
             display: flex;
             align-items: center;
@@ -427,14 +427,12 @@
             <li>Use the search bar to find players or stats.</li>
             <li>Filter by games, teams, or callout tags using the buttons.</li>
             <li>Select odds type: All, Standard, Demon, or Goblin.</li>
-            <li>Only stat types with available data are active (others are greyed out).</li>
             <li>Click 'More' or 'Less' on cards to add to bet slip.</li>
             <li>View generated bet slips with edge and payout calculations.</li>
         </ul>
     </div>
     <script>
         let allData = [];
-        let gameLogs = [];
         let currentFiltered = [];
         let currentTab = 'All';
         let currentOddsType = 'standard';
@@ -450,16 +448,12 @@
         let selectedPayout = 'all';
         let betSlipsSortColumn = 'Edge';
         let betSlipsSortDirection = 'desc';
-        let contentSortColumn = 'Edge';
-        let contentSortDirection = 'desc';
-        let expandedCombinations = new Set();
         let currentRow = null;
         let gameToTime = new Map();
         let showSelectedOnly = false;
         const contentDiv = document.getElementById('content');
         contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
         const url = './data/prizepicks-mlb.csv';
-        const gameLogUrl = '';
         const predefinedCombinations = {
             2: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],[1,10],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8],[2,9],[2,10],[3,4],[3,5],[3,6],[3,7],[3,8],[3,9],[3,10],[4,5],[4,6],[4,7],[4,8],[4,9],[4,10],[5,6],[5,7],[5,8],[5,9],[5,10],[6,7],[6,8],[6,9],[6,10],[7,8],[7,9],[7,10],[8,9],[8,10],[9,10]],
             3: [[1,2,3],[1,2,4],[1,2,5],[1,2,6],[1,2,7],[1,2,8],[1,3,4],[1,3,5],[1,3,6],[1,3,7],[1,4,5],[1,4,6],[1,4,7],[1,5,6],[1,5,7],[1,6,7],[1,7,8],[1,8,9],[1,9,10],[2,3,4],[2,3,5],[2,3,6],[2,3,7],[2,3,8],[2,4,5],[2,4,6],[2,4,7],[2,5,6],[2,5,7],[2,6,7],[2,7,8],[2,8,9],[2,9,10],[3,4,5],[3,4,6],[3,4,7],[3,4,8],[3,5,6],[3,5,7],[3,6,7],[3,7,8],[3,8,9],[3,9,10],[4,5,6],[4,5,7],[4,5,8],[4,6,7],[4,6,8],[4,7,8],[4,8,9],[4,9,10],[5,6,7,8],[5,6,8,9],[5,7,8,9],[5,8,9,10],[6,7,8,9],[6,8,9,10],[7,8,9,10]],
@@ -467,12 +461,8 @@
             5: [[1,2,3,4,5],[1,2,3,4,6],[1,2,3,4,7],[1,2,3,5,6],[1,2,3,5,7],[1,2,3,6,7],[1,2,4,5,6],[1,2,4,5,7],[1,2,4,6,7],[1,2,5,6,7],[1,3,4,5,6],[1,3,4,5,7],[1,3,4,6,7],[1,3,5,6,7],[1,4,5,6,7],[1,5,6,7,8],[1,6,7,8,9],[1,7,8,9,10],[2,3,4,5,6],[2,3,4,5,7],[2,3,4,6,7],[2,3,5,6,7],[2,3,6,7,8],[2,4,5,6,7],[2,4,6,7,8],[2,5,6,7,8],[2,6,7,8,9],[2,7,8,9,10],[3,4,5,6,7],[3,4,5,6,8],[3,4,5,7,8],[3,4,6,7,8],[3,5,6,7,8],[3,6,7,8,9],[3,7,8,9,10],[4,5,6,7,8],[4,5,6,7,9],[4,5,7,8,9],[4,6,7,8,9],[4,7,8,9,10],[5,6,7,8,9],[5,6,7,8,10],[5,6,8,9,10],[5,7,8,9,10],[6,7,8,9,10]],
             6: [[1,2,3,4,5,6],[1,2,3,4,5,7],[1,2,3,4,6,7],[1,2,3,5,6,7],[1,2,4,5,6,7],[1,3,4,5,6,7],[1,4,5,6,7,8],[1,5,6,7,8,9],[1,6,7,8,9,10],[2,3,4,5,6,7],[2,3,4,5,6,8],[2,3,4,5,7,8],[2,3,4,6,7,8],[2,3,5,6,7,8],[2,4,5,6,7,8],[2,5,6,7,8,9],[2,6,7,8,9,10],[3,4,5,6,7,8],[3,4,5,6,7,9],[3,4,5,6,8,9],[3,4,6,7,8,9],[3,5,6,7,8,9],[3,6,7,8,9,10],[4,5,6,7,8,9],[4,5,6,7,8,10],[4,5,6,7,9,10],[4,5,7,8,9,10],[5,6,7,8,9,10]]
         };
-        const bases = { 2: 33.3, 3: 20, 4: 10, 5: 13.8, 6: 4.9 };
         fetch(url)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return response.text();
-            })
+            .then(response => response.text())
             .then(csv => {
                 allData = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
                 allData.forEach(row => {
@@ -480,9 +470,7 @@
                         gameToTime.set(row['Game Short Title'], row['Scheduled At']);
                     }
                 });
-                uniqueGames = Array.from(gameToTime.entries())
-                    .sort((a, b) => new Date(a[1]) - new Date(b[1]))
-                    .map(entry => entry[0]);
+                uniqueGames = Array.from(gameToTime.entries()).sort((a, b) => new Date(a[1]) - new Date(b[1])).map(entry => entry[0]);
                 uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
                 uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
                 selectedGames = new Set(uniqueGames);
@@ -685,9 +673,6 @@
                 console.error('Error fetching CSV:', error);
                 contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
             });
-        function normalizeName(name) {
-            return (name || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+(jr\.?|sr\.?|ii|iii|iv)$/i, "").trim().toLowerCase();
-        }
         function updateBetSlip() {
             filterBetSlips();
         }
@@ -765,15 +750,6 @@
             selectedPayout = document.getElementById('payoutFilter').value;
             renderBetSlips();
         }
-        function sortBetSlips(column) {
-            if (betSlipsSortColumn === column) {
-                betSlipsSortDirection = betSlipsSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                betSlipsSortColumn = column;
-                betSlipsSortDirection = 'asc';
-            }
-            filterBetSlips();
-        }
         function renderBetSlips() {
             const header = document.getElementById('betslipsHeader');
             const body = document.getElementById('betslipsBody');
@@ -798,10 +774,6 @@
             }
             if (selectedPayout !== 'all') {
                 outputData = outputData.filter(combo => combo.payout === selectedPayout);
-            }
-            if (outputData.length === 0) {
-                body.innerHTML = '<tr><td colspan="5" class="error-message">No valid combinations.</td></tr>';
-                return;
             }
             outputData.sort((a, b) => {
                 let aVal = a[betSlipsSortColumn.toLowerCase().replace(' ', '')] || 0;
@@ -858,7 +830,8 @@
                 {label: 'Line', value: parseFloat(row['Line Score']).toFixed(1)},
                 {label: 'Proj', value: parseFloat(row['Average Projected']).toFixed(1)},
                 {label: 'DVP', value: parseFloat(row['DVP Adjusted']).toFixed(1)},
-                {label: 'Total', value: parseFloat(row['Total Projection']).toFixed(1)}
+                {label: 'Total', value: parseFloat(row['Total Projection']).toFixed(1)},
+                {label: 'Opp', value: parseFloat(row['Opportunities'] || 0).toFixed(1)}
             ];
             stats.forEach(stat => {
                 const box = document.createElement('div');
@@ -918,13 +891,13 @@
                 const avgLine = parseFloat(row['Average Line']) || 0;
                 const udLine = parseFloat(row['Underdog Line']) || 0;
                 let projections = [
-                    {name: 'Avg Proj', value: avgProjected, definition: 'Average Projected'},
-                    {name: 'DVP Adj', value: dvpAdjusted, definition: 'DVP Adjusted'},
-                    {name: 'Total Proj', value: totalProjection, definition: 'Total Projection'},
-                    {name: 'True Avg Line', value: trueAvgLine, definition: 'True Point Average Line'},
-                    {name: 'Avg Line', value: avgLine, definition: 'Average Line'}
+                    {name: 'Avg Proj', value: avgProjected},
+                    {name: 'DVP Adj', value: dvpAdjusted},
+                    {name: 'Total Proj', value: totalProjection},
+                    {name: 'True Avg Line', value: trueAvgLine},
+                    {name: 'Avg Line', value: avgLine}
                 ].filter(p => p.value > 0);
-                if (udLine > 0) projections.push({name: 'UD Line', value: udLine, definition: 'Underdog Line'});
+                if (udLine > 0) projections.push({name: 'UD Line', value: udLine});
                 const overProjs = projections.filter(p => p.value > lineScore);
                 const underProjs = projections.filter(p => p.value < lineScore);
                 const equalProjs = projections.filter(p => p.value === lineScore);
@@ -936,44 +909,10 @@
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Projections',
-                            data: dataPoints,
-                            backgroundColor: colors,
-                            borderColor: colors.map(c => c.replace('0.6', '1')),
-                            borderWidth: 1,
-                            borderRadius: 5
-                        }]
-                    },
+                    data: { labels, datasets: [{ label: 'Projections', data: dataPoints, backgroundColor: colors, borderColor: colors.map(c => c.replace('0.6','1')), borderWidth: 1, borderRadius: 5 }] },
                     options: {
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#fff' } },
-                            x: { grid: { color: '#333' }, ticks: { color: '#fff' } }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            annotation: {
-                                annotations: {
-                                    line1: {
-                                        type: 'line',
-                                        yMin: lineScore,
-                                        yMax: lineScore,
-                                        borderColor: '#808080',
-                                        borderWidth: 2,
-                                        borderDash: [5, 5]
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'end',
-                                color: '#fff',
-                                font: { weight: 'bold', size: 12 },
-                                formatter: (value) => value.toFixed(1)
-                            }
-                        }
+                        scales: { y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#fff' } }, x: { grid: { color: '#333' }, ticks: { color: '#fff' } } },
+                        plugins: { legend: { display: false }, annotation: { annotations: { line1: { type: 'line', yMin: lineScore, yMax: lineScore, borderColor: '#808080', borderWidth: 2, borderDash: [5, 5] } } }, datalabels: { anchor: 'end', align: 'end', color: '#fff', font: { weight: 'bold', size: 12 }, formatter: (value) => value.toFixed(1) } }
                     },
                     plugins: [ChartDataLabels]
                 });
@@ -983,15 +922,19 @@
                 let moreClass = 'button more';
                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                 const selectedBet = selectedBets.find(b => b.key === key);
+                const betTag = (row['Bet Tag'] || '').toLowerCase();
+                const recommendLess = betTag.includes('under');
+                const recommendMore = betTag.includes('over');
                 if (selectedBet) {
                     if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
                     else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
                 } else {
-                    if ((row['Bet Tag'] || '').toLowerCase() === 'over') moreClass += ' green-outline';
-                    else if ((row['Bet Tag'] || '').toLowerCase() === 'under') lessClass += ' red-outline';
+                    if (recommendMore) moreClass += ' green-outline';
+                    if (recommendLess) lessClass += ' red-outline';
                 }
                 buttonsDiv.innerHTML = `
                     <button id="popupLess" class="${lessClass}" data-choice="Less">↓ Less</button>
+                    <div class="divider" style="background: ${recommendLess ? '#ff4d4d' : (recommendMore ? '#4dff4d' : '#444')}"></div>
                     <button id="popupMore" class="${moreClass}" data-choice="More">↑ More</button>
                 `;
                 content.appendChild(buttonsDiv);
@@ -1003,11 +946,7 @@
                         const existingIndex = selectedBets.findIndex(b => b.key === key);
                         let prob = choice === 'More' ? parseFloat(row['Average No-Vig Over %']) / 100 : parseFloat(row['Average No-Vig Under %']) / 100;
                         if (isNaN(prob)) prob = 0.5;
-                        const betData = {
-                            key, player: row['Player Name'], choice, line: row['Line Score'],
-                            stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob,
-                            game: row['Game Short Title'], team: row.Team
-                        };
+                        const betData = { key, player: row['Player Name'], choice, line: row['Line Score'], stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob, game: row['Game Short Title'], team: row.Team };
                         if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
                             selectedBets.splice(existingIndex, 1);
                         } else {
@@ -1021,34 +960,20 @@
                 });
             }
             else if (tab === 'News') {
-                content.innerHTML = `
-                    <table style="width:100%; border-collapse:collapse;">
-                        <tr><th style="text-align:left;">EST. Return Date</th><td>${row['EST. Return Date'] || '-'}</td></tr>
-                        <tr><th style="text-align:left;">Injury Status</th><td>${row['Injury Status'] || '-'}</td></tr>
-                        <tr><th style="text-align:left;">Comment</th><td>${row.Comment || '-'}</td></tr>
-                    </table>
-                `;
+                content.innerHTML = `<table style="width:100%; border-collapse:collapse;"><tr><th style="text-align:left;">EST. Return Date</th><td>${row['EST. Return Date'] || '-'}</td></tr><tr><th style="text-align:left;">Injury Status</th><td>${row['Injury Status'] || '-'}</td></tr><tr><th style="text-align:left;">Comment</th><td>${row.Comment || '-'}</td></tr></table>`;
             }
             else if (tab === 'Other Bets') {
                 const otherBets = allData.filter(r => r['Player Name'] === row['Player Name'] && r['Stat Type'] !== row['Stat Type']);
-                if (otherBets.length === 0) {
-                    content.innerHTML = '<p>No other bets available for this player.</p>';
-                } else {
+                if (otherBets.length === 0) content.innerHTML = '<p>No other bets available for this player.</p>';
+                else {
                     let html = `<table style="width:100%;"><thead><tr><th>Stat Type</th><th>Line</th><th>Edge %</th></tr></thead><tbody>`;
-                    otherBets.forEach(b => {
-                        html += `<tr><td>${b['Stat Type']}</td><td>${b['Line Score']}</td><td>${parseFloat(b['Edge %'] || 0).toFixed(1)}%</td></tr>`;
-                    });
+                    otherBets.forEach(b => html += `<tr><td>${b['Stat Type']}</td><td>${b['Line Score']}</td><td>${parseFloat(b['Edge %'] || 0).toFixed(1)}%</td></tr>`);
                     html += `</tbody></table>`;
                     content.innerHTML = html;
                 }
             }
             else if (tab === 'Matchup') {
-                content.innerHTML = `
-                    <p><strong>DVP Bet:</strong> ${row['DVP Bet'] || '-'}</p>
-                    <p><strong>DVP Rank:</strong> ${row['DVP Rank'] || '-'}</p>
-                    <p><strong>DVP Adjusted:</strong> ${parseFloat(row['DVP Adjusted'] || 0).toFixed(1)}</p>
-                    <p><strong>Opponent:</strong> ${row.Opp || '-'}</p>
-                `;
+                content.innerHTML = `<p><strong>DVP Bet:</strong> ${row['DVP Bet'] || '-'}</p><p><strong>DVP Rank:</strong> ${row['DVP Rank'] || '-'}</p><p><strong>DVP Adjusted:</strong> ${parseFloat(row['DVP Adjusted'] || 0).toFixed(1)}</p><p><strong>Opponent:</strong> ${row.Opp || '-'}</p>`;
             }
             else if (tab === 'Game Log' || tab === 'Splits') {
                 content.innerHTML = `<p>Game Log and Splits data coming soon (requires full game-log CSV).</p>`;
@@ -1059,15 +984,8 @@
             const activeStatTypes = new Set(currentFiltered.map(row => (row['Stat Type'] || '').trim()));
             tabs.forEach(tab => {
                 const tabText = tab.textContent.trim();
-                if (tabText === 'All') {
-                    tab.classList.remove('inactive');
-                } else {
-                    if (activeStatTypes.has(tabText)) {
-                        tab.classList.remove('inactive');
-                    } else {
-                        tab.classList.add('inactive');
-                    }
-                }
+                if (tabText === 'All') tab.classList.remove('inactive');
+                else tab.classList.toggle('inactive', !activeStatTypes.has(tabText));
             });
         }
         function renderContent() {
@@ -1076,52 +994,25 @@
                 let filtered = allData.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const lineScore = (row['Line Score'] || '').trim();
-                    return statType !== '' && lineScore !== '';
+                    return statType && lineScore;
                 });
-                if (currentTab !== 'All') {
-                    filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
-                }
-                if (currentOddsType !== 'all') {
-                    filtered = filtered.filter(row => (row['Odds Type'] || '').toLowerCase() === currentOddsType);
-                }
-                if (searchTerm) {
-                    filtered = filtered.filter(row =>
-                        (row['Player Name'] || '').toLowerCase().includes(searchTerm) ||
-                        (row['Stat Type'] || '').toLowerCase().includes(searchTerm)
-                    );
-                }
+                if (currentTab !== 'All') filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
+                if (currentOddsType !== 'all') filtered = filtered.filter(row => (row['Odds Type'] || '').toLowerCase() === currentOddsType);
+                if (searchTerm) filtered = filtered.filter(row => (row['Player Name'] || '').toLowerCase().includes(searchTerm) || (row['Stat Type'] || '').toLowerCase().includes(searchTerm));
                 filtered = filtered.filter(row => {
                     const gameTitle = (row['Game Short Title'] || '').trim();
                     const teamVal = (row.Team || '').trim();
                     const calloutTag = (row['Callout Bet Tag'] || '').trim();
-                    const gameMatch = !gameTitle || selectedGames.has(gameTitle);
-                    const teamMatch = !teamVal || selectedTeams.has(teamVal);
-                    const calloutMatch = !calloutTag || selectedCallouts.has(calloutTag);
-                    return gameMatch && teamMatch && calloutMatch;
+                    return (!gameTitle || selectedGames.has(gameTitle)) && (!teamVal || selectedTeams.has(teamVal)) && (!calloutTag || selectedCallouts.has(calloutTag));
                 });
-
-                // NEW: Filter out 100% edge bets (extreme goblin lines)
-                filtered = filtered.filter(row => {
-                    const edge = parseFloat(row['Edge %']) || 0;
-                    return edge < 100;
-                });
-
-                // Default sort by Edge % descending (highest first)
-                filtered.sort((a, b) => {
-                    const edgeA = parseFloat(a['Edge %']) || 0;
-                    const edgeB = parseFloat(b['Edge %']) || 0;
-                    return edgeB - edgeA;
-                });
-
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
-
+                filtered.sort((a, b) => (parseFloat(b['Edge %']) || 0) - (parseFloat(a['Edge %']) || 0));
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
-                contentDiv.classList.remove('table-view');
-                if (currentView === 'table') contentDiv.classList.add('table-view');
+                contentDiv.classList.toggle('table-view', currentView === 'table');
                 if (filtered.length === 0) {
                     contentDiv.innerHTML = '<div class="loading">No data available for this selection. Try changing filters or odds type.</div>';
                     updateTabStates();
@@ -1133,8 +1024,8 @@
                         card.classList.add('card');
                         const edge = parseFloat(row['Edge %']) || 0;
                         const betTag = (row['Bet Tag'] || '').toLowerCase();
-                        let recommendLess = betTag.includes('under');
-                        let recommendMore = betTag.includes('over');
+                        const recommendLess = betTag.includes('under');
+                        const recommendMore = betTag.includes('over');
                         let lessClass = 'button';
                         let moreClass = 'button';
                         if (recommendMore) moreClass += ' green-outline';
@@ -1149,7 +1040,7 @@
                             <div class="stat">${row['Line Score']} ${row['Stat Type']}</div>
                             <div class="buttons">
                                 <button class="${lessClass}" data-choice="Less">↓ Less</button>
-                                <div class="divider" style="background: ${dividerColor};"></div>
+                                <div class="divider" style="background: ${dividerColor}"></div>
                                 <button class="${moreClass}" data-choice="More">↑ More</button>
                             </div>
                             <div class="info-icon" data-index="${index}">ℹ️</div>
@@ -1161,14 +1052,9 @@
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
                                 const prob = choice === 'More' ? (parseFloat(row['Average No-Vig Over %']) || 50) / 100 : (parseFloat(row['Average No-Vig Under %']) || 50) / 100;
-                                const betData = {
-                                    key, player: row['Player Name'], choice, line: row['Line Score'],
-                                    stat: row['Stat Type'], edge: edge, prob, game: row['Game Short Title'],
-                                    team: row.Team
-                                };
-                                if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
-                                    selectedBets.splice(existingIndex, 1);
-                                } else {
+                                const betData = { key, player: row['Player Name'], choice, line: row['Line Score'], stat: row['Stat Type'], edge, prob, game: row['Game Short Title'], team: row.Team };
+                                if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) selectedBets.splice(existingIndex, 1);
+                                else {
                                     if (existingIndex > -1) selectedBets[existingIndex] = betData;
                                     else selectedBets.push(betData);
                                 }
@@ -1190,6 +1076,7 @@
                                 <th>Avg Proj</th>
                                 <th>DVP Adj</th>
                                 <th>Total Proj</th>
+                                <th>Opp</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -1222,6 +1109,7 @@
                             <td>${parseFloat(row['Average Projected'] || 0).toFixed(1)}</td>
                             <td>${parseFloat(row['DVP Adjusted'] || 0).toFixed(1)}</td>
                             <td>${parseFloat(row['Total Projection'] || 0).toFixed(1)}</td>
+                            <td>${parseFloat(row['Opportunities'] || 0).toFixed(1)}</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn less" data-choice="Less" style="background:${recommendLess ? '#ff4d4d' : '#333'}; color:${recommendLess ? '#fff' : '#ccc'}">↓ Less</button>
@@ -1238,14 +1126,9 @@
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
                                 const prob = choice === 'More' ? (parseFloat(row['Average No-Vig Over %']) || 50) / 100 : (parseFloat(row['Average No-Vig Under %']) || 50) / 100;
-                                const betData = {
-                                    key, player: row['Player Name'], choice, line: row['Line Score'],
-                                    stat: row['Stat Type'], edge: edge, prob, game: row['Game Short Title'],
-                                    team: row.Team
-                                };
-                                if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
-                                    selectedBets.splice(existingIndex, 1);
-                                } else {
+                                const betData = { key, player: row['Player Name'], choice, line: row['Line Score'], stat: row['Stat Type'], edge, prob, game: row['Game Short Title'], team: row.Team };
+                                if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) selectedBets.splice(existingIndex, 1);
+                                else {
                                     if (existingIndex > -1) selectedBets[existingIndex] = betData;
                                     else selectedBets.push(betData);
                                 }
