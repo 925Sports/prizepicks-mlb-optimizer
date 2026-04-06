@@ -143,7 +143,14 @@
         .name { font-weight: 600; font-size: 18px; }
         .game { font-size: 14px; color: #888; margin-bottom: 8px; }
         .stat { margin-top: 10px; font-size: 20px; font-weight: 700; }
-        .buttons { display: flex; margin-top: 8px; background: #121212; border-radius: 9999px; overflow: hidden; }
+        .buttons { 
+            display: flex; 
+            margin-top: 8px; 
+            background: #121212; 
+            border-radius: 9999px; 
+            overflow: hidden; 
+            position: relative;
+        }
         .button {
             flex: 1;
             padding: 10px 16px;
@@ -154,6 +161,8 @@
             cursor: pointer;
             opacity: 0.7;
             transition: opacity 0.2s, background 0.2s;
+            position: relative;
+            z-index: 2;
         }
         .button:hover { opacity: 1; background: #222; }
         .button.selected { font-weight: 600; opacity: 1; background: #333; }
@@ -161,6 +170,14 @@
         .red-outline { outline: 3px solid #ff4d4d; }
         .button.selected.selected-more { background-color: #4dff4d; color: #000; }
         .button.selected.selected-less { background-color: #ff4d4d; color: #000; }
+        .divider {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            width: 3px;
+            z-index: 1;
+            border-radius: 9999px;
+        }
         .info-icon { position: absolute; top: 16px; right: 16px; cursor: pointer; font-size: 18px; color: #00ffcc; transition: color 0.2s; }
         .info-icon:hover { color: #00e6b3; }
         .loading { text-align: center; padding: 20px; font-size: 18px; color: #00ffcc; }
@@ -246,7 +263,7 @@
         #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
             background: #00e6b3;
         }
-        /* Table view specific styles to match NBA tool */
+        /* Table view - matches NBA style */
         .details-cell {
             display: flex;
             align-items: center;
@@ -841,8 +858,7 @@
                 {label: 'Line', value: parseFloat(row['Line Score']).toFixed(1)},
                 {label: 'Proj', value: parseFloat(row['Average Projected']).toFixed(1)},
                 {label: 'DVP', value: parseFloat(row['DVP Adjusted']).toFixed(1)},
-                {label: 'Total', value: parseFloat(row['Total Projection']).toFixed(1)},
-                {label: 'Opp', value: parseFloat(row['Opportunities'] || 0).toFixed(1)}
+                {label: 'Total', value: parseFloat(row['Total Projection']).toFixed(1)}
             ];
             stats.forEach(stat => {
                 const box = document.createElement('div');
@@ -901,7 +917,6 @@
                 const trueAvgLine = parseFloat(row['True Point Average Line']) || 0;
                 const avgLine = parseFloat(row['Average Line']) || 0;
                 const udLine = parseFloat(row['Underdog Line']) || 0;
-                const opportunities = parseFloat(row['Opportunities']) || 0;
                 let projections = [
                     {name: 'Avg Proj', value: avgProjected, definition: 'Average Projected'},
                     {name: 'DVP Adj', value: dvpAdjusted, definition: 'DVP Adjusted'},
@@ -1084,17 +1099,24 @@
                     const calloutMatch = !calloutTag || selectedCallouts.has(calloutTag);
                     return gameMatch && teamMatch && calloutMatch;
                 });
-                if (showSelectedOnly) {
-                    const selectedKeys = new Set(selectedBets.map(b => b.key));
-                    filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
-                }
 
-                // NEW: Default sort by Edge % (highest first) - applied to both cards and table
+                // NEW: Filter out 100% edge bets (extreme goblin lines)
+                filtered = filtered.filter(row => {
+                    const edge = parseFloat(row['Edge %']) || 0;
+                    return edge < 100;
+                });
+
+                // Default sort by Edge % descending (highest first)
                 filtered.sort((a, b) => {
                     const edgeA = parseFloat(a['Edge %']) || 0;
                     const edgeB = parseFloat(b['Edge %']) || 0;
                     return edgeB - edgeA;
                 });
+
+                if (showSelectedOnly) {
+                    const selectedKeys = new Set(selectedBets.map(b => b.key));
+                    filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
+                }
 
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
@@ -1111,13 +1133,13 @@
                         card.classList.add('card');
                         const edge = parseFloat(row['Edge %']) || 0;
                         const betTag = (row['Bet Tag'] || '').toLowerCase();
+                        let recommendLess = betTag.includes('under');
+                        let recommendMore = betTag.includes('over');
                         let lessClass = 'button';
                         let moreClass = 'button';
-                        if (betTag === 'over' || betTag === 'great bet' || betTag === 'ideal bet') {
-                            moreClass += ' green-outline';
-                        } else if (betTag === 'under') {
-                            lessClass += ' red-outline';
-                        }
+                        if (recommendMore) moreClass += ' green-outline';
+                        if (recommendLess) lessClass += ' red-outline';
+                        const dividerColor = recommendLess ? '#ff4d4d' : (recommendMore ? '#4dff4d' : '#444');
                         card.innerHTML = `
                             <div class="header"><span class="pop">${edge.toFixed(1)}%</span></div>
                             <img class="headshot" src="${row['Headshot URL'] || ''}" alt="">
@@ -1127,6 +1149,7 @@
                             <div class="stat">${row['Line Score']} ${row['Stat Type']}</div>
                             <div class="buttons">
                                 <button class="${lessClass}" data-choice="Less">↓ Less</button>
+                                <div class="divider" style="background: ${dividerColor};"></div>
                                 <button class="${moreClass}" data-choice="More">↑ More</button>
                             </div>
                             <div class="info-icon" data-index="${index}">ℹ️</div>
@@ -1156,7 +1179,6 @@
                         card.querySelector('.info-icon').addEventListener('click', () => showPlayerPopup(row, index));
                     });
                 } else {
-                    // UPDATED TABLE VIEW - now matches NBA Optimizer style exactly
                     const table = document.createElement('table');
                     table.innerHTML = `
                         <thead>
@@ -1178,15 +1200,12 @@
                         const edge = parseFloat(row['Edge %']) || 0;
                         const betTag = (row['Bet Tag'] || '').toLowerCase();
                         let tagHTML = '';
-                        if (betTag.includes('great') || betTag.includes('ideal')) {
-                            tagHTML = `<span class="bet-tag great">Great Bet</span>`;
-                        } else if (betTag.includes('good')) {
-                            tagHTML = `<span class="bet-tag good">Good Bet</span>`;
-                        } else if (betTag.includes('best')) {
-                            tagHTML = `<span class="bet-tag best">Best Bet</span>`;
-                        } else if (betTag.includes('push')) {
-                            tagHTML = `<span class="bet-tag push">Push</span>`;
-                        }
+                        if (betTag.includes('great') || betTag.includes('ideal')) tagHTML = `<span class="bet-tag great">Great Bet</span>`;
+                        else if (betTag.includes('good')) tagHTML = `<span class="bet-tag good">Good Bet</span>`;
+                        else if (betTag.includes('best')) tagHTML = `<span class="bet-tag best">Best Bet</span>`;
+                        else if (betTag.includes('push')) tagHTML = `<span class="bet-tag push">Push</span>`;
+                        const recommendLess = betTag.includes('under');
+                        const recommendMore = betTag.includes('over');
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td class="details-cell">
@@ -1205,14 +1224,12 @@
                             <td>${parseFloat(row['Total Projection'] || 0).toFixed(1)}</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn less" data-choice="Less">↓ Less</button>
-                                    <button class="action-btn more" data-choice="More">↑ More</button>
+                                    <button class="action-btn less" data-choice="Less" style="background:${recommendLess ? '#ff4d4d' : '#333'}; color:${recommendLess ? '#fff' : '#ccc'}">↓ Less</button>
+                                    <button class="action-btn more" data-choice="More" style="background:${recommendMore ? '#4dff4d' : '#333'}; color:${recommendMore ? '#000' : '#ccc'}">↑ More</button>
                                 </div>
                             </td>
                         `;
                         tbody.appendChild(tr);
-
-                        // Add button listeners
                         const lessBtn = tr.querySelector('.action-btn.less');
                         const moreBtn = tr.querySelector('.action-btn.more');
                         [lessBtn, moreBtn].forEach(btn => {
