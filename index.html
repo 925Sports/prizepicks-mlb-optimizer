@@ -1226,6 +1226,7 @@
                 selectedGames = new Set(uniqueGames);
                 selectedTeams = new Set(uniqueTeams);
                 selectedCallouts = new Set(uniqueCallouts);
+                // Dynamic tabs from the actual MLB CSV data - this ensures Hitter Fantasy Score and Pitcher Fantasy Score appear
                 const tabNames = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
                 const tabsDiv = document.querySelector('.tabs');
                 tabNames.forEach((tab, index) => {
@@ -1955,41 +1956,17 @@
                 filtered = filtered.filter(row =>
                     selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) && selectedCallouts.has(row['Callout Bet Tag'])
                 );
+                // Filter out 100% edge bets
+                filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
+                // Default sort by Edge % descending
                 filtered.sort((a, b) => {
-                    let aVal = 0;
-                    let bVal = 0;
-                    if (contentSortColumn === 'Edge') {
-                        aVal = parseFloat(a['Edge %']) || 0;
-                        bVal = parseFloat(b['Edge %']) || 0;
-                    } else if (contentSortColumn === 'Line') {
-                        aVal = parseFloat(a['Line Score']) || 0;
-                        bVal = parseFloat(b['Line Score']) || 0;
-                    } else if (contentSortColumn === 'PP-UD') {
-                        const aUd = parseFloat(a['Underdog Line']);
-                        const bUd = parseFloat(b['Underdog Line']);
-                        aVal = (aUd && aUd !== 0) ? parseFloat(a['Line Score']) - aUd : 0;
-                        bVal = (bUd && bUd !== 0) ? parseFloat(b['Line Score']) - bUd : 0;
-                    } else if (contentSortColumn === 'Avg Proj') {
-                        aVal = parseFloat(a['Average Projected']) || 0;
-                        bVal = parseFloat(b['Average Projected']) || 0;
-                    } else if (contentSortColumn === 'DVP Adj') {
-                        aVal = parseFloat(a['DVP Adjusted']) || 0;
-                        bVal = parseFloat(b['DVP Adjusted']) || 0;
-                    } else if (contentSortColumn === 'Total Proj') {
-                        aVal = parseFloat(a['Total Projection']) || 0;
-                        bVal = parseFloat(b['Total Projection']) || 0;
-                    } else if (contentSortColumn === 'L5 Avg') {
-                        aVal = parseFloat(a.l5Avg) || 0;
-                        bVal = parseFloat(b.l5Avg) || 0;
-                    } else if (contentSortColumn === 'L5 Hit%') {
-                        aVal = parseFloat(a.l5HitRate) || 0;
-                        bVal = parseFloat(b.l5HitRate) || 0;
-                    }
-                    return contentSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                    let aVal = parseFloat(a['Edge %']) || 0;
+                    let bVal = parseFloat(b['Edge %']) || 0;
+                    return bVal - aVal;
                 });
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
@@ -2212,8 +2189,11 @@
                                 lessClass += ' red-outline';
                             }
                         }
+                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                        const dividerClass = betTagLower.includes('more') ? 'more' : (betTagLower.includes('less') ? 'less' : '');
                         buttonsDiv.innerHTML = `
                             <button class="${lessClass}" data-choice="Less">↓ Less</button>
+                            <div class="divider ${dividerClass}"></div>
                             <button class="${moreClass}" data-choice="More">↑ More</button>
                         `;
                         actionsTd.appendChild(buttonsDiv);
