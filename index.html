@@ -262,6 +262,7 @@
             background: #121212;
             border-radius: 9999px;
             overflow: hidden;
+            position: relative;
         }
         .button {
             flex: 1;
@@ -296,6 +297,21 @@
         .button.selected.selected-less {
             background-color: #ff4d4d;
             color: #000;
+        }
+        .divider {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 50%;
+            width: 3px;
+            background: #333;
+            transform: translateX(-50%);
+        }
+        .divider.more {
+            background: #4dff4d;
+        }
+        .divider.less {
+            background: #ff4d4d;
         }
         .info-icon {
             position: absolute;
@@ -1106,7 +1122,7 @@
             <li>Use the search bar to find players or stats.</li>
             <li>Filter by games, teams, or callout tags using the buttons.</li>
             <li>Select odds type: All, Standard, Demon, or Goblin.</li>
-            <li>Switch tabs to view different stat categories like Points, Rebounds, etc.</li>
+            <li>Switch tabs to view different stat categories.</li>
             <li>On each player card, click 'More' or 'Less' to add bets to your slip.</li>
             <li>View and filter generated bet slips with calculated edges and payouts.</li>
             <li>Click the info icon on cards for detailed player info, game logs, splits, etc.</li>
@@ -1653,7 +1669,7 @@
                 popupName.innerHTML += ` <span title="${titleText}" style="color: #ff4d4d; cursor: pointer;">⚠️</span>`;
             }
             document.getElementById('popupTeamPos').textContent = `${row.Team} | ${row.Position || ''}`;
-            document.getElementById('popupGame').textContent = `${row.Team} @ ${row.Opp || ''}`;
+            document.getElementById('popupGame').textContent = `${row.Team} @ ${row.Opp || row['Opponent'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
             const statsBoxes = document.getElementById('statsBoxes');
             statsBoxes.innerHTML = '';
@@ -1923,16 +1939,12 @@
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
-                let filtered = allData;
-                if (currentTab === 'All') {
-                    if (currentOddsType !== 'all') {
-                        filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
-                    }
-                } else {
+                let filtered = allData.filter(row => (row['Stat Type'] || '').trim() !== '');
+                if (currentTab !== 'All') {
                     filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
-                    if (currentOddsType !== 'all') {
-                        filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
-                    }
+                }
+                if (currentOddsType !== 'all') {
+                    filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
                 }
                 if (searchTerm) {
                     filtered = filtered.filter(row =>
@@ -1947,44 +1959,8 @@
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
-                filtered.forEach(row => {
-                    const normPlayer = normalizeName(row['Player Name']);
-                    let playerLogs = gameLogs.filter(log => normalizeName(log.PLAYER) === normPlayer);
-                    playerLogs.sort((a, b) => new Date(b['GAME DATE']) - new Date(a['GAME DATE']));
-                    const statType = row['Stat Type'].toLowerCase();
-                    const statMap = {
-                        'points': 'PTS',
-                        'rebounds': 'REB',
-                        'assists': 'AST',
-                        '3-pt made': '3sPM',
-                        'pts+asts': (log) => parseFloat(log.PTS) + parseFloat(log.AST),
-                        'pts+rebs+asts': (log) => parseFloat(log.PTS) + parseFloat(log.REB) + parseFloat(log.AST),
-                        'fg made': 'FGM',
-                        'fantasy score': 'FP',
-                        'rebs+asts': (log) => parseFloat(log.REB) + parseFloat(log.AST),
-                        '3-pt attempted': '3PA',
-                        'free throws made': 'FTM',
-                        'fg attempted': 'FGA',
-                        'pts+rebs': (log) => parseFloat(log.PTS) + parseFloat(log.REB),
-                        'blocked shots': 'BLK',
-                        'steals': 'STL',
-                        'personal fouls': 'PF',
-                        'blks+stls': (log) => parseFloat(log.BLK) + parseFloat(log.STL),
-                        'turnovers': 'TOV',
-                        'two pointers made': (log) => parseFloat(log.FGM) - parseFloat(log['3sPM']),
-                        'two pointers attempted': (log) => parseFloat(log.FGA) - parseFloat(log['3PA'])
-                    };
-                    const getStat = statMap[statType] || ((log) => parseFloat(log[statType.toUpperCase()]) || 0);
-                    const line = parseFloat(row['Line Score']);
-                    const betTag = row['Bet Tag'] ? row['Bet Tag'].toLowerCase() : 'over';
-                    const last5 = playerLogs.slice(0, 5);
-                    row.l5Avg = last5.length > 0 ? (last5.reduce((acc, log) => acc + (typeof getStat === 'function' ? getStat(log) : parseFloat(log[getStat]) || 0), 0) / last5.length).toFixed(1) : 0;
-                    const l5Hits = last5.filter(log => {
-                        const statValue = typeof getStat === 'function' ? getStat(log) : parseFloat(log[getStat]) || 0;
-                        return (betTag === 'over' && statValue > line) || (betTag === 'under' && statValue < line);
-                    }).length;
-                    row.l5HitRate = last5.length > 0 ? ((l5Hits / last5.length) * 100).toFixed(0) : 0;
-                });
+                // 100% edge filter
+                filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 filtered.sort((a, b) => {
                     let aVal = 0;
                     let bVal = 0;
@@ -2057,6 +2033,8 @@
                                 lessClass += ' red-outline';
                             }
                         }
+                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                        const dividerClass = betTagLower.includes('more') ? 'more' : (betTagLower.includes('less') ? 'less' : '');
                         card.innerHTML = `
                             ${icon}
                             <div class="header">
@@ -2069,6 +2047,7 @@
                             <div class="stat">${row['Line Score']} ${row['Stat Type']}</div>
                             <div class="buttons">
                                 <button class="${lessClass}" data-choice="Less">↓ Less</button>
+                                <div class="divider ${dividerClass}"></div>
                                 <button class="${moreClass}" data-choice="More">↑ More</button>
                             </div>
                             <div class="info-icon" title="Player Info" data-index="${index}">ℹ️</div>
