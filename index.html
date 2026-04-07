@@ -1959,8 +1959,6 @@
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
-                // 100% edge filter
-                filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 filtered.sort((a, b) => {
                     let aVal = 0;
                     let bVal = 0;
