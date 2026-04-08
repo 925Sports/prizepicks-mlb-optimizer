@@ -1016,61 +1016,6 @@
                 text-align: center;
             }
         }
-        /* Table view - exact match to NBA tool */
-        .details-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .details-cell img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #333;
-        }
-        .player-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .player-name {
-            font-weight: 600;
-            font-size: 15px;
-            color: #00ffcc;
-        }
-        .player-sub {
-            font-size: 12px;
-            color: #aaa;
-        }
-        .bet-tag {
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-weight: 600;
-        }
-        .bet-tag.best { background: #00ffcc; color: #000; }
-        .bet-tag.great { background: #00cc99; color: #000; }
-        .bet-tag.good { background: #ffcc00; color: #000; }
-        .bet-tag.push { background: #888; color: #fff; }
-        .action-buttons {
-            display: flex;
-            gap: 4px;
-        }
-        .action-btn {
-            padding: 6px 14px;
-            font-size: 13px;
-            border-radius: 9999px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .action-btn.less {
-            background: #ff4d4d;
-            color: #fff;
-        }
-        .action-btn.more {
-            background: #4dff4d;
-            color: #000;
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1511,36 +1456,26 @@
                         games.add(bet.game);
                     }
                     if (valid) {
-                        let edge = 0;
+                        let cashLikelihood = productProb * 100;
+                        let breakEven = 0;
+                        if (pickcount === 2) breakEven = 0.33;
+                        else if (pickcount === 3) breakEven = 0.1667;
+                        else if (pickcount === 4) breakEven = 0.10;
+                        else if (pickcount === 5) breakEven = 0.10;
+                        else if (pickcount === 6) breakEven = 0.04;
+                        let edge = (productProb - breakEven) * 100;
                         let payout = '';
                         let gameLabel = games.size === 1 ? Array.from(games)[0] : 'Mixed';
-                        // Improved edge / cash likelihood logic (taken + refined from NBA optimizer)
-                        const cashLikelihood = productProb * 100;
-                        if (pickcount === 2) {
-                            edge = (productProb * 3 - 1) * 100;
-                            payout = '3X';
-                        } else if (pickcount === 3) {
-                            const standardEdge = (productProb * 6 - 1) * 100;
-                            const insuredEdge = (productProb * 2.25 - 1) * 100;
-                            edge = Math.max(standardEdge, insuredEdge);
-                            payout = edge === standardEdge ? '6X' : '2.25X';
-                        } else if (pickcount === 4) {
-                            const standardEdge = (productProb * 10 - 1) * 100;
-                            const insuredEdge = (productProb * 7 - 1) * 100;
-                            edge = Math.max(standardEdge, insuredEdge);
-                            payout = edge === standardEdge ? '10X' : '7X';
-                        } else if (pickcount === 5) {
-                            edge = (productProb * 10 - 1) * 100;
-                            payout = '10X';
-                        } else if (pickcount === 6) {
-                            edge = (productProb * 25 - 1) * 100;
-                            payout = '25X';
-                        }
+                        if (pickcount === 2) payout = '3X';
+                        else if (pickcount === 3) payout = '6X';
+                        else if (pickcount === 4) payout = '10X';
+                        else if (pickcount === 5) payout = '10X';
+                        else if (pickcount === 6) payout = '25X';
                         allCombinations[pickcount].push({
                             sliplink: `https://prizepicks.onelink.me/gCQS/shareEntry?projections=${projectionEntries.join(',')}`,
                             players: comboPlayers.join(' | '),
                             playerdetails,
-                            edge: Math.max(0, edge),
+                            edge: edge,
                             payout,
                             pickcount,
                             cashlikelihood: cashLikelihood,
@@ -1621,7 +1556,6 @@
                 });
                 body.appendChild(tr);
 
-                // Expandable detail row (dropdown of all bets in this slip)
                 const detailRow = document.createElement('tr');
                 detailRow.classList.add('expanded-details');
                 detailRow.style.display = expandedCombinations.has(combo.players) ? '' : 'none';
@@ -1895,7 +1829,6 @@
                 tableWrapper.appendChild(table);
                 content.appendChild(tableWrapper);
             } else if (tab === 'Other Bets') {
-                // Show all other available standard bets for this exact player
                 const playerBets = allData.filter(r => 
                     r['Player Name'] === row['Player Name'] && 
                     r['Stat Type'] !== row['Stat Type']
@@ -1909,6 +1842,7 @@
                 container.style.gridTemplateColumns = 'repeat(auto-fit, minmax(240px, 1fr))';
                 container.style.gap = '12px';
                 playerBets.forEach(bet => {
+                    const oddsType = (bet['Odds Type'] || 'standard').charAt(0).toUpperCase() + (bet['Odds Type'] || 'standard').slice(1);
                     const betCard = document.createElement('div');
                     betCard.style.background = '#222';
                     betCard.style.borderRadius = '12px';
@@ -1916,6 +1850,7 @@
                     betCard.style.textAlign = 'center';
                     betCard.innerHTML = `
                         <div style="font-weight:600; font-size:15px;">${bet['Stat Type']}</div>
+                        <div style="color:#aaa; font-size:13px; margin:4px 0;">${oddsType}</div>
                         <div style="margin:8px 0; font-size:22px; font-weight:700;">${bet['Line Score']}</div>
                         <div style="color:#00ffcc; font-size:14px;">Edge: ${parseFloat(bet['Edge %'] || 0).toFixed(1)}%</div>
                         <div style="margin-top:12px; display:flex; justify-content:center; gap:8px;">
@@ -1937,7 +1872,6 @@
                 `;
             }
         }
-        // Helper for adding bets directly from Other Bets tab
         window.addPopupBet = function(player, stat, choice, line, edge) {
             const key = `${player}-${stat}`;
             const existingIndex = selectedBets.findIndex(b => b.key === key);
@@ -1962,7 +1896,6 @@
             }
             updateBetSlip();
             renderContent();
-            // Refresh popup content to reflect selection
             renderPopupContent('Other Bets', currentRow);
         };
         function sortContentTable(column) {
