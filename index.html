@@ -462,10 +462,9 @@
         }
         th, td {
             padding: 14px 12px;
-            text-align: left;
+            text-align: center;
             border: 1px solid #333;
-            white-space: normal;
-            word-break: break-word;
+            white-space: nowrap;
         }
         th {
             background: #222;
@@ -474,7 +473,6 @@
             position: sticky;
             top: 0;
             color: #f0f0f0;
-            text-align: center;
         }
         tr:nth-child(even) {
             background: #181818;
@@ -601,8 +599,11 @@
                 display: block;
             }
             th, td {
-                padding: 12px 8px;
+                padding: 14px 8px;
                 font-size: 0.78rem;
+            }
+            .card {
+                margin: 8px;
             }
         }
     </style>
