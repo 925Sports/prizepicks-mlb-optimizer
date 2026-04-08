@@ -86,18 +86,18 @@
             border-color: #00ffcc;
             outline: none;
         }
-        #filterBtn, #calloutFilterBtn, #betslipBtn {
+        .filter-button {
             padding: 8px 20px;
             background: #00ffcc;
             color: #000;
             border: none;
             border-radius: 9999px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             transition: background 0.2s;
             white-space: nowrap;
         }
-        #filterBtn:hover, #calloutFilterBtn:hover, #betslipBtn:hover {
+        .filter-button:hover {
             background: #00e6b3;
         }
         .toggle {
@@ -115,6 +115,7 @@
             color: #f0f0f0;
             font-weight: 500;
             transition: background 0.2s;
+            white-space: nowrap;
         }
         .toggle button:hover {
             background: #333;
@@ -181,12 +182,13 @@
             top: 100px;
             z-index: 10;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            overflow-x: auto;
             gap: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
         }
         .tab {
             padding: 8px 20px;
-            margin: 6px;
             background: #222;
             border-radius: 9999px;
             cursor: pointer;
@@ -216,6 +218,7 @@
             max-width: 100%;
             grid-template-columns: none;
             overflow-x: auto;
+            padding: 16px;
         }
         #content.table-view table {
             width: 100%;
@@ -380,6 +383,34 @@
             display: block;
             font-size: 14px;
         }
+        #filterBtn, #betslipBtn, #calloutFilterBtn {
+            padding: 8px 20px;
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
+            background: #00e6b3;
+        }
+        #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo {
+            margin-bottom: 20px;
+            padding: 8px 20px;
+            background: #4dff4d;
+            color: #000;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover {
+            background: #66ff66;
+        }
         .select-btn {
             margin: 5px 0;
             padding: 6px 12px;
@@ -420,10 +451,12 @@
             -webkit-overflow-scrolling: touch;
         }
         th, td {
-            padding: 1.25rem 0.9rem;
+            padding: 12px 8px;
             text-align: center;
             border: 1px solid #333;
-            vertical-align: middle;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         th {
             background: #222;
@@ -432,7 +465,7 @@
             position: sticky;
             top: 0;
             color: #f0f0f0;
-            white-space: nowrap;
+            min-width: 90px;
         }
         tr:nth-child(even) {
             background: #181818;
@@ -783,14 +816,14 @@
                 font-size: 1.1rem;
             }
             table {
-                font-size: 0.85rem;
+                font-size: 0.6rem;
                 table-layout: fixed;
                 word-wrap: break-word;
                 word-break: break-word;
                 white-space: normal;
             }
             th, td {
-                padding: 0.9rem 0.6rem;
+                padding: 0.2rem;
                 white-space: normal;
             }
             .name {
@@ -1014,9 +1047,9 @@
     </div>
     <div class="controls">
         <input id="search" type="text" placeholder="Search players or stats...">
-        <button id="filterBtn">Filter Games/Teams</button>
-        <button id="calloutFilterBtn">Filter Callouts</button>
-        <button id="betslipBtn">Generated Bet Slips</button>
+        <button id="filterBtn" class="filter-button">Filter Games/Teams</button>
+        <button id="calloutFilterBtn" class="filter-button">Filter Callouts</button>
+        <button id="betslipBtn" class="filter-button">Generated Bet Slips</button>
         <select id="oddsSelect"></select>
         <select id="betTypeSelect"></select>
         <select id="viewSelect">
@@ -1226,6 +1259,7 @@
 
                 const tabNames = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
                 const tabsDiv = document.querySelector('.tabs');
+                tabsDiv.innerHTML = '';
                 tabNames.forEach((tab, index) => {
                     const btn = document.createElement('div');
                     btn.classList.add('tab');
@@ -1254,6 +1288,7 @@
                 tabsDiv.appendChild(viewSwitch);
 
                 const betTypeSelect = document.getElementById('betTypeSelect');
+                betTypeSelect.innerHTML = '';
                 tabNames.forEach(tab => {
                     const option = document.createElement('option');
                     option.value = tab;
@@ -1271,6 +1306,7 @@
 
                 const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
                 const oddsSelect = document.getElementById('oddsSelect');
+                oddsSelect.innerHTML = '';
                 oddsOptions.forEach(opt => {
                     const option = document.createElement('option');
                     option.value = opt;
@@ -2122,12 +2158,12 @@
                 } else {
                     const table = document.createElement('table');
                     const thead = document.createElement('thead');
-                    const headers = ['Details', 'Stat', 'Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'L5 Avg', 'L5 Hit%', 'Actions'];
+                    const headers = ['Details', 'Stat', 'Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp', 'Actions'];
                     const headerTr = document.createElement('tr');
                     headers.forEach(h => {
                         const th = document.createElement('th');
                         th.textContent = h;
-                        if (['Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'L5 Avg', 'L5 Hit%'].includes(h)) {
+                        if (['Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp'].includes(h)) {
                             th.dataset.column = h;
                             th.onclick = () => sortContentTable(h);
                             if (h === contentSortColumn) th.classList.add(contentSortDirection);
@@ -2209,14 +2245,10 @@
                         totalProjTd.textContent = parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1) || '-';
                         totalProjTd.setAttribute('data-label', 'Total Proj');
                         tr.appendChild(totalProjTd);
-                        const l5AvgTd = document.createElement('td');
-                        l5AvgTd.textContent = row.l5Avg || '-';
-                        l5AvgTd.setAttribute('data-label', 'L5 Avg');
-                        tr.appendChild(l5AvgTd);
-                        const l5HitTd = document.createElement('td');
-                        l5HitTd.textContent = row.l5HitRate + '%' || '-';
-                        l5HitTd.setAttribute('data-label', 'L5 Hit%');
-                        tr.appendChild(l5HitTd);
+                        const oppTd = document.createElement('td');
+                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1) || '-';
+                        oppTd.setAttribute('data-label', 'Opp');
+                        tr.appendChild(oppTd);
                         const actionsTd = document.createElement('td');
                         actionsTd.setAttribute('data-label', 'Actions');
                         const buttonsDiv = document.createElement('div');
