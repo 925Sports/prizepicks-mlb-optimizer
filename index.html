@@ -1110,7 +1110,6 @@
     </div>
     <div class="tabs"></div>
     <div id="content"></div>
-
     <div id="playerPopup">
         <span id="closePlayerPopup">×</span>
         <div class="header">
@@ -1133,7 +1132,6 @@
         <div class="tabs" id="popupTabs"></div>
         <div class="tab-content" id="popupContent"></div>
     </div>
-
     <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
         <h3>Games</h3>
@@ -1145,7 +1143,6 @@
         <button id="deselectAllTeams" class="select-btn">Deselect All</button>
         <div id="teamsList"></div>
     </div>
-
     <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
         <h3>Callout Bet Tags</h3>
@@ -1153,7 +1150,6 @@
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
         <div id="calloutsList"></div>
     </div>
-
     <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
         <h3>Generated Bet Slips</h3>
@@ -1178,7 +1174,6 @@
             </table>
         </div>
     </div>
-
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
@@ -1193,7 +1188,6 @@
             <li>Click the info icon on cards for detailed player info, game logs, splits, etc.</li>
         </ul>
     </div>
-
     <script>
         let allData = [];
         let gameLogs = [];
@@ -1222,7 +1216,6 @@
         contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
         const url = './data/prizepicks-mlb.csv';
         const gameLogUrl = '';
-
         const predefinedCombinations = {
             2: [[1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10],
                 [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10],
@@ -1268,7 +1261,6 @@
                 [3,4,5,6,7,9], [3,4,5,6,8,9], [3,4,6,7,8,9], [3,5,6,7,8,9], [3,6,7,8,9,10], [4,5,6,7,8,9],
                 [4,5,6,7,8,10], [4,5,6,7,9,10], [4,5,7,8,9,10], [5,6,7,8,9,10]]
         };
-
         fetch(url)
             .then(response => response.text())
             .then(csv => {
@@ -1284,13 +1276,11 @@
                 selectedGames = new Set(uniqueGames);
                 selectedTeams = new Set(uniqueTeams);
                 selectedCallouts = new Set(uniqueCallouts);
-
                 let uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
                 // ONLY CHANGE REQUESTED FOR FANTASY SCORES - EXCEPTION ADDED SO THEY ALWAYS APPEAR IN TABS AND DATA
                 if (!uniqueStatTypes.includes('Hitter Fantasy Score')) uniqueStatTypes.push('Hitter Fantasy Score');
                 if (!uniqueStatTypes.includes('Pitcher Fantasy Score')) uniqueStatTypes.push('Pitcher Fantasy Score');
                 uniqueStatTypes.sort();
-
                 const tabsDiv = document.querySelector('.tabs');
                 tabsDiv.innerHTML = '';
                 uniqueStatTypes.forEach((tab, index) => {
@@ -1308,7 +1298,6 @@
                     };
                     tabsDiv.appendChild(btn);
                 });
-
                 const viewSwitch = document.createElement('div');
                 viewSwitch.classList.add('view-switch');
                 viewSwitch.innerHTML = `
@@ -1320,7 +1309,6 @@
                     <span>Table</span>
                 `;
                 tabsDiv.appendChild(viewSwitch);
-
                 const betTypeSelect = document.getElementById('betTypeSelect');
                 betTypeSelect.innerHTML = '';
                 uniqueStatTypes.forEach(tab => {
@@ -1337,7 +1325,6 @@
                     if (activeTab) activeTab.classList.add('active');
                     renderContent();
                 });
-
                 const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
                 const oddsSelect = document.getElementById('oddsSelect');
                 oddsSelect.innerHTML = '';
@@ -1355,7 +1342,6 @@
                     if (activeBtn) activeBtn.classList.add('active');
                     renderContent();
                 });
-
                 const viewSelect = document.getElementById('viewSelect');
                 viewSelect.value = 'cards';
                 viewSelect.addEventListener('change', () => {
@@ -1363,7 +1349,6 @@
                     document.getElementById('viewToggle').checked = currentView === 'table';
                     renderContent();
                 });
-
                 document.getElementById('search').addEventListener('input', (e) => {
                     searchTerm = e.target.value.toLowerCase();
                     renderContent();
@@ -1386,7 +1371,6 @@
                     showSelectedOnly = e.target.checked;
                     renderContent();
                 });
-
                 document.getElementById('filterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('popup');
                     popup.style.display = 'block';
@@ -1428,14 +1412,12 @@
                     document.getElementById('selectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                     document.getElementById('deselectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = false);
                 });
-
                 document.getElementById('applyFilter').addEventListener('click', () => {
                     selectedGames = new Set(Array.from(document.getElementById('gamesList').querySelectorAll('input:checked')).map(cb => cb.value));
                     selectedTeams = new Set(Array.from(document.getElementById('teamsList').querySelectorAll('input:checked')).map(cb => cb.value));
                     document.getElementById('popup').style.display = 'none';
                     renderContent();
                 });
-
                 document.getElementById('calloutFilterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('calloutPopup');
                     popup.style.display = 'block';
@@ -1455,34 +1437,28 @@
                     document.getElementById('selectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                     document.getElementById('deselectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = false);
                 });
-
                 document.getElementById('applyCalloutFilter').addEventListener('click', () => {
                     selectedCallouts = new Set(Array.from(document.getElementById('calloutsList').querySelectorAll('input:checked')).map(cb => cb.value));
                     document.getElementById('calloutPopup').style.display = 'none';
                     renderContent();
                 });
-
                 document.getElementById('betslipBtn').addEventListener('click', () => {
                     document.getElementById('overlay').style.display = 'block';
                     document.getElementById('betslipPopup').style.display = 'block';
                     filterBetSlips();
                 });
-
                 document.getElementById('closeBetSlip').addEventListener('click', () => {
                     document.getElementById('betslipPopup').style.display = 'none';
                     document.getElementById('overlay').style.display = 'none';
                 });
-
                 document.getElementById('tool-info').addEventListener('click', () => {
                     document.getElementById('overlay').style.display = 'block';
                     document.getElementById('toolInfoPopup').style.display = 'block';
                 });
-
                 document.getElementById('closeToolInfo').addEventListener('click', () => {
                     document.getElementById('toolInfoPopup').style.display = 'none';
                     document.getElementById('overlay').style.display = 'none';
                 });
-
                 document.addEventListener('click', (event) => {
                     const popups = ['popup', 'calloutPopup', 'betslipPopup', 'toolInfoPopup'];
                     popups.forEach(p => {
@@ -1495,18 +1471,15 @@
                         }
                     });
                 }, true);
-
                 renderContent();
             })
             .catch(error => {
                 console.error('Error fetching CSV:', error);
                 contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
             });
-
         function updateBetSlip() {
             filterBetSlips();
         }
-
         function generateCombinations(bets) {
             let allCombinations = { 2: [], 3: [], 4: [], 5: [], 6: [] };
             const betCount = bets.length;
@@ -1577,12 +1550,10 @@
             }
             return allCombinations;
         }
-
         function filterBetSlips() {
             selectedPayout = document.getElementById('payoutFilter').value;
             renderBetSlips();
         }
-
         function renderBetSlips() {
             const header = document.getElementById('betslipsHeader');
             const body = document.getElementById('betslipsBody');
@@ -1639,7 +1610,6 @@
                 body.appendChild(tr);
             });
         }
-
         function sortBetSlips(column) {
             if (betSlipsSortColumn === column) {
                 betSlipsSortDirection = betSlipsSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1649,33 +1619,27 @@
             }
             filterBetSlips();
         }
-
         function showPlayerPopup(row, currentIndex) {
             currentRow = row;
             const popup = document.getElementById('playerPopup');
             const overlay = document.getElementById('overlay');
             popup.style.display = 'block';
             overlay.style.display = 'block';
-
             document.getElementById('popupHeadshot').src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
-
             const betTagLower = (row['Bet Tag'] || '').toLowerCase();
             const isOver = betTagLower.includes('over') || betTagLower.includes('more');
             const arrowColor = isOver ? '#4dff4d' : '#ff4d4d';
             const arrowSymbol = isOver ? '↑' : '↓';
             document.getElementById('popupName').innerHTML = `${row['Player Name']}: <span style="color: ${arrowColor};">${arrowSymbol}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
-
             document.getElementById('popupTeamPos').textContent = `${row.Team} | ${row.Position || ''}`;
             document.getElementById('popupGame').textContent = `${row.Team} @ ${row.Opp || row['Opponent'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
-
             const spread = parseFloat(row.Spread) || 0;
             const ou = parseFloat(row['O/U']) || 0;
             document.getElementById('popupSpreadOU').innerHTML = `
-                <span class="spread-red">Spread: ${spread}</span> 
+                <span class="spread-red">Spread: ${spread}</span>
                 <span class="${ou < 230 ? 'ou-red' : 'ou-green'}">O/U: ${ou}</span>
             `;
-
             const statsBoxes = document.getElementById('statsBoxes');
             statsBoxes.innerHTML = '';
             const stats = [
@@ -1695,7 +1659,6 @@
                 `;
                 statsBoxes.appendChild(box);
             });
-
             const popupTabs = document.getElementById('popupTabs');
             popupTabs.innerHTML = '';
             const tabNames = ['Overview', 'Game Log', 'Splits', 'News', 'Other Bets', 'Matchup'];
@@ -1711,9 +1674,7 @@
                 };
                 popupTabs.appendChild(btn);
             });
-
             renderPopupContent('Overview', row);
-
             const prevBtn = document.getElementById('prevPlayer');
             const nextBtn = document.getElementById('nextPlayer');
             prevBtn.disabled = currentIndex <= 0;
@@ -1724,13 +1685,11 @@
             nextBtn.onclick = () => {
                 if (currentIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
             };
-
             document.getElementById('closePlayerPopup').onclick = () => {
                 popup.style.display = 'none';
                 overlay.style.display = 'none';
             };
         }
-
         function renderPopupContent(tab, row) {
             const content = document.getElementById('popupContent');
             content.innerHTML = '';
@@ -1913,7 +1872,6 @@
                 `;
             }
         }
-
         function sortContentTable(column) {
             if (contentSortColumn === column) {
                 contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1923,7 +1881,6 @@
             }
             renderContent();
         }
-
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
@@ -1942,9 +1899,9 @@
                 }
                 // ONLY CHANGE REQUESTED FOR TABLE VIEW SORTING - DYNAMIC SORT LOGIC ADDED HERE (previously hardcoded to Edge % only)
                 filtered = filtered.filter(row =>
-                    selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) && 
-                    (selectedCallouts.has(row['Callout Bet Tag']) || 
-                     (row['Stat Type'] || '').trim() === 'Hitter Fantasy Score' || 
+                    selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) &&
+                    (selectedCallouts.has(row['Callout Bet Tag']) ||
+                     (row['Stat Type'] || '').trim() === 'Hitter Fantasy Score' ||
                      (row['Stat Type'] || '').trim() === 'Pitcher Fantasy Score')
                 );
                 filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
