@@ -16,12 +16,11 @@
             width: 100vw;
             overflow: auto;
             overflow-x: hidden;
-            scrollbar-width: thin; /* Firefox */
+            scrollbar-width: thin;
             scrollbar-color: #555 #1a1a1a;
-            touch-action: manipulation; /* Improve touch scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
         }
-        /* Webkit scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -164,7 +163,7 @@
             background: #0a0a0a;
             padding: 12px 40px;
             position: sticky;
-            top: 100px; /* Adjust based on controls height */
+            top: 100px;
             z-index: 10;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
@@ -344,7 +343,7 @@
             font-size: 18px;
             color: #00ffcc;
         }
-        #popup, #betslipPopup, #calloutPopup, #toolInfoPopup {
+        #popup, #betslipPopup, #calloutPopup, #toolInfoPopup, #advancedFilterPopup {
             display: none;
             position: fixed;
             top: 10%;
@@ -361,7 +360,7 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
             -webkit-overflow-scrolling: touch;
         }
-        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3 {
+        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3, #advancedFilterPopup h3 {
             margin-top: 20px;
             font-weight: 600;
         }
@@ -369,7 +368,7 @@
             display: block;
             font-size: 14px;
         }
-        #filterBtn, #betslipBtn, #calloutFilterBtn {
+        #filterBtn, #betslipBtn, #calloutFilterBtn, #advancedFilterBtn {
             padding: 8px 20px;
             background: #00ffcc;
             color: #000;
@@ -379,10 +378,10 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
+        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover, #advancedFilterBtn:hover {
             background: #00e6b3;
         }
-        #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo {
+        #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo, #applyAdvancedFilter {
             margin-bottom: 20px;
             padding: 8px 20px;
             background: #4dff4d;
@@ -393,7 +392,7 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover {
+        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover, #applyAdvancedFilter:hover {
             background: #66ff66;
         }
         .select-btn {
@@ -484,7 +483,7 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            font-size: 1rem; /* Larger font for mobile */
+            font-size: 1rem;
             -webkit-overflow-scrolling: touch;
         }
         #playerPopup .header {
@@ -521,7 +520,7 @@
             position: relative;
             top: auto;
             padding: 8px;
-            overflow-x: auto; /* Allow horizontal scroll if tabs overflow */
+            overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
         }
@@ -532,14 +531,14 @@
         #playerPopup table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* Prevent wide tables */
+            table-layout: fixed;
             font-size: 0.7rem;
         }
         #playerPopup th, #playerPopup td {
             border: 1px solid #333;
             padding: 4px;
             text-align: center;
-            word-wrap: break-word; /* Break long words */
+            word-wrap: break-word;
         }
         #playerPopup th {
             font-size: 0.7rem;
@@ -571,7 +570,7 @@
             z-index: 35;
         }
         #popupName {
-            font-size: 24px; /* Adjust for mobile */
+            font-size: 24px;
             font-weight: 700;
             color: #f0f0f0;
             display: inline-flex;
@@ -581,7 +580,7 @@
             text-align: left;
         }
         #popupGame, #popupScheduledAt {
-            font-size: 14px; /* Adjust for mobile */
+            font-size: 14px;
             font-weight: 600;
         }
         .stats-boxes {
@@ -767,11 +766,11 @@
             #betTypeSelect, #oddsSelect, #viewSelect {
                 display: block;
             }
-            #popup, #betslipPopup, #calloutPopup, #toolInfoPopup {
+            #popup, #betslipPopup, #calloutPopup, #toolInfoPopup, #advancedFilterPopup {
                 width: 100%;
                 max-width: none;
                 padding: 5px;
-                font-size: 1.1rem; /* Slightly larger font */
+                font-size: 1.1rem;
                 top: 0;
                 left: 0;
                 transform: none;
@@ -779,7 +778,7 @@
                 max-height: 90vh;
                 border-radius: 16px;
             }
-            #popup h3, #calloutPopup h3, #betslipPopup h3, #toolInfoPopup h3 {
+            #popup h3, #calloutPopup h3, #betslipPopup h3, #toolInfoPopup h3, #advancedFilterPopup h3 {
                 font-size: 1.3rem;
                 margin-top: 10px;
             }
@@ -791,7 +790,7 @@
                 padding: 8px 12px;
                 font-size: 1.1rem;
             }
-            #applyFilter, #applyCalloutFilter, #closeBetSlip, #closeToolInfo {
+            #applyFilter, #applyCalloutFilter, #closeBetSlip, #closeToolInfo, #applyAdvancedFilter {
                 margin-bottom: 10px;
                 padding: 10px 16px;
                 font-size: 1.1rem;
@@ -833,13 +832,13 @@
                 width: 60px;
                 height: 60px;
             }
-            #filterBtn, #calloutFilterBtn, #betslipBtn {
+            #filterBtn, #calloutFilterBtn, #betslipBtn, #advancedFilterBtn {
                 padding: 8px 14px;
                 font-size: 1rem;
                 margin-bottom: 10px;
             }
             .betslips-container {
-                overflow-x: auto; /* Allow scroll if needed, but aim to avoid */
+                overflow-x: auto;
             }
             #playerPopup .tabs {
                 overflow-x: auto;
@@ -932,7 +931,6 @@
             #playerPopup th, #playerPopup td {
                 padding: 2px;
             }
-            /* Responsive table stacking for mobile */
             #playerPopup table {
                 border: 0;
             }
@@ -973,7 +971,6 @@
                 background-color: #333;
                 font-weight: bold;
             }
-            /* Responsive table for content in table view */
             #content table {
                 border: 0;
             }
@@ -1032,6 +1029,7 @@
         <input id="search" type="text" placeholder="Search players or stats...">
         <button id="filterBtn">Filter Games/Teams</button>
         <button id="calloutFilterBtn">Filter Callouts</button>
+        <button id="advancedFilterBtn">Filter Bet Tag / Fav / O/U</button>
         <button id="betslipBtn">Generated Bet Slips</button>
         <select id="oddsSelect"></select>
         <select id="betTypeSelect"></select>
@@ -1055,6 +1053,7 @@
     </div>
     <div class="tabs"></div>
     <div id="content"></div>
+
     <div id="playerPopup">
         <span id="closePlayerPopup">×</span>
         <div class="header">
@@ -1077,6 +1076,7 @@
         <div class="tabs" id="popupTabs"></div>
         <div class="tab-content" id="popupContent"></div>
     </div>
+
     <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
         <h3>Games</h3>
@@ -1088,6 +1088,7 @@
         <button id="deselectAllTeams" class="select-btn">Deselect All</button>
         <div id="teamsList"></div>
     </div>
+
     <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
         <h3>Callout Bet Tags</h3>
@@ -1095,6 +1096,25 @@
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
         <div id="calloutsList"></div>
     </div>
+
+    <div id="advancedFilterPopup" class="popup">
+        <button id="applyAdvancedFilter">Apply</button>
+        <h3>Bet Tag (More / Less)</h3>
+        <button id="selectAllBetTags" class="select-btn">Select All</button>
+        <button id="deselectAllBetTags" class="select-btn">Deselect All</button>
+        <div id="betTagsList"></div>
+
+        <h3>Favorite (Yes / No)</h3>
+        <button id="selectAllFav" class="select-btn">Select All</button>
+        <button id="deselectAllFav" class="select-btn">Deselect All</button>
+        <div id="favList"></div>
+
+        <h3>Game Scoring (O/U)</h3>
+        <button id="selectAllGameTypes" class="select-btn">Select All</button>
+        <button id="deselectAllGameTypes" class="select-btn">Deselect All</button>
+        <div id="gameTypesList"></div>
+    </div>
+
     <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
         <h3>Generated Bet Slips</h3>
@@ -1119,13 +1139,14 @@
             </table>
         </div>
     </div>
+
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
         <p>This tool helps you optimize your MLB bets on PrizePicks.</p>
         <ul>
             <li>Use the search bar to find players or stats.</li>
-            <li>Filter by games, teams, or callout tags using the buttons.</li>
+            <li>Filter by games, teams, callouts, bet tags, fav status, or game scoring using the buttons.</li>
             <li>Select odds type: All, Standard, Demon, or Goblin.</li>
             <li>Switch tabs to view different stat categories.</li>
             <li>On each player card, click 'More' or 'Less' to add bets to your slip.</li>
@@ -1133,6 +1154,7 @@
             <li>Click the info icon on cards for detailed player info, game logs, splits, etc.</li>
         </ul>
     </div>
+
     <script>
         let allData = [];
         let gameLogs = [];
@@ -1144,9 +1166,13 @@
         let uniqueGames = [];
         let uniqueTeams = [];
         let uniqueCallouts = [];
+        let uniqueBetTags = [];
         let selectedGames = new Set();
         let selectedTeams = new Set();
         let selectedCallouts = new Set();
+        let selectedBetTags = new Set();
+        let selectedFav = new Set();
+        let selectedGameTypes = new Set();
         let selectedBets = [];
         let selectedPayout = 'all';
         let betSlipsSortColumn = 'Edge';
@@ -1218,13 +1244,20 @@
                 uniqueGames = Array.from(gameToTime.entries()).sort((a, b) => new Date(a[1]) - new Date(b[1])).map(entry => entry[0]);
                 uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
                 uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
+                uniqueBetTags = [...new Set(allData.map(row => row['Bet Tag']).filter(Boolean))].sort();
+
                 selectedGames = new Set(uniqueGames);
                 selectedTeams = new Set(uniqueTeams);
                 selectedCallouts = new Set(uniqueCallouts);
+                selectedBetTags = new Set(uniqueBetTags);
+                selectedFav = new Set(['Yes', 'No']);
+                selectedGameTypes = new Set(['High', 'Normal', 'Low']);
+
                 let uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
                 if (!uniqueStatTypes.includes('Hitter Fantasy Score')) uniqueStatTypes.push('Hitter Fantasy Score');
                 if (!uniqueStatTypes.includes('Pitcher Fantasy Score')) uniqueStatTypes.push('Pitcher Fantasy Score');
                 uniqueStatTypes.sort();
+
                 const tabsDiv = document.querySelector('.tabs');
                 tabsDiv.innerHTML = '';
                 uniqueStatTypes.forEach((tab, index) => {
@@ -1242,6 +1275,7 @@
                     };
                     tabsDiv.appendChild(btn);
                 });
+
                 const viewSwitch = document.createElement('div');
                 viewSwitch.classList.add('view-switch');
                 viewSwitch.innerHTML = `
@@ -1253,6 +1287,7 @@
                     <span>Table</span>
                 `;
                 tabsDiv.appendChild(viewSwitch);
+
                 const betTypeSelect = document.getElementById('betTypeSelect');
                 betTypeSelect.innerHTML = '';
                 uniqueStatTypes.forEach(tab => {
@@ -1269,6 +1304,7 @@
                     if (activeTab) activeTab.classList.add('active');
                     renderContent();
                 });
+
                 const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
                 const oddsSelect = document.getElementById('oddsSelect');
                 oddsSelect.innerHTML = '';
@@ -1286,6 +1322,7 @@
                     if (activeBtn) activeBtn.classList.add('active');
                     renderContent();
                 });
+
                 const viewSelect = document.getElementById('viewSelect');
                 viewSelect.value = 'cards';
                 viewSelect.addEventListener('change', () => {
@@ -1293,10 +1330,12 @@
                     document.getElementById('viewToggle').checked = currentView === 'table';
                     renderContent();
                 });
+
                 document.getElementById('search').addEventListener('input', (e) => {
                     searchTerm = e.target.value.toLowerCase();
                     renderContent();
                 });
+
                 document.querySelectorAll('.toggle-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
@@ -1306,15 +1345,18 @@
                         renderContent();
                     });
                 });
+
                 document.getElementById('viewToggle').addEventListener('change', (e) => {
                     currentView = e.target.checked ? 'table' : 'cards';
                     viewSelect.value = currentView;
                     renderContent();
                 });
+
                 document.getElementById('selectedToggle').addEventListener('change', (e) => {
                     showSelectedOnly = e.target.checked;
                     renderContent();
                 });
+
                 document.getElementById('filterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('popup');
                     popup.style.display = 'block';
@@ -1356,12 +1398,14 @@
                     document.getElementById('selectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                     document.getElementById('deselectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = false);
                 });
+
                 document.getElementById('applyFilter').addEventListener('click', () => {
                     selectedGames = new Set(Array.from(document.getElementById('gamesList').querySelectorAll('input:checked')).map(cb => cb.value));
                     selectedTeams = new Set(Array.from(document.getElementById('teamsList').querySelectorAll('input:checked')).map(cb => cb.value));
                     document.getElementById('popup').style.display = 'none';
                     renderContent();
                 });
+
                 document.getElementById('calloutFilterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('calloutPopup');
                     popup.style.display = 'block';
@@ -1381,33 +1425,105 @@
                     document.getElementById('selectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                     document.getElementById('deselectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = false);
                 });
+
                 document.getElementById('applyCalloutFilter').addEventListener('click', () => {
                     selectedCallouts = new Set(Array.from(document.getElementById('calloutsList').querySelectorAll('input:checked')).map(cb => cb.value));
                     document.getElementById('calloutPopup').style.display = 'none';
                     renderContent();
                 });
+
+                // Advanced Filter Button
+                document.getElementById('advancedFilterBtn').addEventListener('click', () => {
+                    const popup = document.getElementById('advancedFilterPopup');
+                    popup.style.display = 'block';
+
+                    // Bet Tags
+                    const betTagsList = document.getElementById('betTagsList');
+                    betTagsList.innerHTML = '';
+                    uniqueBetTags.forEach(tag => {
+                        const label = document.createElement('label');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = tag;
+                        checkbox.checked = selectedBetTags.has(tag);
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(tag));
+                        betTagsList.appendChild(label);
+                        betTagsList.appendChild(document.createElement('br'));
+                    });
+
+                    // Favorite
+                    const favList = document.getElementById('favList');
+                    favList.innerHTML = '';
+                    ['Yes', 'No'].forEach(fav => {
+                        const label = document.createElement('label');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = fav;
+                        checkbox.checked = selectedFav.has(fav);
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(fav));
+                        favList.appendChild(label);
+                        favList.appendChild(document.createElement('br'));
+                    });
+
+                    // Game Types
+                    const gameTypesList = document.getElementById('gameTypesList');
+                    gameTypesList.innerHTML = '';
+                    ['High', 'Normal', 'Low'].forEach(type => {
+                        const label = document.createElement('label');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = type;
+                        checkbox.checked = selectedGameTypes.has(type);
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(type + ' Scoring'));
+                        gameTypesList.appendChild(label);
+                        gameTypesList.appendChild(document.createElement('br'));
+                    });
+
+                    document.getElementById('selectAllBetTags').onclick = () => document.querySelectorAll('#betTagsList input').forEach(cb => cb.checked = true);
+                    document.getElementById('deselectAllBetTags').onclick = () => document.querySelectorAll('#betTagsList input').forEach(cb => cb.checked = false);
+                    document.getElementById('selectAllFav').onclick = () => document.querySelectorAll('#favList input').forEach(cb => cb.checked = true);
+                    document.getElementById('deselectAllFav').onclick = () => document.querySelectorAll('#favList input').forEach(cb => cb.checked = false);
+                    document.getElementById('selectAllGameTypes').onclick = () => document.querySelectorAll('#gameTypesList input').forEach(cb => cb.checked = true);
+                    document.getElementById('deselectAllGameTypes').onclick = () => document.querySelectorAll('#gameTypesList input').forEach(cb => cb.checked = false);
+                });
+
+                document.getElementById('applyAdvancedFilter').addEventListener('click', () => {
+                    selectedBetTags = new Set(Array.from(document.querySelectorAll('#betTagsList input:checked')).map(cb => cb.value));
+                    selectedFav = new Set(Array.from(document.querySelectorAll('#favList input:checked')).map(cb => cb.value));
+                    selectedGameTypes = new Set(Array.from(document.querySelectorAll('#gameTypesList input:checked')).map(cb => cb.value));
+                    document.getElementById('advancedFilterPopup').style.display = 'none';
+                    renderContent();
+                });
+
                 document.getElementById('betslipBtn').addEventListener('click', () => {
                     document.getElementById('overlay').style.display = 'block';
                     document.getElementById('betslipPopup').style.display = 'block';
                     filterBetSlips();
                 });
+
                 document.getElementById('closeBetSlip').addEventListener('click', () => {
                     document.getElementById('betslipPopup').style.display = 'none';
                     document.getElementById('overlay').style.display = 'none';
                 });
+
                 document.getElementById('tool-info').addEventListener('click', () => {
                     document.getElementById('overlay').style.display = 'block';
                     document.getElementById('toolInfoPopup').style.display = 'block';
                 });
+
                 document.getElementById('closeToolInfo').addEventListener('click', () => {
                     document.getElementById('toolInfoPopup').style.display = 'none';
                     document.getElementById('overlay').style.display = 'none';
                 });
+
                 document.addEventListener('click', (event) => {
-                    const popups = ['popup', 'calloutPopup', 'betslipPopup', 'toolInfoPopup'];
+                    const popups = ['popup', 'calloutPopup', 'betslipPopup', 'toolInfoPopup', 'advancedFilterPopup'];
                     popups.forEach(p => {
                         const popupEl = document.getElementById(p);
-                        const btnId = p === 'popup' ? 'filterBtn' : p === 'calloutPopup' ? 'calloutFilterBtn' : p === 'betslipPopup' ? 'betslipBtn' : 'tool-info';
+                        const btnId = p === 'popup' ? 'filterBtn' : p === 'calloutPopup' ? 'calloutFilterBtn' : p === 'betslipPopup' ? 'betslipBtn' : p === 'advancedFilterPopup' ? 'advancedFilterBtn' : 'tool-info';
                         const btn = document.getElementById(btnId);
                         if (popupEl.style.display === 'block' && !popupEl.contains(event.target) && event.target !== btn) {
                             popupEl.style.display = 'none';
@@ -1415,15 +1531,18 @@
                         }
                     });
                 }, true);
+
                 renderContent();
             })
             .catch(error => {
                 console.error('Error fetching CSV:', error);
                 contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
             });
+
         function updateBetSlip() {
             filterBetSlips();
         }
+
         function generateCombinations(bets) {
             let allCombinations = { 2: [], 3: [], 4: [], 5: [], 6: [] };
             const betCount = bets.length;
@@ -1486,10 +1605,12 @@
             }
             return allCombinations;
         }
+
         function filterBetSlips() {
             selectedPayout = document.getElementById('payoutFilter').value;
             renderBetSlips();
         }
+
         function renderBetSlips() {
             const header = document.getElementById('betslipsHeader');
             const body = document.getElementById('betslipsBody');
@@ -1572,6 +1693,7 @@
                 body.appendChild(detailRow);
             });
         }
+
         function toggleBetSlipDetail(index, playersKey) {
             if (expandedCombinations.has(playersKey)) {
                 expandedCombinations.delete(playersKey);
@@ -1580,6 +1702,7 @@
             }
             renderBetSlips();
         }
+
         function sortBetSlips(column) {
             if (betSlipsSortColumn === column) {
                 betSlipsSortDirection = betSlipsSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1589,6 +1712,7 @@
             }
             filterBetSlips();
         }
+
         function showPlayerPopup(row, currentIndex) {
             currentRow = row;
             const popup = document.getElementById('playerPopup');
@@ -1662,6 +1786,7 @@
                 overlay.style.display = 'none';
             };
         }
+
         function renderPopupContent(tab, row) {
             const content = document.getElementById('popupContent');
             content.innerHTML = '';
@@ -1686,21 +1811,19 @@
                     {name: 'UD Line', value: udLine},
                     {name: 'True Pt Avg', value: truePtAvg}
                 ];
-                projections = projections.filter(p => p.value > 0 || p.name === 'UD Line' || p.name === 'True Pt Avg');
-                const overProjs = projections.filter(p => p.value > lineScore && p.name !== 'UD Line' && p.name !== 'True Pt Avg');
-                const underProjs = projections.filter(p => p.value < lineScore && p.name !== 'UD Line' && p.name !== 'True Pt Avg');
-                const equalProjs = projections.filter(p => p.value === lineScore && p.name !== 'UD Line' && p.name !== 'True Pt Avg');
-                const refLines = projections.filter(p => p.name === 'UD Line' || p.name === 'True Pt Avg');
-                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name), refLines.map(p => p.name));
-                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value), refLines.map(p => p.value));
+                projections = projections.filter(p => p.value > 0);
+                projections.sort((a, b) => b.value - a.value);
+                const overProjs = projections.filter(p => p.value > lineScore);
+                const underProjs = projections.filter(p => p.value < lineScore);
+                const equalProjs = projections.filter(p => p.value === lineScore);
+                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name));
+                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value));
                 const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)')
                     .concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)')
-                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'))
-                    .concat(refLines.map(() => 'rgba(255, 215, 0, 0.6)'));
+                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
                 const borderColors = overProjs.map(() => 'rgba(75, 192, 75, 1)')
                     .concat(equalProjs.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)')
-                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'))
-                    .concat(refLines.map(() => 'rgba(255, 215, 0, 1)'));
+                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'));
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -1885,6 +2008,7 @@
                 `;
             }
         }
+
         window.addPopupBet = function(player, stat, choice, line, edge) {
             const key = `${player}-${stat}`;
             const existingIndex = selectedBets.findIndex(b => b.key === key);
@@ -1912,6 +2036,7 @@
             renderContent();
             renderPopupContent('Other Bets', currentRow);
         };
+
         function sortContentTable(column) {
             if (contentSortColumn === column) {
                 contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1921,6 +2046,7 @@
             }
             renderContent();
         }
+
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
@@ -1947,11 +2073,30 @@
                                selectedCallouts.has(row['Callout Bet Tag']);
                     }
                 });
+
+                // NEW ADVANCED FILTERS
+                if (selectedBetTags.size > 0) {
+                    filtered = filtered.filter(row => selectedBetTags.has(row['Bet Tag']));
+                }
+                if (selectedFav.size > 0) {
+                    filtered = filtered.filter(row => selectedFav.has(row['Fav'] || 'No'));
+                }
+                if (selectedGameTypes.size > 0) {
+                    filtered = filtered.filter(row => {
+                        const ou = parseFloat(row['O/U'] || 0);
+                        let type = 'Normal';
+                        if (ou >= 8.9) type = 'High';
+                        else if (ou < 7) type = 'Low';
+                        return selectedGameTypes.has(type);
+                    });
+                }
+
                 filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
+
                 filtered.sort((a, b) => {
                     let aVal = 0, bVal = 0;
                     if (contentSortColumn === 'Edge') {
@@ -1986,6 +2131,7 @@
                         return bVal - aVal;
                     }
                 });
+
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
                 contentDiv.classList.remove('table-view');
