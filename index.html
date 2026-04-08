@@ -1618,7 +1618,9 @@
                 {label: 'DVP', value: parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1)},
                 {label: 'Total', value: parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1)},
                 {label: 'Opp', value: parseFloat(row['Opportunities'] || row['Opp'] || 0).toFixed(1)},
-                {label: 'DVP Rank', value: row['DVP Rank'] || '-'}
+                {label: 'DVP Rank', value: row['DVP Rank'] || '-'},
+                {label: 'UD Line', value: parseFloat(row['Underdog Line'] || 0).toFixed(1)},
+                {label: 'True Pt Avg', value: parseFloat(row['True Point Average'] || row['True Point Avg'] || 0).toFixed(1)}
             ];
             stats.forEach(stat => {
                 const box = document.createElement('div');
@@ -1674,20 +1676,31 @@
                 const avgProjected = parseFloat(row['Average Projected'] || row['Proj'] || 0);
                 const dvpAdjusted = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0);
                 const totalProjection = parseFloat(row['Total Projection'] || row['Total'] || 0);
+                const udLine = parseFloat(row['Underdog Line'] || 0);
+                const truePtAvg = parseFloat(row['True Point Average'] || row['True Point Avg'] || 0);
                 const lineScore = parseFloat(row['Line Score'] || 0);
                 let projections = [
                     {name: 'Avg Proj', value: avgProjected},
                     {name: 'DVP Adj', value: dvpAdjusted},
-                    {name: 'Total Proj', value: totalProjection}
+                    {name: 'Total Proj', value: totalProjection},
+                    {name: 'UD Line', value: udLine},
+                    {name: 'True Pt Avg', value: truePtAvg}
                 ];
-                projections = projections.filter(p => p.value > 0);
-                const overProjs = projections.filter(p => p.value > lineScore);
-                const underProjs = projections.filter(p => p.value < lineScore);
-                const equalProjs = projections.filter(p => p.value === lineScore);
-                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name));
-                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value));
-                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)').concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)').concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
-                const borderColors = overProjs.map(() => 'rgba(75, 192, 75, 1)').concat(equalProjs.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)').concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'));
+                projections = projections.filter(p => p.value > 0 || p.name === 'UD Line' || p.name === 'True Pt Avg');
+                const overProjs = projections.filter(p => p.value > lineScore && p.name !== 'UD Line' && p.name !== 'True Pt Avg');
+                const underProjs = projections.filter(p => p.value < lineScore && p.name !== 'UD Line' && p.name !== 'True Pt Avg');
+                const equalProjs = projections.filter(p => p.value === lineScore && p.name !== 'UD Line' && p.name !== 'True Pt Avg');
+                const refLines = projections.filter(p => p.name === 'UD Line' || p.name === 'True Pt Avg');
+                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name), refLines.map(p => p.name));
+                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value), refLines.map(p => p.value));
+                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)')
+                    .concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)')
+                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'))
+                    .concat(refLines.map(() => 'rgba(255, 215, 0, 0.6)'));
+                const borderColors = overProjs.map(() => 'rgba(75, 192, 75, 1)')
+                    .concat(equalProjs.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)')
+                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'))
+                    .concat(refLines.map(() => 'rgba(255, 215, 0, 1)'));
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
