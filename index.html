@@ -1898,8 +1898,8 @@
                     );
                 }
                 // ONLY CHANGE REQUESTED FOR FANTASY SCORES - EXCEPTION ADDED SO THEY ALWAYS APPEAR IN TABS AND DATA
-                // Fantasy Score bets now bypass the Callout Bet Tag filter (while still respecting game/team filters) 
-                // so Hitter Fantasy Score and Pitcher Fantasy Score rows are always shown regardless of selected callouts
+                // Hitter Fantasy Score and Pitcher Fantasy Score now bypass the Callout Bet Tag filter completely
+                // while still respecting game and team filters (this is the only place the filter logic lives)
                 filtered = filtered.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const isFantasyScore = statType === 'Hitter Fantasy Score' || statType === 'Pitcher Fantasy Score';
