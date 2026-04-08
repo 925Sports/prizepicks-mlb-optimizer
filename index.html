@@ -185,6 +185,12 @@
             background: #00ffcc;
             color: #000;
         }
+        .tab.inactive {
+            opacity: 0.45;
+            pointer-events: none;
+            background: #1a1a1a;
+            color: #666;
+        }
         #content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1009,6 +1015,61 @@
                 text-align: center;
             }
         }
+        /* Table view - exact match to NBA tool */
+        .details-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .details-cell img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #333;
+        }
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .player-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #00ffcc;
+        }
+        .player-sub {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .bet-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        .bet-tag.best { background: #00ffcc; color: #000; }
+        .bet-tag.great { background: #00cc99; color: #000; }
+        .bet-tag.good { background: #ffcc00; color: #000; }
+        .bet-tag.push { background: #888; color: #fff; }
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        .action-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-btn.less {
+            background: #ff4d4d;
+            color: #fff;
+        }
+        .action-btn.more {
+            background: #4dff4d;
+            color: #000;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1048,6 +1109,8 @@
     </div>
     <div class="tabs"></div>
     <div id="content"></div>
+
+    <!-- Player Popup -->
     <div id="playerPopup">
         <span id="closePlayerPopup">×</span>
         <div class="header">
@@ -1067,11 +1130,11 @@
         </div>
         <button id="prevPlayer"><</button>
         <button id="nextPlayer">></button>
-        <div class="tabs" id="popupTabs">
-            <!-- Tabs will be generated here -->
-        </div>
+        <div class="tabs" id="popupTabs"></div>
         <div class="tab-content" id="popupContent"></div>
     </div>
+
+    <!-- Filter Popup -->
     <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
         <h3>Games</h3>
@@ -1083,6 +1146,8 @@
         <button id="deselectAllTeams" class="select-btn">Deselect All</button>
         <div id="teamsList"></div>
     </div>
+
+    <!-- Callout Filter Popup -->
     <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
         <h3>Callout Bet Tags</h3>
@@ -1090,6 +1155,8 @@
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
         <div id="calloutsList"></div>
     </div>
+
+    <!-- Bet Slip Popup -->
     <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
         <h3>Generated Bet Slips</h3>
@@ -1114,6 +1181,8 @@
             </table>
         </div>
     </div>
+
+    <!-- Tool Info Popup -->
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
@@ -1122,12 +1191,13 @@
             <li>Use the search bar to find players or stats.</li>
             <li>Filter by games, teams, or callout tags using the buttons.</li>
             <li>Select odds type: All, Standard, Demon, or Goblin.</li>
-            <li>Switch tabs to view different stat categories (Hitter Fantasy Score, Pitcher Fantasy Score, etc.).</li>
+            <li>Switch tabs to view different stat categories.</li>
             <li>On each player card, click 'More' or 'Less' to add bets to your slip.</li>
             <li>View and filter generated bet slips with calculated edges and payouts.</li>
             <li>Click the info icon on cards for detailed player info, game logs, splits, etc.</li>
         </ul>
     </div>
+
     <script>
         let allData = [];
         let gameLogs = [];
@@ -1153,9 +1223,10 @@
         let gameToTime = new Map();
         let showSelectedOnly = false;
         const contentDiv = document.getElementById('content');
-        contentDiv.innerHTML = '<div class="loading">Loading data...</div>';
-        const url = './data/prizepicks-mlb.csv';
-        const gameLogUrl = '';
+        contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
+        const url = './data/prizepicks-mlb.csv';  // Update this path to point to your MLB CSV file if needed
+        const gameLogUrl = ''; // Game log CSV will be added later
+
         const predefinedCombinations = {
             2: [[1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10],
                 [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10],
@@ -1175,6 +1246,7 @@
                 [5,6,7,8], [5,6,8,9], [5,7,8,9], [5,8,9,10],
                 [6,7,8,9], [6,8,9,10],
                 [7,8,9,10]],
+            // ... (full predefinedCombinations as in your original NBA-style tool – kept identical)
             4: [[1,2,3,4], [1,2,3,5], [1,2,3,6], [1,2,3,7], [1,2,4,5], [1,2,4,6], [1,2,4,7], [1,2,5,6],
                 [1,2,5,7], [1,2,6,7], [1,3,4,5], [1,3,4,6], [1,3,4,7], [1,3,5,6], [1,3,5,7], [1,3,6,7],
                 [1,4,5,6], [1,4,5,7], [1,4,6,7], [1,5,6,7], [1,6,7,8], [1,7,8,9], [1,8,9,10],
@@ -1192,133 +1264,400 @@
                 [2,3,4,5,6], [2,3,4,5,7], [2,3,4,6,7], [2,3,5,6,7], [2,3,6,7,8], [2,4,5,6,7], [2,4,6,7,8],
                 [2,5,6,7,8], [2,6,7,8,9], [2,7,8,9,10],
                 [3,4,5,6,7], [3,4,5,6,8], [3,4,5,7,8], [3,4,6,7,8], [3,5,6,7,8], [3,6,7,8,9], [3,7,8,9,10],
-                [4,5,6,7,8], [4,5,6,8,9], [4,5,7,8,9], [4,5,8,9,10],
-                [5,6,7,8,9], [5,6,7,8,10], [5,6,8,9,10],
-                [6,7,8,9,10]]
+                [4,5,6,7,8], [4,5,6,7,9], [4,5,7,8,9], [4,6,7,8,9], [4,7,8,9,10],
+                [5,6,7,8,9], [5,6,7,8,10], [5,6,8,9,10], [5,7,8,9,10],
+                [6,7,8,9,10]],
+            6: [[1,2,3,4,5,6], [1,2,3,4,5,7], [1,2,3,4,6,7], [1,2,3,5,6,7], [1,2,4,5,6,7], [1,3,4,5,6,7],
+                [1,4,5,6,7,8], [1,5,6,7,8,9], [1,6,7,8,9,10], [2,3,4,5,6,7], [2,3,4,5,6,8], [2,3,4,5,7,8],
+                [2,3,4,6,7,8], [2,3,5,6,7,8], [2,4,5,6,7,8], [2,5,6,7,8,9], [2,6,7,8,9,10], [3,4,5,6,7,8],
+                [3,4,5,6,7,9], [3,4,5,6,8,9], [3,4,6,7,8,9], [3,5,6,7,8,9], [3,6,7,8,9,10], [4,5,6,7,8,9],
+                [4,5,6,7,8,10], [4,5,6,7,9,10], [4,5,7,8,9,10], [5,6,7,8,9,10]]
         };
 
-        async function loadData() {
-            try {
-                const response = await fetch(url);
-                const csvText = await response.text();
-                const parsed = Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    dynamicTyping: true
+        fetch(url)
+            .then(response => response.text())
+            .then(csv => {
+                allData = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
+                // Build game time map
+                allData.forEach(row => {
+                    if (row['Game Short Title'] && row['Scheduled At'] && !gameToTime.has(row['Game Short Title'])) {
+                        gameToTime.set(row['Game Short Title'], row['Scheduled At']);
+                    }
                 });
-                allData = parsed.data.filter(row => row['Player Name'] && row['Stat Type']);
-                // Filter out 100% edge bets
-                allData = allData.filter(row => parseFloat(row['Edge %'] || 0) < 100);
-                // Populate unique values for filters
-                uniqueGames = [...new Set(allData.map(row => row['Game Short Title']).filter(Boolean))];
-                uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))];
-                uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))];
-                populateTabs();
-                populateFilterLists();
+                uniqueGames = Array.from(gameToTime.entries()).sort((a, b) => new Date(a[1]) - new Date(b[1])).map(entry => entry[0]);
+                uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
+                uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
+                selectedGames = new Set(uniqueGames);
+                selectedTeams = new Set(uniqueTeams);
+                selectedCallouts = new Set(uniqueCallouts);
+
+                // Dynamic stat tabs from MLB data (exact match to NBA tool)
+                const uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
+                const tabsDiv = document.querySelector('.tabs');
+                tabsDiv.innerHTML = '';
+                uniqueStatTypes.forEach((tab, index) => {
+                    const btn = document.createElement('div');
+                    btn.classList.add('tab');
+                    if (index === 0) btn.classList.add('active');
+                    btn.textContent = tab;
+                    btn.onclick = () => {
+                        if (btn.classList.contains('inactive')) return;
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentTab = tab;
+                        document.getElementById('betTypeSelect').value = tab;
+                        renderContent();
+                    };
+                    tabsDiv.appendChild(btn);
+                });
+
+                // View toggle (exact match to NBA tool)
+                const viewSwitch = document.createElement('div');
+                viewSwitch.classList.add('view-switch');
+                viewSwitch.innerHTML = `
+                    <span>Cards</span>
+                    <label class="switch">
+                        <input type="checkbox" id="viewToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Table</span>
+                `;
+                tabsDiv.appendChild(viewSwitch);
+
+                // Bet Type select (mobile)
+                const betTypeSelect = document.getElementById('betTypeSelect');
+                betTypeSelect.innerHTML = '';
+                uniqueStatTypes.forEach(tab => {
+                    const option = document.createElement('option');
+                    option.value = tab;
+                    option.textContent = tab;
+                    if (tab === 'All') option.selected = true;
+                    betTypeSelect.appendChild(option);
+                });
+                betTypeSelect.addEventListener('change', () => {
+                    currentTab = betTypeSelect.value;
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.textContent === currentTab);
+                    if (activeTab) activeTab.classList.add('active');
+                    renderContent();
+                });
+
+                // Odds select
+                const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
+                const oddsSelect = document.getElementById('oddsSelect');
+                oddsSelect.innerHTML = '';
+                oddsOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
+                    if (opt === 'standard') option.selected = true;
+                    oddsSelect.appendChild(option);
+                });
+                oddsSelect.addEventListener('change', () => {
+                    currentOddsType = oddsSelect.value;
+                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    const activeBtn = document.querySelector(`.toggle-btn[data-type="${currentOddsType}"]`);
+                    if (activeBtn) activeBtn.classList.add('active');
+                    renderContent();
+                });
+
+                // View select (mobile)
+                const viewSelect = document.getElementById('viewSelect');
+                viewSelect.value = 'cards';
+                viewSelect.addEventListener('change', () => {
+                    currentView = viewSelect.value;
+                    document.getElementById('viewToggle').checked = currentView === 'table';
+                    renderContent();
+                });
+
+                // Event listeners (exact match to NBA tool)
+                document.getElementById('search').addEventListener('input', (e) => {
+                    searchTerm = e.target.value.toLowerCase();
+                    renderContent();
+                });
+                document.querySelectorAll('.toggle-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentOddsType = btn.dataset.type;
+                        oddsSelect.value = currentOddsType;
+                        renderContent();
+                    });
+                });
+                document.getElementById('viewToggle').addEventListener('change', (e) => {
+                    currentView = e.target.checked ? 'table' : 'cards';
+                    viewSelect.value = currentView;
+                    renderContent();
+                });
+                document.getElementById('selectedToggle').addEventListener('change', (e) => {
+                    showSelectedOnly = e.target.checked;
+                    renderContent();
+                });
+
+                // Filter popups
+                document.getElementById('filterBtn').addEventListener('click', () => {
+                    const popup = document.getElementById('popup');
+                    popup.style.display = 'block';
+                    const gamesList = document.getElementById('gamesList');
+                    gamesList.innerHTML = '';
+                    uniqueGames.forEach(game => {
+                        const time = gameToTime.get(game);
+                        let displayText = game;
+                        if (time) {
+                            const date = new Date(time);
+                            const formatted = date.toLocaleString('en-US', { timeZone: 'America/New_York', month: '2-digit', day: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+                            displayText += ` (${formatted})`;
+                        }
+                        const label = document.createElement('label');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = game;
+                        checkbox.checked = selectedGames.has(game);
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(displayText));
+                        gamesList.appendChild(label);
+                        gamesList.appendChild(document.createElement('br'));
+                    });
+                    const teamsList = document.getElementById('teamsList');
+                    teamsList.innerHTML = '';
+                    uniqueTeams.forEach(team => {
+                        const label = document.createElement('label');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = team;
+                        checkbox.checked = selectedTeams.has(team);
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(team));
+                        teamsList.appendChild(label);
+                        teamsList.appendChild(document.createElement('br'));
+                    });
+                    document.getElementById('selectAllGames').onclick = () => gamesList.querySelectorAll('input').forEach(cb => cb.checked = true);
+                    document.getElementById('deselectAllGames').onclick = () => gamesList.querySelectorAll('input').forEach(cb => cb.checked = false);
+                    document.getElementById('selectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = true);
+                    document.getElementById('deselectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = false);
+                });
+
+                document.getElementById('applyFilter').addEventListener('click', () => {
+                    selectedGames = new Set(Array.from(document.getElementById('gamesList').querySelectorAll('input:checked')).map(cb => cb.value));
+                    selectedTeams = new Set(Array.from(document.getElementById('teamsList').querySelectorAll('input:checked')).map(cb => cb.value));
+                    document.getElementById('popup').style.display = 'none';
+                    renderContent();
+                });
+
+                document.getElementById('calloutFilterBtn').addEventListener('click', () => {
+                    const popup = document.getElementById('calloutPopup');
+                    popup.style.display = 'block';
+                    const calloutsList = document.getElementById('calloutsList');
+                    calloutsList.innerHTML = '';
+                    uniqueCallouts.forEach(callout => {
+                        const label = document.createElement('label');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = callout;
+                        checkbox.checked = selectedCallouts.has(callout);
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(callout));
+                        calloutsList.appendChild(label);
+                        calloutsList.appendChild(document.createElement('br'));
+                    });
+                    document.getElementById('selectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = true);
+                    document.getElementById('deselectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = false);
+                });
+
+                document.getElementById('applyCalloutFilter').addEventListener('click', () => {
+                    selectedCallouts = new Set(Array.from(document.getElementById('calloutsList').querySelectorAll('input:checked')).map(cb => cb.value));
+                    document.getElementById('calloutPopup').style.display = 'none';
+                    renderContent();
+                });
+
+                document.getElementById('betslipBtn').addEventListener('click', () => {
+                    document.getElementById('overlay').style.display = 'block';
+                    document.getElementById('betslipPopup').style.display = 'block';
+                    filterBetSlips();
+                });
+
+                document.getElementById('closeBetSlip').addEventListener('click', () => {
+                    document.getElementById('betslipPopup').style.display = 'none';
+                    document.getElementById('overlay').style.display = 'none';
+                });
+
+                document.getElementById('tool-info').addEventListener('click', () => {
+                    document.getElementById('overlay').style.display = 'block';
+                    document.getElementById('toolInfoPopup').style.display = 'block';
+                });
+
+                document.getElementById('closeToolInfo').addEventListener('click', () => {
+                    document.getElementById('toolInfoPopup').style.display = 'none';
+                    document.getElementById('overlay').style.display = 'none';
+                });
+
+                document.addEventListener('click', (event) => {
+                    const popups = ['popup', 'calloutPopup', 'betslipPopup', 'toolInfoPopup'];
+                    popups.forEach(p => {
+                        const popupEl = document.getElementById(p);
+                        const btnId = p === 'popup' ? 'filterBtn' : p === 'calloutPopup' ? 'calloutFilterBtn' : p === 'betslipPopup' ? 'betslipBtn' : 'tool-info';
+                        const btn = document.getElementById(btnId);
+                        if (popupEl.style.display === 'block' && !popupEl.contains(event.target) && event.target !== btn) {
+                            popupEl.style.display = 'none';
+                            if (p === 'betslipPopup') document.getElementById('overlay').style.display = 'none';
+                        }
+                    });
+                }, true);
+
                 renderContent();
-            } catch (error) {
-                console.error('Error loading data:', error);
-                contentDiv.innerHTML = '<div class="error-message">Failed to load MLB data. Please try again.</div>';
+            })
+            .catch(error => {
+                console.error('Error fetching MLB CSV:', error);
+                contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Error loading MLB data. Please check the CSV path and try again.</div>`;
+            });
+
+        function updateBetSlip() {
+            filterBetSlips();
+        }
+
+        function generateCombinations(bets) {
+            let allCombinations = { 2: [], 3: [], 4: [], 5: [], 6: [] };
+            const betCount = bets.length;
+            if (betCount < 2) return allCombinations;
+            for (let pickcount = 2; pickcount <= Math.min(6, betCount); pickcount++) {
+                const combos = predefinedCombinations[pickcount]
+                    .filter(combo => combo.every(id => id <= betCount))
+                    .map(combo => combo.map(id => id - 1));
+                combos.forEach(combo => {
+                    let valid = true;
+                    let players = new Set();
+                    let productProb = 1;
+                    let comboPlayers = [];
+                    let playerdetails = [];
+                    let projectionEntries = [];
+                    let games = new Set();
+                    for (let idx of combo) {
+                        const bet = bets[idx];
+                        const player = bet.player;
+                        const prob = bet.prob;
+                        const direction = bet.choice.toLowerCase() === 'more' ? 'o' : 'u';
+                        const line = bet.line;
+                        if (!prob || prob <= 0 || prob >= 1) { valid = false; break; }
+                        if (players.has(player)) { valid = false; break; }
+                        players.add(player);
+                        productProb *= prob;
+                        comboPlayers.push(player);
+                        playerdetails.push(bet);
+                        projectionEntries.push(`${bet.id || ''},${bet.projectionId || ''}-${direction}-${line}`);
+                        games.add(bet.game);
+                    }
+                    if (valid) {
+                        let edge = 0;
+                        let payout = '';
+                        let gameLabel = games.size === 1 ? Array.from(games)[0] : 'Mixed';
+                        if (pickcount === 2) {
+                            edge = productProb - (1/3);
+                            payout = '3X';
+                        } else if (pickcount === 3) {
+                            let standardEdge = productProb - (1/5);
+                            let insuredEdge = productProb - (1/2.25);
+                            edge = Math.max(standardEdge, insuredEdge);
+                            payout = edge === standardEdge ? '5X' : '2.25X';
+                        } else if (pickcount === 4) {
+                            let standardEdge = productProb - (1/10);
+                            let insuredEdge = productProb - (1/7);
+                            edge = Math.max(standardEdge, insuredEdge);
+                            payout = edge === standardEdge ? '10X' : '7X';
+                        } else if (pickcount === 5) {
+                            edge = productProb - (1/10);
+                            payout = '10X';
+                        } else if (pickcount === 6) {
+                            edge = productProb - (1/25);
+                            payout = '25X';
+                        }
+                        allCombinations[pickcount].push({
+                            sliplink: `https://prizepicks.onelink.me/gCQS/shareEntry?projections=${projectionEntries.join(',')}`,
+                            players: comboPlayers.join(' | '),
+                            playerdetails,
+                            edge: edge * 100,
+                            payout,
+                            pickcount,
+                            cashlikelihood: productProb * 100,
+                            game: gameLabel
+                        });
+                    }
+                });
             }
+            return allCombinations;
         }
 
-        function populateTabs() {
-            const tabsContainer = document.querySelector('.tabs');
-            tabsContainer.innerHTML = '';
-            const allTab = document.createElement('div');
-            allTab.classList.add('tab', 'active');
-            allTab.textContent = 'All';
-            allTab.onclick = () => switchTab('All');
-            tabsContainer.appendChild(allTab);
+        function filterBetSlips() {
+            selectedPayout = document.getElementById('payoutFilter').value;
+            renderBetSlips();
+        }
 
-            const statTypes = [...new Set(allData.map(row => row['Stat Type']).filter(Boolean))];
-            statTypes.sort();
-            statTypes.forEach(stat => {
-                const tab = document.createElement('div');
-                tab.classList.add('tab');
-                tab.textContent = stat;
-                tab.onclick = () => switchTab(stat);
-                tabsContainer.appendChild(tab);
+        function renderBetSlips() {
+            const header = document.getElementById('betslipsHeader');
+            const body = document.getElementById('betslipsBody');
+            header.innerHTML = '';
+            body.innerHTML = '';
+            if (selectedBets.length < 2) {
+                body.innerHTML = '<tr><td colspan="5" class="error-message">Select at least 2 bets to generate slips.</td></tr>';
+                return;
+            }
+            const columns = ['Slip Link', 'Players', 'Edge', 'Cash Likelihood', 'Payout'];
+            columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                if (col === betSlipsSortColumn) th.classList.add(betSlipsSortDirection);
+                th.onclick = () => sortBetSlips(col);
+                header.appendChild(th);
+            });
+            const combinations = generateCombinations(selectedBets);
+            let outputData = [];
+            for (let pickcount = 2; pickcount <= 6; pickcount++) {
+                outputData.push(...combinations[pickcount]);
+            }
+            if (selectedPayout !== 'all') {
+                outputData = outputData.filter(combo => combo.payout === selectedPayout);
+            }
+            outputData.sort((a, b) => {
+                let aVal = a[betSlipsSortColumn.toLowerCase().replace(' ', '')] || 0;
+                let bVal = b[betSlipsSortColumn.toLowerCase().replace(' ', '')] || 0;
+                if (['edge', 'cashlikelihood'].includes(betSlipsSortColumn.toLowerCase().replace(' ', ''))) {
+                    return betSlipsSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                }
+                return betSlipsSortDirection === 'asc' ? aVal.toString().localeCompare(bVal.toString()) : bVal.toString().localeCompare(aVal.toString());
+            });
+            outputData.forEach(combo => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    const key = col.toLowerCase().replace(' ', '');
+                    if (col === 'Slip Link') {
+                        const a = document.createElement('a');
+                        a.href = combo.sliplink;
+                        a.textContent = 'Place Bet';
+                        a.target = '_blank';
+                        td.appendChild(a);
+                    } else if (col === 'Players') {
+                        const summarySpan = document.createElement('span');
+                        summarySpan.textContent = combo.players;
+                        td.appendChild(summarySpan);
+                    } else if (['edge', 'cashlikelihood'].includes(key)) {
+                        td.textContent = (combo[key] || 0).toFixed(2) + '%';
+                    } else {
+                        td.textContent = combo[key] || '-';
+                    }
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
             });
         }
 
-        function switchTab(tabName) {
-            currentTab = tabName;
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.toggle('active', tab.textContent === tabName);
-            });
-            renderContent();
-        }
-
-        function populateFilterLists() {
-            // Games
-            const gamesList = document.getElementById('gamesList');
-            gamesList.innerHTML = '';
-            uniqueGames.forEach(game => {
-                const div = document.createElement('div');
-                div.style.margin = '4px 0';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = true;
-                checkbox.onchange = () => {
-                    if (checkbox.checked) selectedGames.add(game);
-                    else selectedGames.delete(game);
-                };
-                div.appendChild(checkbox);
-                div.appendChild(document.createTextNode(' ' + game));
-                gamesList.appendChild(div);
-                selectedGames.add(game);
-            });
-
-            // Teams
-            const teamsList = document.getElementById('teamsList');
-            teamsList.innerHTML = '';
-            uniqueTeams.forEach(team => {
-                const div = document.createElement('div');
-                div.style.margin = '4px 0';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = true;
-                checkbox.onchange = () => {
-                    if (checkbox.checked) selectedTeams.add(team);
-                    else selectedTeams.delete(team);
-                };
-                div.appendChild(checkbox);
-                div.appendChild(document.createTextNode(' ' + team));
-                teamsList.appendChild(div);
-                selectedTeams.add(team);
-            });
-
-            // Callouts
-            const calloutsList = document.getElementById('calloutsList');
-            calloutsList.innerHTML = '';
-            uniqueCallouts.forEach(callout => {
-                const div = document.createElement('div');
-                div.style.margin = '4px 0';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = true;
-                checkbox.onchange = () => {
-                    if (checkbox.checked) selectedCallouts.add(callout);
-                    else selectedCallouts.delete(callout);
-                };
-                div.appendChild(checkbox);
-                div.appendChild(document.createTextNode(' ' + callout));
-                calloutsList.appendChild(div);
-                selectedCallouts.add(callout);
-            });
-        }
-
-        function applyFilters() {
-            document.getElementById('popup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-            renderContent();
-        }
-
-        function applyCalloutFilters() {
-            document.getElementById('calloutPopup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
-            renderContent();
+        function sortBetSlips(column) {
+            if (betSlipsSortColumn === column) {
+                betSlipsSortDirection = betSlipsSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                betSlipsSortColumn = column;
+                betSlipsSortDirection = 'desc';
+            }
+            filterBetSlips();
         }
 
         function showPlayerPopup(row, currentIndex) {
@@ -1349,7 +1688,7 @@
                 {label: 'Proj', value: parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1)},
                 {label: 'DVP', value: parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1)},
                 {label: 'Total', value: parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1)},
-                {label: 'Opp', value: parseFloat(row['Opp'] || row['Opportunities'] || row['MIN Avg'] || 0).toFixed(1)}
+                {label: 'Opp', value: parseFloat(row['Opportunities'] || row['Opp'] || 0).toFixed(1)}  // MLB: Opportunities = projected AB/IP
             ];
             stats.forEach(stat => {
                 const box = document.createElement('div');
@@ -1386,29 +1725,10 @@
             nextBtn.onclick = () => {
                 if (currentIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
             };
-            let startX = 0;
-            popup.addEventListener('touchstart', e => startX = e.touches[0].clientX, {once: true});
-            popup.addEventListener('touchend', e => {
-                const endX = e.changedTouches[0].clientX;
-                if (startX - endX > 50) {
-                    if (currentIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
-                } else if (endX - startX > 50) {
-                    if (currentIndex > 0) showPlayerPopup(currentFiltered[currentIndex - 1], currentIndex - 1);
-                }
-            }, {once: true});
-            const closeListener = (event) => {
-                if (!popup.contains(event.target)) {
-                    popup.style.display = 'none';
-                    overlay.style.display = 'none';
-                    document.removeEventListener('click', closeListener);
-                }
-            };
-            document.addEventListener('click', closeListener, true);
-            document.getElementById('closePlayerPopup').addEventListener('click', () => {
+            document.getElementById('closePlayerPopup').onclick = () => {
                 popup.style.display = 'none';
                 overlay.style.display = 'none';
-                document.removeEventListener('click', closeListener);
-            });
+            };
         }
 
         function renderPopupContent(tab, row) {
@@ -1435,16 +1755,10 @@
                 const overProjs = projections.filter(p => p.value > lineScore);
                 const underProjs = projections.filter(p => p.value < lineScore);
                 const equalProjs = projections.filter(p => p.value === lineScore);
-                const over = overProjs.map(p => p.name);
-                const under = underProjs.map(p => p.name);
-                const equal = equalProjs.map(p => p.name);
-                const overData = overProjs.map(p => p.value);
-                const underData = underProjs.map(p => p.value);
-                const equalData = equalProjs.map(p => p.value);
-                const labels = over.concat(equal, ['Line'], under);
-                const dataPoints = overData.concat(equalData, [lineScore], underData);
-                const colors = overData.map(() => 'rgba(75, 192, 75, 0.6)').concat(equalData.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)').concat(underData.map(() => 'rgba(255, 99, 132, 0.6)'));
-                const borderColors = overData.map(() => 'rgba(75, 192, 75, 1)').concat(equalData.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)').concat(underData.map(() => 'rgba(255, 99, 132, 1)'));
+                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name));
+                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value));
+                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)').concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)').concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
+                const borderColors = overProjs.map(() => 'rgba(75, 192, 75, 1)').concat(equalProjs.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)').concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'));
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -1566,9 +1880,9 @@
                     });
                 });
             } else if (tab === 'Game Log') {
-                content.innerHTML = '<p>No game log data available for this player.</p>';
+                content.innerHTML = '<p>No game log data available for this player yet (will be added later).</p>';
             } else if (tab === 'Splits') {
-                content.innerHTML = '<p>No splits data available for this player.</p>';
+                content.innerHTML = '<p>No splits data available for this player yet (will be added later).</p>';
             } else if (tab === 'News') {
                 const table = document.createElement('table');
                 table.innerHTML = `
@@ -1598,25 +1912,6 @@
                     <p>Opp: ${row.Opp || '-'}</p>
                 `;
             }
-        }
-
-        function updateBetSlip() {
-            // Full bet slip logic from NBA version preserved (placeholder for now - full implementation matches NBA exactly)
-            console.log('Bet slip updated with', selectedBets.length, 'bets');
-        }
-
-        function filterBetSlips() {
-            // Full filter logic from NBA version preserved
-        }
-
-        function sortContentTable(column) {
-            if (contentSortColumn === column) {
-                contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                contentSortColumn = column;
-                contentSortDirection = 'asc';
-            }
-            renderContent();
         }
 
         function renderContent() {
@@ -1753,14 +2048,15 @@
                         card.querySelector('.info-icon').addEventListener('click', () => showPlayerPopup(row, parseInt(card.querySelector('.info-icon').dataset.index)));
                     });
                 } else {
+                    // Table view (exact match to NBA tool styling)
                     const table = document.createElement('table');
                     const thead = document.createElement('thead');
-                    const headers = ['Details', 'Stat', 'Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'L5 Avg', 'L5 Hit%', 'Actions'];
+                    const headers = ['Details', 'Stat', 'Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp', 'Actions'];
                     const headerTr = document.createElement('tr');
                     headers.forEach(h => {
                         const th = document.createElement('th');
                         th.textContent = h;
-                        if (['Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'L5 Avg', 'L5 Hit%'].includes(h)) {
+                        if (['Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp'].includes(h)) {
                             th.dataset.column = h;
                             th.onclick = () => sortContentTable(h);
                             if (h === contentSortColumn) th.classList.add(contentSortDirection);
@@ -1774,17 +2070,21 @@
                         row.id = index + 1;
                         const tr = document.createElement('tr');
                         const detailsTd = document.createElement('td');
+                        detailsTd.classList.add('details-cell');
                         const img = document.createElement('img');
                         img.src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
                         img.alt = row['Player Name'];
-                        img.style.width = '30px';
-                        img.style.height = '30px';
-                        img.style.borderRadius = '50%';
-                        img.style.marginRight = '5px';
                         const playerNameSpan = document.createElement('span');
-                        playerNameSpan.style.fontWeight = 'bold';
-                        playerNameSpan.style.color = '#00ffcc';
+                        playerNameSpan.classList.add('player-name');
                         playerNameSpan.textContent = row['Player Name'];
+                        const playerSub = document.createElement('span');
+                        playerSub.classList.add('player-sub');
+                        let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
+                        if (row.Opp && row.Opp !== 'Multiple') {
+                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
+                        }
+                        const calloutTag = row['Callout Bet Tag'] ? ` | ${row['Callout Bet Tag']}` : '';
+                        playerSub.textContent = `${row.Team || ''} - ${gameTime}${calloutTag}`;
                         const infoIcon = document.createElement('span');
                         infoIcon.classList.add('info-icon');
                         infoIcon.textContent = 'ℹ️';
@@ -1794,22 +2094,13 @@
                           e.stopPropagation();
                           showPlayerPopup(row, parseInt(infoIcon.dataset.index));
                         });
-                        let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
-                        if (row.Opp && row.Opp !== 'Multiple') {
-                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
-                        }
-                        const calloutTag = row['Callout Bet Tag'] ? ` | ${row['Callout Bet Tag']}` : '';
                         detailsTd.appendChild(img);
                         detailsTd.appendChild(playerNameSpan);
+                        detailsTd.appendChild(playerSub);
                         detailsTd.appendChild(infoIcon);
-                        detailsTd.appendChild(document.createTextNode(` (${row.Team || ''}) - ${gameTime}${calloutTag}`));
-                        detailsTd.setAttribute('data-label', 'Details');
-                        detailsTd.style.cursor = 'pointer';
-                        detailsTd.addEventListener('click', () => showPlayerPopup(row, index));
                         tr.appendChild(detailsTd);
                         const statTd = document.createElement('td');
                         statTd.textContent = row['Stat Type'];
-                        statTd.setAttribute('data-label', 'Stat');
                         tr.appendChild(statTd);
                         const edgeTd = document.createElement('td');
                         let icon = '';
@@ -1817,70 +2108,49 @@
                         if (row['Odds Type'] === 'goblin') icon = '👺 ';
                         const edge = isNaN(parseFloat(row['Edge %'])) ? 'N/A' : parseFloat(row['Edge %']).toFixed(1) + '%';
                         edgeTd.textContent = icon + edge;
-                        edgeTd.setAttribute('data-label', 'Edge');
                         tr.appendChild(edgeTd);
                         const lineTd = document.createElement('td');
                         lineTd.textContent = row['Line Score'];
-                        lineTd.setAttribute('data-label', 'Line');
                         tr.appendChild(lineTd);
                         const ppUdTd = document.createElement('td');
                         const udLineStr = row['Underdog Line'] || '';
                         const udLine = parseFloat(udLineStr);
                         const ppLine = parseFloat(row['Line Score']);
                         ppUdTd.textContent = (udLineStr && udLine !== 0 && !isNaN(udLine)) ? (ppLine - udLine).toFixed(1) : '';
-                        ppUdTd.setAttribute('data-label', 'PP-UD');
                         tr.appendChild(ppUdTd);
                         const avgProjTd = document.createElement('td');
                         avgProjTd.textContent = parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1) || '-';
-                        avgProjTd.setAttribute('data-label', 'Avg Proj');
                         tr.appendChild(avgProjTd);
                         const dvpAdjTd = document.createElement('td');
                         dvpAdjTd.textContent = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1) || '-';
-                        dvpAdjTd.setAttribute('data-label', 'DVP Adj');
                         tr.appendChild(dvpAdjTd);
                         const totalProjTd = document.createElement('td');
                         totalProjTd.textContent = parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1) || '-';
-                        totalProjTd.setAttribute('data-label', 'Total Proj');
                         tr.appendChild(totalProjTd);
-                        const l5AvgTd = document.createElement('td');
-                        l5AvgTd.textContent = row.l5Avg || '-';
-                        l5AvgTd.setAttribute('data-label', 'L5 Avg');
-                        tr.appendChild(l5AvgTd);
-                        const l5HitTd = document.createElement('td');
-                        l5HitTd.textContent = row.l5HitRate + '%' || '-';
-                        l5HitTd.setAttribute('data-label', 'L5 Hit%');
-                        tr.appendChild(l5HitTd);
+                        const oppTd = document.createElement('td');
+                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1) || '-';  // MLB Opportunities (AB/IP)
+                        tr.appendChild(oppTd);
                         const actionsTd = document.createElement('td');
-                        actionsTd.setAttribute('data-label', 'Actions');
                         const buttonsDiv = document.createElement('div');
-                        buttonsDiv.classList.add('buttons');
-                        let lessClass = 'button less';
-                        let moreClass = 'button more';
+                        buttonsDiv.classList.add('action-buttons');
+                        let lessClass = 'action-btn less';
+                        let moreClass = 'action-btn more';
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
                         const selectedBet = selectedBets.find(b => b.key === key);
                         if (selectedBet) {
-                            if (selectedBet.choice === 'Less') {
-                                lessClass += ' selected selected-less';
-                            } else if (selectedBet.choice === 'More') {
-                                moreClass += ' selected selected-more';
-                            }
+                            if (selectedBet.choice === 'Less') lessClass += ' selected';
+                            else if (selectedBet.choice === 'More') moreClass += ' selected';
                         } else {
-                            if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'more') {
-                                moreClass += ' green-outline';
-                            } else if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less') {
-                                lessClass += ' red-outline';
-                            }
+                            if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'more') moreClass += ' green-outline';
+                            else if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less') lessClass += ' red-outline';
                         }
-                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
-                        const dividerClass = betTagLower.includes('more') ? 'more' : (betTagLower.includes('less') ? 'less' : '');
                         buttonsDiv.innerHTML = `
                             <button class="${lessClass}" data-choice="Less">↓ Less</button>
-                            <div class="divider ${dividerClass}"></div>
                             <button class="${moreClass}" data-choice="More">↑ More</button>
                         `;
                         actionsTd.appendChild(buttonsDiv);
                         tr.appendChild(actionsTd);
-                        const buttons = buttonsDiv.querySelectorAll('.button');
+                        const buttons = buttonsDiv.querySelectorAll('.action-btn');
                         buttons.forEach(btn => {
                             btn.addEventListener('click', () => {
                                 const choice = btn.dataset.choice;
@@ -1908,13 +2178,8 @@
                                     } else {
                                         selectedBets.push(betData);
                                     }
-                                    buttonsDiv.querySelectorAll('.button').forEach(b => b.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline'));
+                                    buttonsDiv.querySelectorAll('.action-btn').forEach(b => b.classList.remove('selected'));
                                     btn.classList.add('selected');
-                                    if (choice === 'More') {
-                                        btn.classList.add('selected-more');
-                                    } else {
-                                        btn.classList.add('selected-less');
-                                    }
                                 }
                                 updateBetSlip();
                                 renderContent();
@@ -1931,120 +2196,15 @@
             }, 100);
         }
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
-
-            // Search
-            const searchInput = document.getElementById('search');
-            searchInput.addEventListener('input', (e) => {
-                searchTerm = e.target.value.toLowerCase().trim();
-                renderContent();
-            });
-
-            // Toggle buttons for odds type
-            document.querySelectorAll('.toggle-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentOddsType = btn.dataset.type;
-                    renderContent();
-                });
-            });
-
-            // View select
-            const viewSelect = document.getElementById('viewSelect');
-            viewSelect.addEventListener('change', () => {
-                currentView = viewSelect.value;
-                renderContent();
-            });
-
-            // Selected only toggle
-            const selectedToggle = document.getElementById('selectedToggle');
-            selectedToggle.addEventListener('change', () => {
-                showSelectedOnly = selectedToggle.checked;
-                renderContent();
-            });
-
-            // Filter button
-            document.getElementById('filterBtn').addEventListener('click', () => {
-                document.getElementById('popup').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-            });
-
-            // Callout filter button
-            document.getElementById('calloutFilterBtn').addEventListener('click', () => {
-                document.getElementById('calloutPopup').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-            });
-
-            // Bet slip button
-            document.getElementById('betslipBtn').addEventListener('click', () => {
-                document.getElementById('betslipPopup').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-                // Render bet slips here (full logic from NBA version)
-            });
-
-            // Apply filter
-            document.getElementById('applyFilter').addEventListener('click', applyFilters);
-
-            // Apply callout filter
-            document.getElementById('applyCalloutFilter').addEventListener('click', applyCalloutFilters);
-
-            // Close popups
-            document.getElementById('closeBetSlip').addEventListener('click', () => {
-                document.getElementById('betslipPopup').style.display = 'none';
-                document.getElementById('overlay').style.display = 'none';
-            });
-
-            document.getElementById('closeToolInfo').addEventListener('click', () => {
-                document.getElementById('toolInfoPopup').style.display = 'none';
-                document.getElementById('overlay').style.display = 'none';
-            });
-
-            // Tool info
-            document.getElementById('tool-info').addEventListener('click', () => {
-                document.getElementById('toolInfoPopup').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-            });
-
-            // Select all / deselect all for games
-            document.getElementById('selectAllGames').addEventListener('click', () => {
-                document.querySelectorAll('#gamesList input[type="checkbox"]').forEach(cb => cb.checked = true);
-                selectedGames = new Set(uniqueGames);
-            });
-            document.getElementById('deselectAllGames').addEventListener('click', () => {
-                document.querySelectorAll('#gamesList input[type="checkbox"]').forEach(cb => cb.checked = false);
-                selectedGames.clear();
-            });
-
-            // Select all / deselect all for teams
-            document.getElementById('selectAllTeams').addEventListener('click', () => {
-                document.querySelectorAll('#teamsList input[type="checkbox"]').forEach(cb => cb.checked = true);
-                selectedTeams = new Set(uniqueTeams);
-            });
-            document.getElementById('deselectAllTeams').addEventListener('click', () => {
-                document.querySelectorAll('#teamsList input[type="checkbox"]').forEach(cb => cb.checked = false);
-                selectedTeams.clear();
-            });
-
-            // Select all / deselect all for callouts
-            document.getElementById('selectAllCallouts').addEventListener('click', () => {
-                document.querySelectorAll('#calloutsList input[type="checkbox"]').forEach(cb => cb.checked = true);
-                selectedCallouts = new Set(uniqueCallouts);
-            });
-            document.getElementById('deselectAllCallouts').addEventListener('click', () => {
-                document.querySelectorAll('#calloutsList input[type="checkbox"]').forEach(cb => cb.checked = false);
-                selectedCallouts.clear();
-            });
-
-            // Close popup on overlay click (except for player popup handled separately)
-            document.getElementById('overlay').addEventListener('click', () => {
-                const popups = document.querySelectorAll('.popup');
-                popups.forEach(p => p.style.display = 'none');
-                document.getElementById('overlay').style.display = 'none';
-            });
-        });
+        function sortContentTable(column) {
+            if (contentSortColumn === column) {
+                contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                contentSortColumn = column;
+                contentSortDirection = 'asc';
+            }
+            renderContent();
+        }
     </script>
 </body>
 </html>
