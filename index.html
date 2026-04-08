@@ -461,10 +461,11 @@
             -webkit-overflow-scrolling: touch;
         }
         th, td {
-            padding: 14px 10px;
-            text-align: center;
+            padding: 14px 12px;
+            text-align: left;
             border: 1px solid #333;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
         }
         th {
             background: #222;
@@ -473,6 +474,7 @@
             position: sticky;
             top: 0;
             color: #f0f0f0;
+            text-align: center;
         }
         tr:nth-child(even) {
             background: #181818;
@@ -599,11 +601,8 @@
                 display: block;
             }
             th, td {
-                padding: 10px 6px;
-                font-size: 0.75rem;
-            }
-            .card {
-                margin: 8px;
+                padding: 12px 8px;
+                font-size: 0.78rem;
             }
         }
     </style>
