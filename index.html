@@ -16,25 +16,15 @@
             width: 100vw;
             overflow: auto;
             overflow-x: hidden;
-            scrollbar-width: thin; /* Firefox */
+            scrollbar-width: thin;
             scrollbar-color: #555 #1a1a1a;
-            touch-action: manipulation; /* Improve touch scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
         }
-        /* Webkit scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #777;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #777; }
         .title-header {
             display: flex;
             align-items: center;
@@ -46,21 +36,9 @@
             z-index: 30;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-        .title-header h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 700;
-        }
-        .title-header .info-icon {
-            margin-left: 8px;
-            cursor: pointer;
-            font-size: 20px;
-            color: #00ffcc;
-            transition: color 0.2s;
-        }
-        .title-header .info-icon:hover {
-            color: #00e6b3;
-        }
+        .title-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
+        .title-header .info-icon { margin-left: 8px; cursor: pointer; font-size: 20px; color: #00ffcc; transition: color 0.2s; }
+        .title-header .info-icon:hover { color: #00e6b3; }
         .controls {
             display: flex;
             justify-content: space-between;
@@ -82,16 +60,8 @@
             width: 200px;
             transition: border-color 0.2s;
         }
-        #search:focus {
-            border-color: #00ffcc;
-            outline: none;
-        }
-        .toggle {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        #search:focus { border-color: #00ffcc; outline: none; }
+        .toggle { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .toggle button {
             padding: 8px 20px;
             background: #222;
@@ -102,69 +72,23 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        .toggle button:hover {
-            background: #333;
-        }
-        .toggle button.active {
-            background: #00ffcc;
-            color: #000;
-        }
-        .view-switch {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 20px;
-        }
-        .view-switch span {
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 24px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #00ffcc;
-        }
-        input:checked + .slider:before {
-            transform: translateX(16px);
-        }
+        .toggle button:hover { background: #333; }
+        .toggle button.active { background: #00ffcc; color: #000; }
+        .view-switch { display: flex; align-items: center; gap: 8px; margin-left: 20px; }
+        .view-switch span { font-size: 12px; font-weight: 500; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00ffcc; }
+        input:checked + .slider:before { transform: translateX(16px); }
         .tabs {
             display: flex;
             flex-wrap: wrap;
             background: #0a0a0a;
             padding: 12px 40px;
             position: sticky;
-            top: 100px; /* Adjust based on controls height */
+            top: 100px;
             z-index: 10;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
@@ -178,13 +102,8 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        .tab:hover {
-            background: #333;
-        }
-        .tab.active {
-            background: #00ffcc;
-            color: #000;
-        }
+        .tab:hover { background: #333; }
+        .tab.active { background: #00ffcc; color: #000; }
         .tab.inactive {
             opacity: 0.45;
             pointer-events: none;
@@ -205,9 +124,6 @@
             max-width: 100%;
             grid-template-columns: none;
             overflow-x: auto;
-        }
-        #content.table-view table {
-            width: 100%;
         }
         .card {
             background: #1a1a1a;
@@ -281,29 +197,12 @@
             opacity: 0.7;
             transition: opacity 0.2s, background 0.2s;
         }
-        .button:hover {
-            opacity: 1;
-            background: #222;
-        }
-        .button.selected {
-            font-weight: 600;
-            opacity: 1;
-            background: #333;
-        }
-        .green-outline {
-            outline: 3px solid #4dff4d;
-        }
-        .red-outline {
-            outline: 3px solid #ff4d4d;
-        }
-        .button.selected.selected-more {
-            background-color: #4dff4d;
-            color: #000;
-        }
-        .button.selected.selected-less {
-            background-color: #ff4d4d;
-            color: #000;
-        }
+        .button:hover { opacity: 1; background: #222; }
+        .button.selected { font-weight: 600; opacity: 1; background: #333; }
+        .green-outline { outline: 3px solid #4dff4d; }
+        .red-outline { outline: 3px solid #ff4d4d; }
+        .button.selected.selected-more { background-color: #4dff4d; color: #000; }
+        .button.selected.selected-less { background-color: #ff4d4d; color: #000; }
         .divider {
             position: absolute;
             top: 4px;
@@ -314,12 +213,8 @@
             transform: translateX(-50%);
             z-index: 1;
         }
-        .divider.more {
-            background: #4dff4d;
-        }
-        .divider.less {
-            background: #ff4d4d;
-        }
+        .divider.more { background: #4dff4d; }
+        .divider.less { background: #ff4d4d; }
         .info-icon {
             position: absolute;
             top: 16px;
@@ -329,9 +224,7 @@
             color: #00ffcc;
             transition: color 0.2s;
         }
-        .info-icon:hover {
-            color: #00e6b3;
-        }
+        .info-icon:hover { color: #00e6b3; }
         .icon {
             position: absolute;
             top: 40px;
@@ -361,112 +254,6 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
             -webkit-overflow-scrolling: touch;
         }
-        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3 {
-            margin-top: 20px;
-            font-weight: 600;
-        }
-        #popup label, #calloutPopup label {
-            display: block;
-            font-size: 14px;
-        }
-        #filterBtn, #betslipBtn, #calloutFilterBtn {
-            padding: 8px 20px;
-            background: #00ffcc;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover {
-            background: #00e6b3;
-        }
-        #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo {
-            margin-bottom: 20px;
-            padding: 8px 20px;
-            background: #4dff4d;
-            color: #000;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover {
-            background: #66ff66;
-        }
-        .select-btn {
-            margin: 5px 0;
-            padding: 6px 12px;
-            background: #333;
-            border: none;
-            border-radius: 9999px;
-            color: #f0f0f0;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .select-btn:hover {
-            background: #444;
-        }
-        .payout-filter-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        #payoutFilter {
-            padding: 0.5rem 1rem;
-            background: #1a1a1a;
-            color: #f0f0f0;
-            border: 1px solid #333;
-            border-radius: 9999px;
-            cursor: pointer;
-        }
-        .betslips-container {
-            background: #121212;
-            border-radius: 16px;
-            padding: 12px;
-            -webkit-overflow-scrolling: touch;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            -webkit-overflow-scrolling: touch;
-        }
-        th, td {
-            padding: 0.75rem;
-            text-align: center;
-            border: 1px solid #333;
-        }
-        th {
-            background: #222;
-            font-weight: 500;
-            cursor: pointer;
-            position: sticky;
-            top: 0;
-            color: #f0f0f0;
-        }
-        tr:nth-child(even) {
-            background: #181818;
-        }
-        th.asc::after {
-            content: ' ↑';
-        }
-        th.desc::after {
-            content: ' ↓';
-        }
-        .error-message {
-            color: #ff4d4d;
-            text-align: center;
-            margin: 1rem;
-        }
-        .expanded-details td {
-            background-color: #121212;
-            padding: 1rem;
-            text-align: left;
-        }
         #playerPopup {
             display: none;
             position: fixed;
@@ -484,7 +271,7 @@
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-            font-size: 1rem; /* Larger font for mobile */
+            font-size: 1rem;
             -webkit-overflow-scrolling: touch;
         }
         #playerPopup .header {
@@ -521,43 +308,12 @@
             position: relative;
             top: auto;
             padding: 8px;
-            overflow-x: auto; /* Allow horizontal scroll if tabs overflow */
+            overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
         }
         #playerPopup .tab-content {
             padding: 12px;
-            -webkit-overflow-scrolling: touch;
-        }
-        #playerPopup table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed; /* Prevent wide tables */
-            font-size: 0.7rem;
-        }
-        #playerPopup th, #playerPopup td {
-            border: 1px solid #333;
-            padding: 4px;
-            text-align: center;
-            word-wrap: break-word; /* Break long words */
-        }
-        #playerPopup th {
-            font-size: 0.7rem;
-            font-weight: 600;
-            background-color: #222;
-        }
-        #playerPopup td {
-            font-size: 0.65rem;
-        }
-        #betHeader {
-            text-align: center;
-            margin: 12px 0;
-            font-weight: 600;
-        }
-        #chartContainer {
-            margin: 20px 0;
-            max-width: 100%;
-            overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
         #overlay {
@@ -571,7 +327,7 @@
             z-index: 35;
         }
         #popupName {
-            font-size: 24px; /* Adjust for mobile */
+            font-size: 24px;
             font-weight: 700;
             color: #f0f0f0;
             display: inline-flex;
@@ -581,7 +337,7 @@
             text-align: left;
         }
         #popupGame, #popupScheduledAt {
-            font-size: 14px; /* Adjust for mobile */
+            font-size: 14px;
             font-weight: 600;
         }
         .stats-boxes {
@@ -605,27 +361,11 @@
             font-size: 12px;
             font-weight: 600;
         }
-        .dvp-green {
-            color: #4dff4d;
-        }
-        .dvp-yellow {
-            color: #ffd700;
-        }
-        .dvp-red {
-            color: #ff4d4d;
-        }
-        .spread-red {
-            color: #ff4d4d;
-        }
-        .ou-red {
-            color: #ff4d4d;
-        }
-        .ou-green {
-            color: #4dff4d;
-        }
-        #prevPlayer {
+        .spread-red { color: #ff4d4d; }
+        .ou-red { color: #ff4d4d; }
+        .ou-green { color: #4dff4d; }
+        #prevPlayer, #nextPlayer {
             position: absolute;
-            left: 10px;
             top: 50%;
             transform: translateY(-50%);
             z-index: 51;
@@ -635,25 +375,9 @@
             padding: 10px 16px;
             cursor: pointer;
             border-radius: 8px;
-            transition: background 0.2s;
         }
-        #nextPlayer {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 51;
-            background: #222;
-            color: #f0f0f0;
-            border: none;
-            padding: 10px 16px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-        #prevPlayer:hover, #nextPlayer:hover {
-            background: #333;
-        }
+        #prevPlayer { left: 10px; }
+        #nextPlayer { right: 10px; }
         .popup-buttons {
             display: flex;
             margin-top: 10px;
@@ -669,10 +393,6 @@
             font-size: 14px;
             font-weight: 600;
             white-space: nowrap;
-        }
-        .bars {
-            color: #f0f0f0;
-            font-size: 16px;
         }
         #betTypeSelect, #oddsSelect, #viewSelect {
             padding: 10px;
@@ -694,35 +414,6 @@
             color: #f0f0f0;
             z-index: 52;
         }
-        #closePlayerPopup:hover {
-            color: #ff4d4d;
-        }
-        #gameLogSearch {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border-radius: 9999px;
-            border: 1px solid #333;
-            background: #1a1a1a;
-            color: #f0f0f0;
-        }
-        .averages-row td {
-            font-weight: bold;
-            background-color: #333;
-        }
-        .splits-section {
-            margin-top: 10px;
-        }
-        .splits-section h4 {
-            margin: 10px 0 5px;
-        }
-        .splits-section p {
-            margin: 5px 0;
-        }
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
         .selected-switch {
             display: flex;
             align-items: center;
@@ -733,290 +424,7 @@
             font-size: 12px;
             font-weight: 500;
         }
-        @media (max-width: 1200px) {
-            #content {
-                grid-template-columns: repeat(3, minmax(300px, 1fr));
-            }
-        }
-        @media (max-width: 900px) {
-            #content {
-                grid-template-columns: repeat(2, minmax(300px, 1fr));
-            }
-        }
-        @media (max-width: 600px) {
-            #content {
-                grid-template-columns: 1fr;
-                max-width: 100%;
-            }
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .toggle {
-                display: none;
-            }
-            .view-switch {
-                display: none;
-            }
-            .selected-switch {
-                display: none;
-            }
-            .tabs {
-                display: none;
-            }
-            #betTypeSelect, #oddsSelect, #viewSelect {
-                display: block;
-            }
-            #popup, #betslipPopup, #calloutPopup, #toolInfoPopup {
-                width: 100%;
-                max-width: none;
-                padding: 5px;
-                font-size: 1.1rem; /* Slightly larger font */
-                top: 0;
-                left: 0;
-                transform: none;
-                height: auto;
-                max-height: 90vh;
-                border-radius: 16px;
-            }
-            #popup h3, #calloutPopup h3, #betslipPopup h3, #toolInfoPopup h3 {
-                font-size: 1.3rem;
-                margin-top: 10px;
-            }
-            #popup label, #calloutPopup label {
-                font-size: 1.1rem;
-            }
-            .select-btn {
-                margin: 4px 0;
-                padding: 8px 12px;
-                font-size: 1.1rem;
-            }
-            #applyFilter, #applyCalloutFilter, #closeBetSlip, #closeToolInfo {
-                margin-bottom: 10px;
-                padding: 10px 16px;
-                font-size: 1.1rem;
-            }
-            table {
-                font-size: 0.6rem;
-                table-layout: fixed;
-                word-wrap: break-word;
-                word-break: break-word;
-                white-space: normal;
-            }
-            th, td {
-                padding: 0.2rem;
-                white-space: normal;
-            }
-            .name {
-                font-size: 16px;
-            }
-            .stat {
-                font-size: 18px;
-            }
-            .button {
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-            .pop {
-                font-size: 14px;
-            }
-            .team {
-                font-size: 12px;
-            }
-            .game {
-                font-size: 12px;
-            }
-            .header {
-                font-size: 12px;
-            }
-            .headshot {
-                width: 60px;
-                height: 60px;
-            }
-            #filterBtn, #calloutFilterBtn, #betslipBtn {
-                padding: 8px 14px;
-                font-size: 1rem;
-                margin-bottom: 10px;
-            }
-            .betslips-container {
-                overflow-x: auto; /* Allow scroll if needed, but aim to avoid */
-            }
-            #playerPopup .tabs {
-                overflow-x: auto;
-            }
-            #playerPopup .header {
-                flex-wrap: wrap;
-                padding: 5px;
-                align-items: flex-start;
-            }
-            #playerPopup .left-header {
-                flex-wrap: wrap;
-            }
-            #playerPopup .player-info {
-                margin-left: 5px;
-                margin-top: 5px;
-            }
-            #chartContainer canvas {
-                max-width: 100%;
-            }
-            #popupName {
-                font-size: 16px;
-            }
-            #popupGame, #popupScheduledAt {
-                font-size: 10px;
-            }
-            .stat-box {
-                padding: 2px 4px;
-                min-width: 0;
-            }
-            .stat-label {
-                font-size: 6px;
-            }
-            .stat-value {
-                font-size: 8px;
-            }
-            #playerPopup .tabs {
-                padding: 2px;
-            }
-            #playerPopup .tab {
-                padding: 4px 10px;
-                font-size: 10px;
-                margin: 2px;
-            }
-            #playerPopup .tab-content {
-                padding: 5px;
-            }
-            #betHeader {
-                margin: 4px 0;
-            }
-            #chartContainer {
-                margin: 15px 15px;
-            }
-            #projectionChart, #splitsChart {
-                height: 150px !important;
-            }
-            .popup-buttons {
-                margin-top: 10px;
-            }
-            .popup-buttons .button {
-                padding: 6px 40px;
-                font-size: 14px;
-                white-space: nowrap;
-            }
-            #playerPopup .headshot {
-                width: 40px;
-                height: 40px;
-            }
-            .stats-boxes {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-            .stat-box {
-                margin: 2px;
-            }
-            #popupSpreadOU {
-                font-size: 10px;
-            }
-            #prevPlayer {
-                left: 5px;
-                padding: 6px 12px;
-            }
-            #nextPlayer {
-                right: 5px;
-                padding: 6px 12px;
-            }
-            #playerPopup table {
-                font-size: 0.6rem;
-            }
-            #playerPopup th, #playerPopup td {
-                padding: 2px;
-            }
-            /* Responsive table stacking for mobile */
-            #playerPopup table {
-                border: 0;
-            }
-            #playerPopup table thead {
-                display: none;
-            }
-            #playerPopup table tr {
-                display: block;
-                margin-bottom: 10px;
-                border: 1px solid #333;
-                border-radius: 8px;
-                padding: 5px;
-            }
-            #playerPopup table td {
-                display: block;
-                text-align: right;
-                border: none;
-                border-bottom: 1px solid #333;
-                position: relative;
-                padding-left: 50%;
-                padding-right: 10px;
-                font-size: 0.8rem;
-            }
-            #playerPopup table td:last-child {
-                border-bottom: none;
-            }
-            #playerPopup table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 10px;
-                width: calc(50% - 10px);
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: #ccc;
-            }
-            #playerPopup table .averages-row td {
-                background-color: #333;
-                font-weight: bold;
-            }
-            /* Responsive table for content in table view */
-            #content table {
-                border: 0;
-            }
-            #content table thead {
-                display: none;
-            }
-            #content table tr {
-                display: block;
-                margin-bottom: 10px;
-                border: 1px solid #333;
-                border-radius: 8px;
-                padding: 5px;
-            }
-            #content table td {
-                display: block;
-                text-align: right;
-                border: none;
-                border-bottom: 1px solid #333;
-                position: relative;
-                padding-left: 50%;
-                padding-right: 10px;
-                font-size: 0.8rem;
-            }
-            #content table td:last-child {
-                border-bottom: none;
-            }
-            #content table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 10px;
-                width: calc(50% - 10px);
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: #ccc;
-            }
-        }
-        @media (min-width: 601px) {
-            table td:nth-child(1) {
-                text-align: center;
-            }
-        }
-        /* Table view - exact match to NBA tool */
+        /* Table view styling - exact NBA match */
         .details-cell {
             display: flex;
             align-items: center;
@@ -1054,6 +462,7 @@
         .action-buttons {
             display: flex;
             gap: 4px;
+            position: relative;
         }
         .action-btn {
             padding: 6px 14px;
@@ -1063,14 +472,8 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .action-btn.less {
-            background: #ff4d4d;
-            color: #fff;
-        }
-        .action-btn.more {
-            background: #4dff4d;
-            color: #000;
-        }
+        .action-btn.less { background: #ff4d4d; color: #fff; }
+        .action-btn.more { background: #4dff4d; color: #000; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1171,9 +574,7 @@
         </div>
         <div class="betslips-container">
             <table id="betslipsTable">
-                <thead>
-                    <tr id="betslipsHeader"></tr>
-                </thead>
+                <thead><tr id="betslipsHeader"></tr></thead>
                 <tbody id="betslipsBody"></tbody>
             </table>
         </div>
@@ -1190,13 +591,12 @@
             <li>Switch tabs to view different stat categories.</li>
             <li>On each player card, click 'More' or 'Less' to add bets to your slip.</li>
             <li>View and filter generated bet slips with calculated edges and payouts.</li>
-            <li>Click the info icon on cards for detailed player info, game logs, splits, etc.</li>
+            <li>Click the info icon on cards for detailed player info.</li>
         </ul>
     </div>
 
     <script>
         let allData = [];
-        let gameLogs = [];
         let currentFiltered = [];
         let currentTab = 'All';
         let currentOddsType = 'standard';
@@ -1214,59 +614,19 @@
         let betSlipsSortDirection = 'desc';
         let contentSortColumn = 'Edge';
         let contentSortDirection = 'desc';
-        let expandedCombinations = new Set();
         let currentRow = null;
         let gameToTime = new Map();
         let showSelectedOnly = false;
         const contentDiv = document.getElementById('content');
         contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
         const url = './data/prizepicks-mlb.csv';
-        const gameLogUrl = '';
 
         const predefinedCombinations = {
-            2: [[1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10],
-                [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10],
-                [3,4], [3,5], [3,6], [3,7], [3,8], [3,9], [3,10],
-                [4,5], [4,6], [4,7], [4,8], [4,9], [4,10],
-                [5,6], [5,7], [5,8], [5,9], [5,10],
-                [6,7], [6,8], [6,9], [6,10],
-                [7,8], [7,9], [7,10],
-                [8,9], [8,10],
-                [9,10]],
-            3: [[1,2,3], [1,2,4], [1,2,5], [1,2,6], [1,2,7], [1,2,8], [1,3,4], [1,3,5], [1,3,6], [1,3,7],
-                [1,4,5], [1,4,6], [1,4,7], [1,5,6], [1,5,7], [1,6,7], [1,7,8], [1,8,9], [1,9,10],
-                [2,3,4], [2,3,5], [2,3,6], [2,3,7], [2,3,8], [2,4,5], [2,4,6], [2,4,7], [2,5,6], [2,5,7],
-                [2,6,7], [2,7,8], [2,8,9], [2,9,10],
-                [3,4,5], [3,4,6], [3,4,7], [3,4,8], [3,5,6], [3,5,7], [3,6,7], [3,7,8], [3,8,9], [3,9,10],
-                [4,5,6], [4,5,7], [4,5,8], [4,6,7], [4,6,8], [4,7,8], [4,8,9], [4,9,10],
-                [5,6,7,8], [5,6,8,9], [5,7,8,9], [5,8,9,10],
-                [6,7,8,9], [6,8,9,10],
-                [7,8,9,10]],
-            4: [[1,2,3,4], [1,2,3,5], [1,2,3,6], [1,2,3,7], [1,2,4,5], [1,2,4,6], [1,2,4,7], [1,2,5,6],
-                [1,2,5,7], [1,2,6,7], [1,3,4,5], [1,3,4,6], [1,3,4,7], [1,3,5,6], [1,3,5,7], [1,3,6,7],
-                [1,4,5,6], [1,4,5,7], [1,4,6,7], [1,5,6,7], [1,6,7,8], [1,7,8,9], [1,8,9,10],
-                [2,3,4,5], [2,3,4,6], [2,3,4,7], [2,3,5,6], [2,3,5,7], [2,3,6,7], [2,4,5,6], [2,4,5,7],
-                [2,4,6,7], [2,5,6,7], [2,6,7,8], [2,7,8,9], [2,8,9,10],
-                [3,4,5,6], [3,4,5,7], [3,4,5,8], [3,4,6,7], [3,4,6,8], [3,4,7,8], [3,5,6,7], [3,5,6,8],
-                [3,5,7,8], [3,6,7,8], [3,7,8,9], [3,8,9,10],
-                [4,5,6,7], [4,5,6,8], [4,5,7,8], [4,5,8,9], [4,6,7,8], [4,6,8,9], [4,7,8,9], [4,8,9,10],
-                [5,6,7,8], [5,6,8,9], [5,7,8,9], [5,8,9,10],
-                [6,7,8,9], [6,8,9,10],
-                [7,8,9,10]],
-            5: [[1,2,3,4,5], [1,2,3,4,6], [1,2,3,4,7], [1,2,3,5,6], [1,2,3,5,7], [1,2,3,6,7], [1,2,4,5,6],
-                [1,2,4,5,7], [1,2,4,6,7], [1,2,5,6,7], [1,3,4,5,6], [1,3,4,5,7], [1,3,4,6,7], [1,3,5,6,7],
-                [1,4,5,6,7], [1,5,6,7,8], [1,6,7,8,9], [1,7,8,9,10],
-                [2,3,4,5,6], [2,3,4,5,7], [2,3,4,6,7], [2,3,5,6,7], [2,3,6,7,8], [2,4,5,6,7], [2,4,6,7,8],
-                [2,5,6,7,8], [2,6,7,8,9], [2,7,8,9,10],
-                [3,4,5,6,7], [3,4,5,6,8], [3,4,5,7,8], [3,4,6,7,8], [3,5,6,7,8], [3,6,7,8,9], [3,7,8,9,10],
-                [4,5,6,7,8], [4,5,6,7,9], [4,5,7,8,9], [4,6,7,8,9], [4,7,8,9,10],
-                [5,6,7,8,9], [5,6,7,8,10], [5,6,8,9,10], [5,7,8,9,10],
-                [6,7,8,9,10]],
-            6: [[1,2,3,4,5,6], [1,2,3,4,5,7], [1,2,3,4,6,7], [1,2,3,5,6,7], [1,2,4,5,6,7], [1,3,4,5,6,7],
-                [1,4,5,6,7,8], [1,5,6,7,8,9], [1,6,7,8,9,10], [2,3,4,5,6,7], [2,3,4,5,6,8], [2,3,4,5,7,8],
-                [2,3,4,6,7,8], [2,3,5,6,7,8], [2,4,5,6,7,8], [2,5,6,7,8,9], [2,6,7,8,9,10], [3,4,5,6,7,8],
-                [3,4,5,6,7,9], [3,4,5,6,8,9], [3,4,6,7,8,9], [3,5,6,7,8,9], [3,6,7,8,9,10], [4,5,6,7,8,9],
-                [4,5,6,7,8,10], [4,5,6,7,9,10], [4,5,7,8,9,10], [5,6,7,8,9,10]]
+            2: [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],[1,8],[1,9],[1,10],[2,3],[2,4],[2,5],[2,6],[2,7],[2,8],[2,9],[2,10],[3,4],[3,5],[3,6],[3,7],[3,8],[3,9],[3,10],[4,5],[4,6],[4,7],[4,8],[4,9],[4,10],[5,6],[5,7],[5,8],[5,9],[5,10],[6,7],[6,8],[6,9],[6,10],[7,8],[7,9],[7,10],[8,9],[8,10],[9,10]],
+            3: [[1,2,3],[1,2,4],[1,2,5],[1,2,6],[1,2,7],[1,2,8],[1,3,4],[1,3,5],[1,3,6],[1,3,7],[1,4,5],[1,4,6],[1,4,7],[1,5,6],[1,5,7],[1,6,7],[1,7,8],[1,8,9],[1,9,10],[2,3,4],[2,3,5],[2,3,6],[2,3,7],[2,3,8],[2,4,5],[2,4,6],[2,4,7],[2,5,6],[2,5,7],[2,6,7],[2,7,8],[2,8,9],[2,9,10],[3,4,5],[3,4,6],[3,4,7],[3,4,8],[3,5,6],[3,5,7],[3,6,7],[3,7,8],[3,8,9],[3,9,10],[4,5,6],[4,5,7],[4,5,8],[4,6,7],[4,6,8],[4,7,8],[4,8,9],[4,9,10],[5,6,7,8],[5,6,8,9],[5,7,8,9],[5,8,9,10],[6,7,8,9],[6,8,9,10],[7,8,9,10]],
+            4: [[1,2,3,4],[1,2,3,5],[1,2,3,6],[1,2,3,7],[1,2,4,5],[1,2,4,6],[1,2,4,7],[1,2,5,6],[1,2,5,7],[1,2,6,7],[1,3,4,5],[1,3,4,6],[1,3,4,7],[1,3,5,6],[1,3,5,7],[1,3,6,7],[1,4,5,6],[1,4,5,7],[1,4,6,7],[1,5,6,7],[1,6,7,8],[1,7,8,9],[1,8,9,10],[2,3,4,5],[2,3,4,6],[2,3,4,7],[2,3,5,6],[2,3,5,7],[2,3,6,7],[2,4,5,6],[2,4,5,7],[2,4,6,7],[2,5,6,7],[2,6,7,8],[2,7,8,9],[2,8,9,10],[3,4,5,6],[3,4,5,7],[3,4,5,8],[3,4,6,7],[3,4,6,8],[3,4,7,8],[3,5,6,7],[3,5,6,8],[3,5,7,8],[3,6,7,8],[3,7,8,9],[3,8,9,10],[4,5,6,7],[4,5,6,8],[4,5,7,8],[4,5,8,9],[4,6,7,8],[4,6,8,9],[4,7,8,9],[4,8,9,10],[5,6,7,8],[5,6,8,9],[5,7,8,9],[5,8,9,10],[6,7,8,9],[6,8,9,10],[7,8,9,10]],
+            5: [[1,2,3,4,5],[1,2,3,4,6],[1,2,3,4,7],[1,2,3,5,6],[1,2,3,5,7],[1,2,3,6,7],[1,2,4,5,6],[1,2,4,5,7],[1,2,4,6,7],[1,2,5,6,7],[1,3,4,5,6],[1,3,4,5,7],[1,3,4,6,7],[1,3,5,6,7],[1,4,5,6,7],[1,5,6,7,8],[1,6,7,8,9],[1,7,8,9,10],[2,3,4,5,6],[2,3,4,5,7],[2,3,4,6,7],[2,3,5,6,7],[2,3,6,7,8],[2,4,5,6,7],[2,4,6,7,8],[2,5,6,7,8],[2,6,7,8,9],[2,7,8,9,10],[3,4,5,6,7],[3,4,5,6,8],[3,4,5,7,8],[3,4,6,7,8],[3,5,6,7,8],[3,6,7,8,9],[3,7,8,9,10],[4,5,6,7,8],[4,5,6,7,9],[4,5,7,8,9],[4,6,7,8,9],[4,7,8,9,10],[5,6,7,8,9],[5,6,7,8,10],[5,6,8,9,10],[5,7,8,9,10],[6,7,8,9,10]],
+            6: [[1,2,3,4,5,6],[1,2,3,4,5,7],[1,2,3,4,6,7],[1,2,3,5,6,7],[1,2,4,5,6,7],[1,3,4,5,6,7],[1,4,5,6,7,8],[1,5,6,7,8,9],[1,6,7,8,9,10],[2,3,4,5,6,7],[2,3,4,5,6,8],[2,3,4,5,7,8],[2,3,4,6,7,8],[2,3,5,6,7,8],[2,4,5,6,7,8],[2,5,6,7,8,9],[2,6,7,8,9,10],[3,4,5,6,7,8],[3,4,5,6,7,9],[3,4,5,6,8,9],[3,4,6,7,8,9],[3,5,6,7,8,9],[3,6,7,8,9,10],[4,5,6,7,8,9],[4,5,6,7,8,10],[4,5,6,7,9,10],[4,5,7,8,9,10],[5,6,7,8,9,10]]
         };
 
         fetch(url)
@@ -1495,7 +855,7 @@
             })
             .catch(error => {
                 console.error('Error fetching CSV:', error);
-                contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
+                contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Error loading data. Please refresh.</div>`;
             });
 
         function updateBetSlip() {
@@ -1651,21 +1011,26 @@
             const overlay = document.getElementById('overlay');
             popup.style.display = 'block';
             overlay.style.display = 'block';
+
             document.getElementById('popupHeadshot').src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
-            const popupName = document.getElementById('popupName');
-            const betTagColor = row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less' ? '#ff4d4d' : '#4dff4d';
-            const betArrow = row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less' ? '↓' : (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'more' ? '↑' : row['Bet Tag'] || '-');
-            popupName.innerHTML = `${row['Player Name']}: <span style="color: ${betTagColor};">${betArrow}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
-            if (row['Injury Status'] && row['Injury Status'] !== '-') {
-                let titleText = row['Injury Status'];
-                if (row['Comment'] && row['Comment'] !== '-') {
-                    titleText += ` - ${row['Comment']}`;
-                }
-                popupName.innerHTML += ` <span title="${titleText}" style="color: #ff4d4d; cursor: pointer;">⚠️</span>`;
-            }
+
+            const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+            const isOver = betTagLower.includes('over') || betTagLower.includes('more');
+            const arrowColor = isOver ? '#4dff4d' : '#ff4d4d';
+            const arrowSymbol = isOver ? '↑' : '↓';
+            document.getElementById('popupName').innerHTML = `${row['Player Name']}: <span style="color: ${arrowColor};">${arrowSymbol}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
+
             document.getElementById('popupTeamPos').textContent = `${row.Team} | ${row.Position || ''}`;
-            document.getElementById('popupGame').textContent = `${row.Team} @ ${row.Opp || row['Opponent'] || ''}`;
+            document.getElementById('popupGame').textContent = `${row['Game Short Title'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
+
+            const spread = parseFloat(row.Spread) || 0;
+            const ou = parseFloat(row['O/U']) || 0;
+            document.getElementById('popupSpreadOU').innerHTML = `
+                <span class="spread-red">Spread: ${spread}</span> 
+                <span class="${ou < 230 ? 'ou-red' : 'ou-green'}">O/U: ${ou}</span>
+            `;
+
             const statsBoxes = document.getElementById('statsBoxes');
             statsBoxes.innerHTML = '';
             const stats = [
@@ -1673,7 +1038,8 @@
                 {label: 'Proj', value: parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1)},
                 {label: 'DVP', value: parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1)},
                 {label: 'Total', value: parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1)},
-                {label: 'Opp', value: parseFloat(row['Opportunities'] || row['Opp'] || 0).toFixed(1)}
+                {label: 'Opp', value: parseFloat(row['Opportunities'] || 0).toFixed(1)},
+                {label: 'DVP Rank', value: row['DVP Rank'] || '-'}
             ];
             stats.forEach(stat => {
                 const box = document.createElement('div');
@@ -1684,6 +1050,7 @@
                 `;
                 statsBoxes.appendChild(box);
             });
+
             const popupTabs = document.getElementById('popupTabs');
             popupTabs.innerHTML = '';
             const tabNames = ['Overview', 'Game Log', 'Splits', 'News', 'Other Bets', 'Matchup'];
@@ -1699,17 +1066,16 @@
                 };
                 popupTabs.appendChild(btn);
             });
+
             renderPopupContent('Overview', row);
+
             const prevBtn = document.getElementById('prevPlayer');
             const nextBtn = document.getElementById('nextPlayer');
             prevBtn.disabled = currentIndex <= 0;
             nextBtn.disabled = currentIndex >= currentFiltered.length - 1;
-            prevBtn.onclick = () => {
-                if (currentIndex > 0) showPlayerPopup(currentFiltered[currentIndex - 1], currentIndex - 1);
-            };
-            nextBtn.onclick = () => {
-                if (currentIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
-            };
+            prevBtn.onclick = () => currentIndex > 0 && showPlayerPopup(currentFiltered[currentIndex - 1], currentIndex - 1);
+            nextBtn.onclick = () => currentIndex < currentFiltered.length - 1 && showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
+
             document.getElementById('closePlayerPopup').onclick = () => {
                 popup.style.display = 'none';
                 overlay.style.display = 'none';
@@ -1720,6 +1086,7 @@
             const content = document.getElementById('popupContent');
             content.innerHTML = '';
             const isMobile = window.innerWidth <= 600;
+
             if (tab === 'Overview') {
                 const chartContainer = document.createElement('div');
                 chartContainer.id = 'chartContainer';
@@ -1727,23 +1094,35 @@
                 canvas.id = 'projectionChart';
                 chartContainer.appendChild(canvas);
                 content.appendChild(chartContainer);
+
+                const lineScore = parseFloat(row['Line Score'] || 0);
                 const avgProjected = parseFloat(row['Average Projected'] || row['Proj'] || 0);
                 const dvpAdjusted = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0);
                 const totalProjection = parseFloat(row['Total Projection'] || row['Total'] || 0);
-                const lineScore = parseFloat(row['Line Score'] || 0);
+                const trueAvgLine = parseFloat(row['True Point Average Line'] || 0);
+                const avgLine = parseFloat(row['Average Line'] || 0);
+                const udLine = parseFloat(row['Underdog Line'] || 0);
+
                 let projections = [
                     {name: 'Avg Proj', value: avgProjected},
                     {name: 'DVP Adj', value: dvpAdjusted},
-                    {name: 'Total Proj', value: totalProjection}
-                ];
-                projections = projections.filter(p => p.value > 0);
+                    {name: 'Total Proj', value: totalProjection},
+                    {name: 'True Avg Line', value: trueAvgLine},
+                    {name: 'Avg Line', value: avgLine},
+                    {name: 'UD Line', value: udLine}
+                ].filter(p => p.value > 0);
+
                 const overProjs = projections.filter(p => p.value > lineScore);
                 const underProjs = projections.filter(p => p.value < lineScore);
                 const equalProjs = projections.filter(p => p.value === lineScore);
+
                 const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name));
                 const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value));
-                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)').concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)').concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
-                const borderColors = overProjs.map(() => 'rgba(75, 192, 75, 1)').concat(equalProjs.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)').concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'));
+
+                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)')
+                    .concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)')
+                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
+
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -1753,22 +1132,15 @@
                             label: 'Projections',
                             data: dataPoints,
                             backgroundColor: colors,
-                            borderColor: borderColors,
+                            borderColor: colors.map(c => c.replace('0.6', '1')),
                             borderWidth: 1,
                             borderRadius: 5
                         }]
                     },
                     options: {
                         scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: '#333' },
-                                ticks: { color: '#fff', font: { size: isMobile ? 6 : 12 } }
-                            },
-                            x: {
-                                grid: { color: '#333' },
-                                ticks: { color: '#fff', font: { size: isMobile ? 6 : 12 }, maxRotation: isMobile ? 90 : 0, minRotation: isMobile ? 90 : 0 }
-                            }
+                            y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#fff', font: { size: isMobile ? 6 : 12 } } },
+                            x: { grid: { color: '#333' }, ticks: { color: '#fff', font: { size: isMobile ? 6 : 12 }, maxRotation: isMobile ? 90 : 0, minRotation: isMobile ? 90 : 0 } }
                         },
                         plugins: {
                             legend: { display: false },
@@ -1796,30 +1168,28 @@
                     },
                     plugins: [ChartDataLabels]
                 });
+
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.classList.add('popup-buttons');
                 let lessClass = 'button less';
                 let moreClass = 'button more';
                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                 const selectedBet = selectedBets.find(b => b.key === key);
+                const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                const isOver = betTagLower.includes('over') || betTagLower.includes('more');
                 if (selectedBet) {
-                    if (selectedBet.choice === 'Less') {
-                        lessClass += ' selected selected-less';
-                    } else if (selectedBet.choice === 'More') {
-                        moreClass += ' selected selected-more';
-                    }
+                    if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
+                    else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
                 } else {
-                    if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'more') {
-                        moreClass += ' green-outline';
-                    } else if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less') {
-                        lessClass += ' red-outline';
-                    }
+                    if (isOver) moreClass += ' green-outline';
+                    else lessClass += ' red-outline';
                 }
                 buttonsDiv.innerHTML = `
                     <button id="popupLess" class="${lessClass}" data-choice="Less">↓ Less</button>
                     <button id="popupMore" class="${moreClass}" data-choice="More">↑ More</button>
                 `;
                 content.appendChild(buttonsDiv);
+
                 const popupLess = document.getElementById('popupLess');
                 const popupMore = document.getElementById('popupMore');
                 [popupLess, popupMore].forEach(btn => {
@@ -1829,35 +1199,16 @@
                         const existingIndex = selectedBets.findIndex(b => b.key === key);
                         let prob = 0.5;
                         const betData = {
-                            key,
-                            player: row['Player Name'],
-                            choice,
-                            line: row['Line Score'],
-                            stat: row['Stat Type'],
-                            edge: parseFloat(row['Edge %']) || 0,
-                            prob,
-                            game: row['Game Short Title'] || '',
-                            team: row.Team,
-                            id: row.id || '',
-                            projectionId: row['Data ID'] || ''
+                            key, player: row['Player Name'], choice, line: row['Line Score'],
+                            stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob,
+                            game: row['Game Short Title'] || '', team: row.Team,
+                            id: row.id || '', projectionId: row['Data ID'] || ''
                         };
                         if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
                             selectedBets.splice(existingIndex, 1);
-                            btn.classList.remove('selected', 'selected-more', 'selected-less');
                         } else {
-                            if (existingIndex > -1) {
-                                selectedBets[existingIndex] = betData;
-                            } else {
-                                selectedBets.push(betData);
-                            }
-                            popupLess.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline');
-                            popupMore.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline');
-                            btn.classList.add('selected');
-                            if (choice === 'More') {
-                                btn.classList.add('selected-more');
-                            } else {
-                                btn.classList.add('selected-less');
-                            }
+                            if (existingIndex > -1) selectedBets[existingIndex] = betData;
+                            else selectedBets.push(betData);
                         }
                         updateBetSlip();
                         renderPopupContent('Overview', row);
@@ -1871,20 +1222,12 @@
             } else if (tab === 'News') {
                 const table = document.createElement('table');
                 table.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>EST. Return Date</th>
-                            <th>Injury Status</th>
-                            <th>Comment</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td data-label="EST. Return Date">${row['EST. Return Date'] || '-'}</td>
-                            <td data-label="Injury Status">${row['Injury Status'] || '-'}</td>
-                            <td data-label="Comment">${row.Comment || '-'}</td>
-                        </tr>
-                    </tbody>
+                    <thead><tr><th>EST. Return Date</th><th>Injury Status</th><th>Comment</th></tr></thead>
+                    <tbody><tr>
+                        <td data-label="EST. Return Date">${row['EST. Return Date'] || '-'}</td>
+                        <td data-label="Injury Status">${row['Injury Status'] || '-'}</td>
+                        <td data-label="Comment">${row.Comment || '-'}</td>
+                    </tr></tbody>
                 `;
                 const tableWrapper = document.createElement('div');
                 tableWrapper.classList.add('table-wrapper');
@@ -1893,9 +1236,7 @@
             } else if (tab === 'Other Bets') {
                 content.innerHTML = '<p>No other bets available.</p>';
             } else if (tab === 'Matchup') {
-                content.innerHTML = `
-                    <p>Opp: ${row.Opp || '-'}</p>
-                `;
+                content.innerHTML = `<p>Opp: ${row.Opp || '-'}</p>`;
             }
         }
 
@@ -1913,132 +1254,85 @@
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
                 let filtered = allData.filter(row => (row['Stat Type'] || '').trim() !== '');
-                if (currentTab !== 'All') {
-                    filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
-                }
-                if (currentOddsType !== 'all') {
-                    filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
-                }
-                if (searchTerm) {
-                    filtered = filtered.filter(row =>
-                        row['Player Name'].toLowerCase().includes(searchTerm) ||
-                        (row['Stat Type'] || '').toLowerCase().includes(searchTerm)
-                    );
-                }
-                filtered = filtered.filter(row =>
-                    selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) && selectedCallouts.has(row['Callout Bet Tag'])
-                );
+                if (currentTab !== 'All') filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
+                if (currentOddsType !== 'all') filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
+                if (searchTerm) filtered = filtered.filter(row => row['Player Name'].toLowerCase().includes(searchTerm) || (row['Stat Type'] || '').toLowerCase().includes(searchTerm));
+                filtered = filtered.filter(row => selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) && selectedCallouts.has(row['Callout Bet Tag']));
                 filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
-                filtered.sort((a, b) => {
-                    let aVal = parseFloat(a['Edge %']) || 0;
-                    let bVal = parseFloat(b['Edge %']) || 0;
-                    return bVal - aVal;
-                });
+                filtered.sort((a, b) => (parseFloat(b['Edge %']) || 0) - (parseFloat(a['Edge %']) || 0));
                 currentFiltered = filtered;
+
                 contentDiv.innerHTML = '';
-                contentDiv.classList.remove('table-view');
-                if (currentView === 'table') {
-                    contentDiv.classList.add('table-view');
-                }
+                contentDiv.classList.toggle('table-view', currentView === 'table');
+
                 if (filtered.length === 0) {
-                    contentDiv.innerHTML = '<div class="loading">No data available for this selection. Try switching the odds type...</div>';
+                    contentDiv.innerHTML = '<div class="loading">No data available...</div>';
                     return;
                 }
+
                 if (currentView === 'cards') {
                     filtered.forEach((row, index) => {
                         row.id = index + 1;
-                        const card = document.createElement('div');
-                        card.classList.add('card');
                         const edge = isNaN(parseFloat(row['Edge %'])) ? 'N/A' : parseFloat(row['Edge %']).toFixed(1) + '%';
-                        let icon = '';
-                        if (row['Odds Type'] === 'demon') icon = '<div class="icon">👿</div>';
-                        if (row['Odds Type'] === 'goblin') icon = '<div class="icon">👺</div>';
-                        let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
-                        if (row.Opp && row.Opp !== 'Multiple') {
-                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
-                        }
+                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                        const dividerClass = (betTagLower.includes('over') || betTagLower.includes('more')) ? 'more' : (betTagLower.includes('under') || betTagLower.includes('less')) ? 'less' : '';
                         let lessClass = 'button less';
                         let moreClass = 'button more';
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
                         const selectedBet = selectedBets.find(b => b.key === key);
-                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
-                        const dividerClass = betTagLower.includes('more') || betTagLower.includes('over') ? 'more' : (betTagLower.includes('less') || betTagLower.includes('under') ? 'less' : '');
                         if (selectedBet) {
-                            if (selectedBet.choice === 'Less') {
-                                lessClass += ' selected selected-less';
-                            } else if (selectedBet.choice === 'More') {
-                                moreClass += ' selected selected-more';
-                            }
+                            if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
+                            else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
                         } else {
-                            if (betTagLower.includes('more') || betTagLower.includes('over')) {
-                                moreClass += ' green-outline';
-                            } else if (betTagLower.includes('less') || betTagLower.includes('under')) {
-                                lessClass += ' red-outline';
-                            }
+                            if (betTagLower.includes('more') || betTagLower.includes('over')) moreClass += ' green-outline';
+                            else if (betTagLower.includes('less') || betTagLower.includes('under')) lessClass += ' red-outline';
                         }
+
+                        const card = document.createElement('div');
+                        card.classList.add('card');
                         card.innerHTML = `
-                            ${icon}
-                            <div class="header">
-                                <span class="pop">${edge}</span>
-                            </div>
+                            <div class="header"><span class="pop">${edge}</span></div>
                             <img class="headshot" src="${row['Headshot URL'] || row['Player Image'] || 'placeholder.png'}" alt="${row['Player Name']}">
                             <div class="team">${row.Team || ''}</div>
                             <div class="name">${row['Player Name']}</div>
-                            <div class="game">${gameTime}</div>
+                            <div class="game">${row['Game Short Title'] || ''}</div>
                             <div class="stat">${row['Line Score']} ${row['Stat Type']}</div>
                             <div class="buttons">
                                 <button class="${lessClass}" data-choice="Less">↓ Less</button>
                                 <div class="divider ${dividerClass}"></div>
                                 <button class="${moreClass}" data-choice="More">↑ More</button>
                             </div>
-                            <div class="info-icon" title="Player Info" data-index="${index}">ℹ️</div>
+                            <div class="info-icon" data-index="${index}">ℹ️</div>
                         `;
                         contentDiv.appendChild(card);
-                        const buttons = card.querySelectorAll('.button');
-                        buttons.forEach(btn => {
+
+                        card.querySelectorAll('.button').forEach(btn => {
                             btn.addEventListener('click', () => {
                                 const choice = btn.dataset.choice;
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
-                                let prob = choice === 'More' ? 0.5 : 0.5;
+                                let prob = 0.5;
                                 const betData = {
-                                    key,
-                                    player: row['Player Name'],
-                                    choice,
-                                    line: row['Line Score'],
-                                    stat: row['Stat Type'],
-                                    edge: parseFloat(row['Edge %']) || 0,
-                                    prob,
-                                    game: row['Game Short Title'],
-                                    team: row.Team,
-                                    id: row.id,
-                                    projectionId: row['Data ID'] || ''
+                                    key, player: row['Player Name'], choice, line: row['Line Score'],
+                                    stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob,
+                                    game: row['Game Short Title'], team: row.Team,
+                                    id: row.id, projectionId: row['Data ID'] || ''
                                 };
                                 if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
                                     selectedBets.splice(existingIndex, 1);
-                                    btn.classList.remove('selected', 'selected-more', 'selected-less');
                                 } else {
-                                    if (existingIndex > -1) {
-                                        selectedBets[existingIndex] = betData;
-                                    } else {
-                                        selectedBets.push(betData);
-                                    }
-                                    card.querySelectorAll('.button').forEach(b => b.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline'));
-                                    btn.classList.add('selected');
-                                    if (choice === 'More') {
-                                        btn.classList.add('selected-more');
-                                    } else {
-                                        btn.classList.add('selected-less');
-                                    }
+                                    if (existingIndex > -1) selectedBets[existingIndex] = betData;
+                                    else selectedBets.push(betData);
                                 }
                                 updateBetSlip();
+                                renderContent();
                             });
                         });
-                        card.querySelector('.info-icon').addEventListener('click', () => showPlayerPopup(row, parseInt(card.querySelector('.info-icon').dataset.index)));
+                        card.querySelector('.info-icon').addEventListener('click', () => showPlayerPopup(row, index));
                     });
                 } else {
                     const table = document.createElement('table');
@@ -2057,105 +1351,78 @@
                     });
                     thead.appendChild(headerTr);
                     table.appendChild(thead);
+
                     const tbody = document.createElement('tbody');
                     filtered.forEach((row, index) => {
                         row.id = index + 1;
                         const tr = document.createElement('tr');
+
                         const detailsTd = document.createElement('td');
+                        detailsTd.classList.add('details-cell');
                         const img = document.createElement('img');
                         img.src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
-                        img.alt = row['Player Name'];
-                        img.style.width = '30px';
-                        img.style.height = '30px';
-                        img.style.borderRadius = '50%';
-                        img.style.marginRight = '5px';
                         const playerNameSpan = document.createElement('span');
-                        playerNameSpan.style.fontWeight = 'bold';
-                        playerNameSpan.style.color = '#00ffcc';
+                        playerNameSpan.classList.add('player-name');
                         playerNameSpan.textContent = row['Player Name'];
-                        const infoIcon = document.createElement('span');
-                        infoIcon.classList.add('info-icon');
-                        infoIcon.textContent = 'ℹ️';
-                        infoIcon.dataset.index = index;
-                        infoIcon.style.marginLeft = '5px';
-                        infoIcon.addEventListener('click', (e) => {
-                          e.stopPropagation();
-                          showPlayerPopup(row, parseInt(infoIcon.dataset.index));
-                        });
+                        const playerSub = document.createElement('span');
+                        playerSub.classList.add('player-sub');
                         let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
-                        if (row.Opp && row.Opp !== 'Multiple') {
-                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
-                        }
-                        const calloutTag = row['Callout Bet Tag'] ? ` | ${row['Callout Bet Tag']}` : '';
-                        detailsTd.appendChild(img);
-                        detailsTd.appendChild(playerNameSpan);
-                        detailsTd.appendChild(infoIcon);
-                        detailsTd.appendChild(document.createTextNode(` (${row.Team || ''}) - ${gameTime}${calloutTag}`));
-                        detailsTd.setAttribute('data-label', 'Details');
+                        if (row.Opp && row.Opp !== 'Multiple') gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
+                        playerSub.textContent = `${row.Team || ''} - ${gameTime}`;
+                        detailsTd.append(img, playerNameSpan, playerSub);
                         detailsTd.style.cursor = 'pointer';
-                        detailsTd.addEventListener('click', () => showPlayerPopup(row, index));
+                        detailsTd.onclick = () => showPlayerPopup(row, index);
                         tr.appendChild(detailsTd);
+
                         const statTd = document.createElement('td');
                         statTd.textContent = row['Stat Type'];
-                        statTd.setAttribute('data-label', 'Stat');
                         tr.appendChild(statTd);
+
                         const edgeTd = document.createElement('td');
-                        let icon = '';
-                        if (row['Odds Type'] === 'demon') icon = '👿 ';
-                        if (row['Odds Type'] === 'goblin') icon = '👺 ';
-                        const edge = isNaN(parseFloat(row['Edge %'])) ? 'N/A' : parseFloat(row['Edge %']).toFixed(1) + '%';
-                        edgeTd.textContent = icon + edge;
-                        edgeTd.setAttribute('data-label', 'Edge');
+                        edgeTd.textContent = (parseFloat(row['Edge %']) || 0).toFixed(1) + '%';
                         tr.appendChild(edgeTd);
+
                         const lineTd = document.createElement('td');
                         lineTd.textContent = row['Line Score'];
-                        lineTd.setAttribute('data-label', 'Line');
                         tr.appendChild(lineTd);
+
                         const ppUdTd = document.createElement('td');
-                        const udLineStr = row['Underdog Line'] || '';
-                        const udLine = parseFloat(udLineStr);
-                        const ppLine = parseFloat(row['Line Score']);
-                        ppUdTd.textContent = (udLineStr && udLine !== 0 && !isNaN(udLine)) ? (ppLine - udLine).toFixed(1) : '';
-                        ppUdTd.setAttribute('data-label', 'PP-UD');
+                        const ud = parseFloat(row['Underdog Line'] || 0);
+                        const pp = parseFloat(row['Line Score'] || 0);
+                        ppUdTd.textContent = (ud && !isNaN(ud)) ? (pp - ud).toFixed(1) : '';
                         tr.appendChild(ppUdTd);
+
                         const avgProjTd = document.createElement('td');
-                        avgProjTd.textContent = parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1) || '-';
-                        avgProjTd.setAttribute('data-label', 'Avg Proj');
+                        avgProjTd.textContent = parseFloat(row['Average Projected'] || 0).toFixed(1);
                         tr.appendChild(avgProjTd);
+
                         const dvpAdjTd = document.createElement('td');
-                        dvpAdjTd.textContent = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1) || '-';
-                        dvpAdjTd.setAttribute('data-label', 'DVP Adj');
+                        dvpAdjTd.textContent = parseFloat(row['DVP Adjusted'] || 0).toFixed(1);
                         tr.appendChild(dvpAdjTd);
+
                         const totalProjTd = document.createElement('td');
-                        totalProjTd.textContent = parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1) || '-';
-                        totalProjTd.setAttribute('data-label', 'Total Proj');
+                        totalProjTd.textContent = parseFloat(row['Total Projection'] || 0).toFixed(1);
                         tr.appendChild(totalProjTd);
+
                         const oppTd = document.createElement('td');
-                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1) || '-';
-                        oppTd.setAttribute('data-label', 'Opp');
+                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1);
                         tr.appendChild(oppTd);
+
                         const actionsTd = document.createElement('td');
-                        actionsTd.setAttribute('data-label', 'Actions');
                         const buttonsDiv = document.createElement('div');
                         buttonsDiv.classList.add('buttons');
+                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                        const dividerClass = (betTagLower.includes('over') || betTagLower.includes('more')) ? 'more' : (betTagLower.includes('under') || betTagLower.includes('less')) ? 'less' : '';
                         let lessClass = 'button less';
                         let moreClass = 'button more';
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
                         const selectedBet = selectedBets.find(b => b.key === key);
-                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
-                        const dividerClass = betTagLower.includes('more') || betTagLower.includes('over') ? 'more' : (betTagLower.includes('less') || betTagLower.includes('under') ? 'less' : '');
                         if (selectedBet) {
-                            if (selectedBet.choice === 'Less') {
-                                lessClass += ' selected selected-less';
-                            } else if (selectedBet.choice === 'More') {
-                                moreClass += ' selected selected-more';
-                            }
+                            if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
+                            else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
                         } else {
-                            if (betTagLower.includes('more') || betTagLower.includes('over')) {
-                                moreClass += ' green-outline';
-                            } else if (betTagLower.includes('less') || betTagLower.includes('under')) {
-                                lessClass += ' red-outline';
-                            }
+                            if (betTagLower.includes('more') || betTagLower.includes('over')) moreClass += ' green-outline';
+                            else if (betTagLower.includes('less') || betTagLower.includes('under')) lessClass += ' red-outline';
                         }
                         buttonsDiv.innerHTML = `
                             <button class="${lessClass}" data-choice="Less">↓ Less</button>
@@ -2164,46 +1431,31 @@
                         `;
                         actionsTd.appendChild(buttonsDiv);
                         tr.appendChild(actionsTd);
+
                         const buttons = buttonsDiv.querySelectorAll('.button');
                         buttons.forEach(btn => {
                             btn.addEventListener('click', () => {
                                 const choice = btn.dataset.choice;
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
-                                let prob = choice === 'More' ? 0.5 : 0.5;
+                                let prob = 0.5;
                                 const betData = {
-                                    key,
-                                    player: row['Player Name'],
-                                    choice,
-                                    line: row['Line Score'],
-                                    stat: row['Stat Type'],
-                                    edge: parseFloat(row['Edge %']) || 0,
-                                    prob,
-                                    game: row['Game Short Title'],
-                                    team: row.Team,
-                                    id: row.id,
-                                    projectionId: row['Data ID'] || ''
+                                    key, player: row['Player Name'], choice, line: row['Line Score'],
+                                    stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob,
+                                    game: row['Game Short Title'], team: row.Team,
+                                    id: row.id, projectionId: row['Data ID'] || ''
                                 };
                                 if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
                                     selectedBets.splice(existingIndex, 1);
                                 } else {
-                                    if (existingIndex > -1) {
-                                        selectedBets[existingIndex] = betData;
-                                    } else {
-                                        selectedBets.push(betData);
-                                    }
-                                    buttonsDiv.querySelectorAll('.button').forEach(b => b.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline'));
-                                    btn.classList.add('selected');
-                                    if (choice === 'More') {
-                                        btn.classList.add('selected-more');
-                                    } else {
-                                        btn.classList.add('selected-less');
-                                    }
+                                    if (existingIndex > -1) selectedBets[existingIndex] = betData;
+                                    else selectedBets.push(betData);
                                 }
                                 updateBetSlip();
                                 renderContent();
                             });
                         });
+
                         tbody.appendChild(tr);
                     });
                     table.appendChild(tbody);
