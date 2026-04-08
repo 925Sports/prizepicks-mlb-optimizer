@@ -1765,7 +1765,7 @@
                         const choice = btn.dataset.choice;
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
                         const existingIndex = selectedBets.findIndex(b => b.key === key);
-                        let prob = 0.5;
+                        const prob = parseFloat(row['Edge %'] || 50) / 100;
                         const betData = {
                             key,
                             player: row['Player Name'],
@@ -1875,6 +1875,7 @@
         window.addPopupBet = function(player, stat, choice, line, edge) {
             const key = `${player}-${stat}`;
             const existingIndex = selectedBets.findIndex(b => b.key === key);
+            const prob = edge / 100;
             const betData = {
                 key,
                 player: player,
@@ -1882,7 +1883,7 @@
                 line: line,
                 stat: stat,
                 edge: edge,
-                prob: 0.5,
+                prob: prob,
                 game: currentRow ? currentRow['Game Short Title'] : '',
                 team: currentRow ? currentRow.Team : '',
                 id: currentRow ? currentRow.id : '',
@@ -2032,7 +2033,7 @@
                                 const choice = btn.dataset.choice;
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
-                                let prob = choice === 'More' ? 0.5 : 0.5;
+                                const prob = parseFloat(row['Edge %'] || 50) / 100;
                                 const betData = {
                                     key,
                                     player: row['Player Name'],
@@ -2192,7 +2193,7 @@
                                 const choice = btn.dataset.choice;
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
-                                let prob = choice === 'More' ? 0.5 : 0.5;
+                                const prob = parseFloat(row['Edge %'] || 50) / 100;
                                 const betData = {
                                     key,
                                     player: row['Player Name'],
