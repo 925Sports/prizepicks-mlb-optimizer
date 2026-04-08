@@ -1897,13 +1897,19 @@
                         (row['Stat Type'] || '').toLowerCase().includes(searchTerm)
                     );
                 }
-                // ONLY CHANGE REQUESTED FOR TABLE VIEW SORTING - DYNAMIC SORT LOGIC ADDED HERE (previously hardcoded to Edge % only)
-                filtered = filtered.filter(row =>
-                    selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) &&
-                    (selectedCallouts.has(row['Callout Bet Tag']) ||
-                     (row['Stat Type'] || '').trim() === 'Hitter Fantasy Score' ||
-                     (row['Stat Type'] || '').trim() === 'Pitcher Fantasy Score')
-                );
+                // ONLY CHANGE REQUESTED FOR FANTASY SCORES - EXCEPTION ADDED SO THEY ALWAYS APPEAR IN TABS AND DATA
+                // Fantasy Score bets now bypass the Callout Bet Tag filter (while still respecting game/team filters) 
+                // so Hitter Fantasy Score and Pitcher Fantasy Score rows are always shown regardless of selected callouts
+                filtered = filtered.filter(row => {
+                    const statType = (row['Stat Type'] || '').trim();
+                    const isFantasyScore = statType === 'Hitter Fantasy Score' || statType === 'Pitcher Fantasy Score';
+                    if (isFantasyScore) {
+                        return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team);
+                    } else {
+                        return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) &&
+                               selectedCallouts.has(row['Callout Bet Tag']);
+                    }
+                });
                 filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
