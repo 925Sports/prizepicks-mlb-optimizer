@@ -312,6 +312,7 @@
             width: 3px;
             background: #333;
             transform: translateX(-50%);
+            z-index: 1;
         }
         .divider.more {
             background: #4dff4d;
@@ -1110,7 +1111,6 @@
     <div class="tabs"></div>
     <div id="content"></div>
 
-    <!-- Player Popup -->
     <div id="playerPopup">
         <span id="closePlayerPopup">×</span>
         <div class="header">
@@ -1134,7 +1134,6 @@
         <div class="tab-content" id="popupContent"></div>
     </div>
 
-    <!-- Filter Popup -->
     <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
         <h3>Games</h3>
@@ -1147,7 +1146,6 @@
         <div id="teamsList"></div>
     </div>
 
-    <!-- Callout Filter Popup -->
     <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
         <h3>Callout Bet Tags</h3>
@@ -1156,7 +1154,6 @@
         <div id="calloutsList"></div>
     </div>
 
-    <!-- Bet Slip Popup -->
     <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
         <h3>Generated Bet Slips</h3>
@@ -1182,7 +1179,6 @@
         </div>
     </div>
 
-    <!-- Tool Info Popup -->
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
@@ -1224,8 +1220,8 @@
         let showSelectedOnly = false;
         const contentDiv = document.getElementById('content');
         contentDiv.innerHTML = '<div class="loading">Loading MLB data...</div>';
-        const url = './data/prizepicks-mlb.csv';  // Update this path to point to your MLB CSV file if needed
-        const gameLogUrl = ''; // Game log CSV will be added later
+        const url = './data/prizepicks-mlb.csv';
+        const gameLogUrl = '';
 
         const predefinedCombinations = {
             2: [[1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10],
@@ -1246,7 +1242,6 @@
                 [5,6,7,8], [5,6,8,9], [5,7,8,9], [5,8,9,10],
                 [6,7,8,9], [6,8,9,10],
                 [7,8,9,10]],
-            // ... (full predefinedCombinations as in your original NBA-style tool – kept identical)
             4: [[1,2,3,4], [1,2,3,5], [1,2,3,6], [1,2,3,7], [1,2,4,5], [1,2,4,6], [1,2,4,7], [1,2,5,6],
                 [1,2,5,7], [1,2,6,7], [1,3,4,5], [1,3,4,6], [1,3,4,7], [1,3,5,6], [1,3,5,7], [1,3,6,7],
                 [1,4,5,6], [1,4,5,7], [1,4,6,7], [1,5,6,7], [1,6,7,8], [1,7,8,9], [1,8,9,10],
@@ -1278,7 +1273,6 @@
             .then(response => response.text())
             .then(csv => {
                 allData = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
-                // Build game time map
                 allData.forEach(row => {
                     if (row['Game Short Title'] && row['Scheduled At'] && !gameToTime.has(row['Game Short Title'])) {
                         gameToTime.set(row['Game Short Title'], row['Scheduled At']);
@@ -1291,7 +1285,6 @@
                 selectedTeams = new Set(uniqueTeams);
                 selectedCallouts = new Set(uniqueCallouts);
 
-                // Dynamic stat tabs from MLB data (exact match to NBA tool)
                 const uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
                 const tabsDiv = document.querySelector('.tabs');
                 tabsDiv.innerHTML = '';
@@ -1311,7 +1304,6 @@
                     tabsDiv.appendChild(btn);
                 });
 
-                // View toggle (exact match to NBA tool)
                 const viewSwitch = document.createElement('div');
                 viewSwitch.classList.add('view-switch');
                 viewSwitch.innerHTML = `
@@ -1324,7 +1316,6 @@
                 `;
                 tabsDiv.appendChild(viewSwitch);
 
-                // Bet Type select (mobile)
                 const betTypeSelect = document.getElementById('betTypeSelect');
                 betTypeSelect.innerHTML = '';
                 uniqueStatTypes.forEach(tab => {
@@ -1342,7 +1333,6 @@
                     renderContent();
                 });
 
-                // Odds select
                 const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
                 const oddsSelect = document.getElementById('oddsSelect');
                 oddsSelect.innerHTML = '';
@@ -1361,7 +1351,6 @@
                     renderContent();
                 });
 
-                // View select (mobile)
                 const viewSelect = document.getElementById('viewSelect');
                 viewSelect.value = 'cards';
                 viewSelect.addEventListener('change', () => {
@@ -1370,7 +1359,6 @@
                     renderContent();
                 });
 
-                // Event listeners (exact match to NBA tool)
                 document.getElementById('search').addEventListener('input', (e) => {
                     searchTerm = e.target.value.toLowerCase();
                     renderContent();
@@ -1394,7 +1382,6 @@
                     renderContent();
                 });
 
-                // Filter popups
                 document.getElementById('filterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('popup');
                     popup.style.display = 'block';
@@ -1507,8 +1494,8 @@
                 renderContent();
             })
             .catch(error => {
-                console.error('Error fetching MLB CSV:', error);
-                contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Error loading MLB data. Please check the CSV path and try again.</div>`;
+                console.error('Error fetching CSV:', error);
+                contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
             });
 
         function updateBetSlip() {
@@ -1636,9 +1623,7 @@
                         a.target = '_blank';
                         td.appendChild(a);
                     } else if (col === 'Players') {
-                        const summarySpan = document.createElement('span');
-                        summarySpan.textContent = combo.players;
-                        td.appendChild(summarySpan);
+                        td.textContent = combo.players;
                     } else if (['edge', 'cashlikelihood'].includes(key)) {
                         td.textContent = (combo[key] || 0).toFixed(2) + '%';
                     } else {
@@ -1688,7 +1673,7 @@
                 {label: 'Proj', value: parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1)},
                 {label: 'DVP', value: parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1)},
                 {label: 'Total', value: parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1)},
-                {label: 'Opp', value: parseFloat(row['Opportunities'] || row['Opp'] || 0).toFixed(1)}  // MLB: Opportunities = projected AB/IP
+                {label: 'Opp', value: parseFloat(row['Opportunities'] || row['Opp'] || 0).toFixed(1)}
             ];
             stats.forEach(stat => {
                 const box = document.createElement('div');
@@ -1914,6 +1899,16 @@
             }
         }
 
+        function sortContentTable(column) {
+            if (contentSortColumn === column) {
+                contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                contentSortColumn = column;
+                contentSortDirection = 'asc';
+            }
+            renderContent();
+        }
+
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
@@ -1933,13 +1928,11 @@
                 filtered = filtered.filter(row =>
                     selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) && selectedCallouts.has(row['Callout Bet Tag'])
                 );
-                // Filter out 100% edge bets
                 filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
-                // Default sort by Edge % descending
                 filtered.sort((a, b) => {
                     let aVal = parseFloat(a['Edge %']) || 0;
                     let bVal = parseFloat(b['Edge %']) || 0;
@@ -1972,6 +1965,8 @@
                         let moreClass = 'button more';
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
                         const selectedBet = selectedBets.find(b => b.key === key);
+                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                        const dividerClass = betTagLower.includes('more') || betTagLower.includes('over') ? 'more' : (betTagLower.includes('less') || betTagLower.includes('under') ? 'less' : '');
                         if (selectedBet) {
                             if (selectedBet.choice === 'Less') {
                                 lessClass += ' selected selected-less';
@@ -1979,14 +1974,12 @@
                                 moreClass += ' selected selected-more';
                             }
                         } else {
-                            if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'more') {
+                            if (betTagLower.includes('more') || betTagLower.includes('over')) {
                                 moreClass += ' green-outline';
-                            } else if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less') {
+                            } else if (betTagLower.includes('less') || betTagLower.includes('under')) {
                                 lessClass += ' red-outline';
                             }
                         }
-                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
-                        const dividerClass = betTagLower.includes('more') ? 'more' : (betTagLower.includes('less') ? 'less' : '');
                         card.innerHTML = `
                             ${icon}
                             <div class="header">
@@ -2048,7 +2041,6 @@
                         card.querySelector('.info-icon').addEventListener('click', () => showPlayerPopup(row, parseInt(card.querySelector('.info-icon').dataset.index)));
                     });
                 } else {
-                    // Table view (exact match to NBA tool styling)
                     const table = document.createElement('table');
                     const thead = document.createElement('thead');
                     const headers = ['Details', 'Stat', 'Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp', 'Actions'];
@@ -2070,21 +2062,17 @@
                         row.id = index + 1;
                         const tr = document.createElement('tr');
                         const detailsTd = document.createElement('td');
-                        detailsTd.classList.add('details-cell');
                         const img = document.createElement('img');
                         img.src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
                         img.alt = row['Player Name'];
+                        img.style.width = '30px';
+                        img.style.height = '30px';
+                        img.style.borderRadius = '50%';
+                        img.style.marginRight = '5px';
                         const playerNameSpan = document.createElement('span');
-                        playerNameSpan.classList.add('player-name');
+                        playerNameSpan.style.fontWeight = 'bold';
+                        playerNameSpan.style.color = '#00ffcc';
                         playerNameSpan.textContent = row['Player Name'];
-                        const playerSub = document.createElement('span');
-                        playerSub.classList.add('player-sub');
-                        let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
-                        if (row.Opp && row.Opp !== 'Multiple') {
-                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
-                        }
-                        const calloutTag = row['Callout Bet Tag'] ? ` | ${row['Callout Bet Tag']}` : '';
-                        playerSub.textContent = `${row.Team || ''} - ${gameTime}${calloutTag}`;
                         const infoIcon = document.createElement('span');
                         infoIcon.classList.add('info-icon');
                         infoIcon.textContent = 'ℹ️';
@@ -2094,13 +2082,22 @@
                           e.stopPropagation();
                           showPlayerPopup(row, parseInt(infoIcon.dataset.index));
                         });
+                        let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
+                        if (row.Opp && row.Opp !== 'Multiple') {
+                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
+                        }
+                        const calloutTag = row['Callout Bet Tag'] ? ` | ${row['Callout Bet Tag']}` : '';
                         detailsTd.appendChild(img);
                         detailsTd.appendChild(playerNameSpan);
-                        detailsTd.appendChild(playerSub);
                         detailsTd.appendChild(infoIcon);
+                        detailsTd.appendChild(document.createTextNode(` (${row.Team || ''}) - ${gameTime}${calloutTag}`));
+                        detailsTd.setAttribute('data-label', 'Details');
+                        detailsTd.style.cursor = 'pointer';
+                        detailsTd.addEventListener('click', () => showPlayerPopup(row, index));
                         tr.appendChild(detailsTd);
                         const statTd = document.createElement('td');
                         statTd.textContent = row['Stat Type'];
+                        statTd.setAttribute('data-label', 'Stat');
                         tr.appendChild(statTd);
                         const edgeTd = document.createElement('td');
                         let icon = '';
@@ -2108,49 +2105,66 @@
                         if (row['Odds Type'] === 'goblin') icon = '👺 ';
                         const edge = isNaN(parseFloat(row['Edge %'])) ? 'N/A' : parseFloat(row['Edge %']).toFixed(1) + '%';
                         edgeTd.textContent = icon + edge;
+                        edgeTd.setAttribute('data-label', 'Edge');
                         tr.appendChild(edgeTd);
                         const lineTd = document.createElement('td');
                         lineTd.textContent = row['Line Score'];
+                        lineTd.setAttribute('data-label', 'Line');
                         tr.appendChild(lineTd);
                         const ppUdTd = document.createElement('td');
                         const udLineStr = row['Underdog Line'] || '';
                         const udLine = parseFloat(udLineStr);
                         const ppLine = parseFloat(row['Line Score']);
                         ppUdTd.textContent = (udLineStr && udLine !== 0 && !isNaN(udLine)) ? (ppLine - udLine).toFixed(1) : '';
+                        ppUdTd.setAttribute('data-label', 'PP-UD');
                         tr.appendChild(ppUdTd);
                         const avgProjTd = document.createElement('td');
                         avgProjTd.textContent = parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1) || '-';
+                        avgProjTd.setAttribute('data-label', 'Avg Proj');
                         tr.appendChild(avgProjTd);
                         const dvpAdjTd = document.createElement('td');
                         dvpAdjTd.textContent = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1) || '-';
+                        dvpAdjTd.setAttribute('data-label', 'DVP Adj');
                         tr.appendChild(dvpAdjTd);
                         const totalProjTd = document.createElement('td');
                         totalProjTd.textContent = parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1) || '-';
+                        totalProjTd.setAttribute('data-label', 'Total Proj');
                         tr.appendChild(totalProjTd);
                         const oppTd = document.createElement('td');
-                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1) || '-';  // MLB Opportunities (AB/IP)
+                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1) || '-';
+                        oppTd.setAttribute('data-label', 'Opp');
                         tr.appendChild(oppTd);
                         const actionsTd = document.createElement('td');
+                        actionsTd.setAttribute('data-label', 'Actions');
                         const buttonsDiv = document.createElement('div');
-                        buttonsDiv.classList.add('action-buttons');
-                        let lessClass = 'action-btn less';
-                        let moreClass = 'action-btn more';
+                        buttonsDiv.classList.add('buttons');
+                        let lessClass = 'button less';
+                        let moreClass = 'button more';
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
                         const selectedBet = selectedBets.find(b => b.key === key);
+                        const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                        const dividerClass = betTagLower.includes('more') || betTagLower.includes('over') ? 'more' : (betTagLower.includes('less') || betTagLower.includes('under') ? 'less' : '');
                         if (selectedBet) {
-                            if (selectedBet.choice === 'Less') lessClass += ' selected';
-                            else if (selectedBet.choice === 'More') moreClass += ' selected';
+                            if (selectedBet.choice === 'Less') {
+                                lessClass += ' selected selected-less';
+                            } else if (selectedBet.choice === 'More') {
+                                moreClass += ' selected selected-more';
+                            }
                         } else {
-                            if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'more') moreClass += ' green-outline';
-                            else if (row['Bet Tag'] && row['Bet Tag'].toLowerCase() === 'less') lessClass += ' red-outline';
+                            if (betTagLower.includes('more') || betTagLower.includes('over')) {
+                                moreClass += ' green-outline';
+                            } else if (betTagLower.includes('less') || betTagLower.includes('under')) {
+                                lessClass += ' red-outline';
+                            }
                         }
                         buttonsDiv.innerHTML = `
                             <button class="${lessClass}" data-choice="Less">↓ Less</button>
+                            <div class="divider ${dividerClass}"></div>
                             <button class="${moreClass}" data-choice="More">↑ More</button>
                         `;
                         actionsTd.appendChild(buttonsDiv);
                         tr.appendChild(actionsTd);
-                        const buttons = buttonsDiv.querySelectorAll('.action-btn');
+                        const buttons = buttonsDiv.querySelectorAll('.button');
                         buttons.forEach(btn => {
                             btn.addEventListener('click', () => {
                                 const choice = btn.dataset.choice;
@@ -2178,8 +2192,13 @@
                                     } else {
                                         selectedBets.push(betData);
                                     }
-                                    buttonsDiv.querySelectorAll('.action-btn').forEach(b => b.classList.remove('selected'));
+                                    buttonsDiv.querySelectorAll('.button').forEach(b => b.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline'));
                                     btn.classList.add('selected');
+                                    if (choice === 'More') {
+                                        btn.classList.add('selected-more');
+                                    } else {
+                                        btn.classList.add('selected-less');
+                                    }
                                 }
                                 updateBetSlip();
                                 renderContent();
@@ -2194,16 +2213,6 @@
                     contentDiv.appendChild(tableWrapper);
                 }
             }, 100);
-        }
-
-        function sortContentTable(column) {
-            if (contentSortColumn === column) {
-                contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                contentSortColumn = column;
-                contentSortDirection = 'asc';
-            }
-            renderContent();
         }
     </script>
 </body>
