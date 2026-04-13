@@ -1407,11 +1407,9 @@
                     document.getElementById('calloutPopup').style.display = 'none';
                     renderContent();
                 });
-                // Advanced Filter Button
                 document.getElementById('advancedFilterBtn').addEventListener('click', () => {
                     const popup = document.getElementById('advancedFilterPopup');
                     popup.style.display = 'block';
-                    // Bet Tags
                     const betTagsList = document.getElementById('betTagsList');
                     betTagsList.innerHTML = '';
                     uniqueBetTags.forEach(tag => {
@@ -1425,7 +1423,6 @@
                         betTagsList.appendChild(label);
                         betTagsList.appendChild(document.createElement('br'));
                     });
-                    // Favorite
                     const favList = document.getElementById('favList');
                     favList.innerHTML = '';
                     ['Yes', 'No'].forEach(fav => {
@@ -1439,7 +1436,6 @@
                         favList.appendChild(label);
                         favList.appendChild(document.createElement('br'));
                     });
-                    // Game Types
                     const gameTypesList = document.getElementById('gameTypesList');
                     gameTypesList.innerHTML = '';
                     ['High', 'Normal', 'Low'].forEach(type => {
@@ -2019,7 +2015,6 @@
                                selectedCallouts.has(row['Callout Bet Tag']);
                     }
                 });
-                // NEW ADVANCED FILTERS
                 if (selectedBetTags.size > 0) {
                     filtered = filtered.filter(row => selectedBetTags.has(row['Bet Tag']));
                 }
@@ -2046,20 +2041,24 @@
                         aVal = parseFloat(a['Edge %']) || 0;
                         bVal = parseFloat(b['Edge %']) || 0;
                     } else if (contentSortColumn === 'PP-UD') {
-                        const aUD = parseFloat(a['Underdog Line']) || 0;
-                        const bUD = parseFloat(b['Underdog Line']) || 0;
-                        if (aUD <= 0 && bUD <= 0) {
-                            aVal = 0;
-                            bVal = 0;
-                        } else if (aUD <= 0) {
-                            aVal = -Infinity;
-                            bVal = parseFloat(b['Line Score']) - bUD;
-                        } else if (bUD <= 0) {
-                            aVal = parseFloat(a['Line Score']) - aUD;
-                            bVal = -Infinity;
+                        // ONLY CHANGE: Ignore empty cells (push rows without valid Underdog Line to the bottom)
+                        const getPPUD = (row) => {
+                            const udStr = row['Underdog Line'] || '';
+                            const ud = parseFloat(udStr);
+                            if (!udStr || isNaN(ud) || ud === 0) return null;
+                            const pp = parseFloat(row['Line Score']) || 0;
+                            return pp - ud;
+                        };
+                        const aPPUD = getPPUD(a);
+                        const bPPUD = getPPUD(b);
+                        if (aPPUD === null && bPPUD === null) return 0;
+                        if (aPPUD === null) return 1;   // empty goes after
+                        if (bPPUD === null) return -1;  // valid goes before
+                        // both valid - normal sort
+                        if (contentSortDirection === 'asc') {
+                            return aPPUD - bPPUD;
                         } else {
-                            aVal = parseFloat(a['Line Score']) - aUD;
-                            bVal = parseFloat(b['Line Score']) - bUD;
+                            return bPPUD - aPPUD;
                         }
                     } else if (contentSortColumn === 'Line') {
                         aVal = parseFloat(a['Line Score']) || 0;
