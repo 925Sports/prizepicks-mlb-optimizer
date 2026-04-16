@@ -1890,14 +1890,14 @@
                 let playerLogs = gameLogs.filter(log => {
                     const logName = (log.fullName || log['fullName'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
                     const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    return (logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop()));
+                    return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
                 });
 
-                // Only show games where the player actually played
+                // Only games where the player actually played
                 if (isPitcher) {
-                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
+                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || log.innings_pitched || 0) > 0);
                 } else {
-                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
+                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || log.at_bats || 0) > 0);
                 }
 
                 let logHTML = `<h3 style="margin-top:0;">Full Season Game Log (${playerLogs.length} games)</h3>`;
@@ -1906,6 +1906,7 @@
                     logHTML += `<input type="text" id="gameLogSearch" placeholder="Filter by Opponent (e.g. LAD, NYY)...">`;
 
                     if (isPitcher) {
+                        // Pitcher view
                         logHTML += `<div class="table-wrapper"><table><thead><tr>
                             <th style="font-weight:700;background:#333;">Date</th>
                             <th style="font-weight:700;background:#333;">Team</th>
@@ -1914,10 +1915,13 @@
                             <th>IP</th><th>ER</th><th>H</th><th>HR</th><th>K</th><th>BB</th><th>Decision</th><th>Fantasy Score</th><th>Summary</th>
                         </tr></thead><tbody>`;
                         playerLogs.forEach(log => {
-                            const ip = parseFloat(log.inningsPitched || log.IP || 0);
-                            const er = parseFloat(log.earnedRuns || log.ER || 0);
-                            const k = parseFloat(log.strikeOuts || log.K || 0);
-                            const bb = parseFloat(log.walks || log.BB || log['BB'] || 0);
+                            const ip = parseFloat(log.inningsPitched || log.IP || log.innings_pitched || 0);
+                            const er = parseFloat(log.earnedRuns || log.ER || log.earned_runs || 0);
+                            const h = parseFloat(log.hitsAllowed || log.H || log.hits_allowed || 0);
+                            const hr = parseFloat(log.homeRunsAllowed || log.HR || log.home_runs_allowed || 0);
+                            const k = parseFloat(log.strikeOuts || log.K || log.strikeouts || 0);
+                            const bb = parseFloat(log.walks || log.BB || log.walks_allowed || 0);
+                            const decision = log.decision || log.Decision || log['Decision'] || '';
                             const fantasyScore = (ip * 3) - (er * 2) + k;
 
                             logHTML += `<tr>
@@ -1927,16 +1931,17 @@
                                 <td>${log.position || log.Pos || log.Role || 'P'}</td>
                                 <td>${ip.toFixed(1)}</td>
                                 <td>${er}</td>
-                                <td>${log.hitsAllowed || log.H || ''}</td>
-                                <td>${log.homeRunsAllowed || log.HR || ''}</td>
+                                <td>${h}</td>
+                                <td>${hr}</td>
                                 <td>${k}</td>
                                 <td>${bb}</td>
-                                <td>${log.decision || log.Decision || log['Decision'] || ''}</td>
+                                <td>${decision}</td>
                                 <td style="font-weight:700;color:#00ffcc;">${fantasyScore.toFixed(1)}</td>
                                 <td>${log.gameLogSummary || log.Summary || ''}</td>
                             </tr>`;
                         });
                     } else {
+                        // Hitter view
                         logHTML += `<div class="table-wrapper"><table><thead><tr>
                             <th style="font-weight:700;background:#333;">Date</th>
                             <th style="font-weight:700;background:#333;">Team</th>
@@ -1945,10 +1950,12 @@
                             <th>AB</th><th>H</th><th>R</th><th>RBI</th><th>HR</th><th>K</th><th>Fantasy Score</th><th>Summary</th>
                         </tr></thead><tbody>`;
                         playerLogs.forEach(log => {
+                            const ab = parseFloat(log.atBats || log.AB || log.at_bats || 0);
                             const hits = parseFloat(log.hits || log.H || 0);
                             const runs = parseFloat(log.runs || log.R || 0);
                             const rbi = parseFloat(log.rbi || log.RBI || 0);
                             const hr = parseFloat(log.homeRuns || log.HR || 0);
+                            const k = parseFloat(log.strikeOuts || log.K || 0);
                             const fantasyScore = hits + runs + rbi + (hr * 2);
 
                             logHTML += `<tr>
@@ -1956,12 +1963,12 @@
                                 <td>${log.teamAbbrev || log.team || log.Team || ''}</td>
                                 <td>${log.opponent || log.Opp || log['Opponent'] || ''}</td>
                                 <td>${log.position || log.Pos || log.Role || ''}</td>
-                                <td>${log.atBats || log.AB || ''}</td>
+                                <td>${ab}</td>
                                 <td>${hits}</td>
                                 <td>${runs}</td>
                                 <td>${rbi}</td>
                                 <td>${hr}</td>
-                                <td>${log.strikeOuts || log.K || ''}</td>
+                                <td>${k}</td>
                                 <td style="font-weight:700;color:#00ffcc;">${fantasyScore.toFixed(1)}</td>
                                 <td>${log.gameLogSummary || log.Summary || ''}</td>
                             </tr>`;
@@ -1973,6 +1980,7 @@
                 }
                 content.innerHTML = logHTML;
 
+                // Opponent filter
                 setTimeout(() => {
                     const searchInput = document.getElementById('gameLogSearch');
                     if (searchInput) {
@@ -2032,7 +2040,7 @@
                 let html = `
                     <h3 style="margin-top:0;">Splits for ${playerName}</h3>
                     <div style="margin-bottom:12px;font-size:13px;color:#888;">Recent Performance (${row['Stat Type']}) - Last 20 Games</div>
-                    <canvas id="splitsChart" width="400" height="180"></canvas>
+                    <canvas id="splitsChart" width="400" height="160"></canvas>
                     <div style="margin-top:16px;display:flex;justify-content:space-around;font-size:13px;">
                         <div>L5 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l5Hit}%</span></div>
                         <div>L10 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l10Hit}%</span></div>
