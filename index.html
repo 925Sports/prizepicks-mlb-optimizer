@@ -1890,8 +1890,15 @@
                 let playerLogs = gameLogs.filter(log => {
                     const logName = (log.fullName || log['fullName'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
                     const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
+                    return (logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop()));
                 });
+
+                // Only show games where the player actually played
+                if (isPitcher) {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
+                } else {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
+                }
 
                 let logHTML = `<h3 style="margin-top:0;">Full Season Game Log (${playerLogs.length} games)</h3>`;
 
@@ -1899,7 +1906,6 @@
                     logHTML += `<input type="text" id="gameLogSearch" placeholder="Filter by Opponent (e.g. LAD, NYY)...">`;
 
                     if (isPitcher) {
-                        // Pitcher columns
                         logHTML += `<div class="table-wrapper"><table><thead><tr>
                             <th style="font-weight:700;background:#333;">Date</th>
                             <th style="font-weight:700;background:#333;">Team</th>
@@ -1911,7 +1917,8 @@
                             const ip = parseFloat(log.inningsPitched || log.IP || 0);
                             const er = parseFloat(log.earnedRuns || log.ER || 0);
                             const k = parseFloat(log.strikeOuts || log.K || 0);
-                            const fantasyScore = (ip * 3) - (er * 2) + k;  // Standard PrizePicks-style pitcher fantasy scoring
+                            const bb = parseFloat(log.walks || log.BB || log['BB'] || 0);
+                            const fantasyScore = (ip * 3) - (er * 2) + k;
 
                             logHTML += `<tr>
                                 <td>${log.date || log['Date'] || ''}</td>
@@ -1923,14 +1930,13 @@
                                 <td>${log.hitsAllowed || log.H || ''}</td>
                                 <td>${log.homeRunsAllowed || log.HR || ''}</td>
                                 <td>${k}</td>
-                                <td>${log.walks || log.BB || ''}</td>
-                                <td>${log.decision || log.Decision || ''}</td>
+                                <td>${bb}</td>
+                                <td>${log.decision || log.Decision || log['Decision'] || ''}</td>
                                 <td style="font-weight:700;color:#00ffcc;">${fantasyScore.toFixed(1)}</td>
                                 <td>${log.gameLogSummary || log.Summary || ''}</td>
                             </tr>`;
                         });
                     } else {
-                        // Hitter columns
                         logHTML += `<div class="table-wrapper"><table><thead><tr>
                             <th style="font-weight:700;background:#333;">Date</th>
                             <th style="font-weight:700;background:#333;">Team</th>
@@ -1943,7 +1949,7 @@
                             const runs = parseFloat(log.runs || log.R || 0);
                             const rbi = parseFloat(log.rbi || log.RBI || 0);
                             const hr = parseFloat(log.homeRuns || log.HR || 0);
-                            const fantasyScore = hits + runs + rbi + (hr * 2);  // Standard PrizePicks-style hitter fantasy scoring
+                            const fantasyScore = hits + runs + rbi + (hr * 2);
 
                             logHTML += `<tr>
                                 <td>${log.date || log['Date'] || ''}</td>
@@ -1967,7 +1973,6 @@
                 }
                 content.innerHTML = logHTML;
 
-                // Opponent filter
                 setTimeout(() => {
                     const searchInput = document.getElementById('gameLogSearch');
                     if (searchInput) {
@@ -1994,12 +1999,6 @@
                     content.innerHTML = `<p>No splits data available yet for this player.</p>`;
                     return;
                 }
-                const homeLogs = playerLogs.filter(l => {
-                    const team = (l.teamAbbrev || l.team || l.Team || '').toUpperCase();
-                    const homeTeam = (l.home_team_abbreviation || l['home_team_abbreviation'] || '').toUpperCase();
-                    return team === homeTeam || l.isHome === 'true' || l.isHome === true;
-                });
-                const awayLogs = playerLogs.filter(l => !homeLogs.includes(l));
                 const recentLogs = playerLogs.slice(0, 20).reverse();
                 const lineScore = parseFloat(row['Line Score']) || 1.5;
                 const calculateHitRate = (logs) => {
@@ -2032,16 +2031,6 @@
                 const l20Hit = calculateHitRate(playerLogs.slice(0, 20));
                 let html = `
                     <h3 style="margin-top:0;">Splits for ${playerName}</h3>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-                        <div style="background:#222;padding:16px;border-radius:12px;text-align:center;">
-                            <div style="font-size:13px;color:#888;">Home Games</div>
-                            <div style="font-size:32px;font-weight:700;color:#00ffcc;">${homeLogs.length}</div>
-                        </div>
-                        <div style="background:#222;padding:16px;border-radius:12px;text-align:center;">
-                            <div style="font-size:13px;color:#888;">Away Games</div>
-                            <div style="font-size:32px;font-weight:700;color:#00ffcc;">${awayLogs.length}</div>
-                        </div>
-                    </div>
                     <div style="margin-bottom:12px;font-size:13px;color:#888;">Recent Performance (${row['Stat Type']}) - Last 20 Games</div>
                     <canvas id="splitsChart" width="400" height="180"></canvas>
                     <div style="margin-top:16px;display:flex;justify-content:space-around;font-size:13px;">
@@ -2086,7 +2075,7 @@
                                 backgroundColor: barColors,
                                 borderColor: '#fff',
                                 borderWidth: 1,
-                                borderRadius: 4
+                                borderRadius: 5
                             }]
                         },
                         options: {
