@@ -1507,7 +1507,6 @@
             console.error('Error fetching CSV:', error);
             contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
         });
-
         function getGameLogStats(playerName, statType) {
             if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
             const cleanName = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
@@ -1547,7 +1546,6 @@
             }
             return (total / matchingLogs.length).toFixed(2);
         }
-
         function updateBetSlip() {
             filterBetSlips();
         }
@@ -1883,30 +1881,24 @@
                 content.appendChild(buttonsDiv);
             } else if (tab === 'Game Log') {
                 const playerName = row['Player Name'];
-                const isPitcher = (row.Position || row.Pos || '').toUpperCase().includes('P') || 
+                const isPitcher = (row.Position || row.Pos || '').toUpperCase().includes('P') ||
                                   row['Stat Type'].toLowerCase().includes('pitcher') ||
                                   row['Stat Type'].toLowerCase().includes('fantasy score') && row['Line Score'].includes('.');
-
                 let playerLogs = gameLogs.filter(log => {
                     const logName = (log.fullName || log['fullName'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
                     const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
                     return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
                 });
-
                 // Only games where the player actually played
                 if (isPitcher) {
                     playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || log.innings_pitched || 0) > 0);
                 } else {
                     playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || log.at_bats || 0) > 0);
                 }
-
                 let logHTML = `<h3 style="margin-top:0;">Full Season Game Log (${playerLogs.length} games)</h3>`;
-
                 if (playerLogs.length > 0) {
                     logHTML += `<input type="text" id="gameLogSearch" placeholder="Filter by Opponent (e.g. LAD, NYY)...">`;
-
                     if (isPitcher) {
-                        // Pitcher view
                         logHTML += `<div class="table-wrapper"><table><thead><tr>
                             <th style="font-weight:700;background:#333;">Date</th>
                             <th style="font-weight:700;background:#333;">Team</th>
@@ -1923,7 +1915,6 @@
                             const bb = parseFloat(log.walks || log.BB || log.walks_allowed || 0);
                             const decision = log.decision || log.Decision || log['Decision'] || '';
                             const fantasyScore = (ip * 3) - (er * 2) + k;
-
                             logHTML += `<tr>
                                 <td>${log.date || log['Date'] || ''}</td>
                                 <td>${log.teamAbbrev || log.team || log.Team || ''}</td>
@@ -1941,7 +1932,6 @@
                             </tr>`;
                         });
                     } else {
-                        // Hitter view
                         logHTML += `<div class="table-wrapper"><table><thead><tr>
                             <th style="font-weight:700;background:#333;">Date</th>
                             <th style="font-weight:700;background:#333;">Team</th>
@@ -1957,7 +1947,6 @@
                             const hr = parseFloat(log.homeRuns || log.HR || 0);
                             const k = parseFloat(log.strikeOuts || log.K || 0);
                             const fantasyScore = hits + runs + rbi + (hr * 2);
-
                             logHTML += `<tr>
                                 <td>${log.date || log['Date'] || ''}</td>
                                 <td>${log.teamAbbrev || log.team || log.Team || ''}</td>
@@ -1979,8 +1968,6 @@
                     logHTML += `<p>No game log entries found for this player yet.</p>`;
                 }
                 content.innerHTML = logHTML;
-
-                // Opponent filter
                 setTimeout(() => {
                     const searchInput = document.getElementById('gameLogSearch');
                     if (searchInput) {
