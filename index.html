@@ -532,21 +532,21 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            font-size: 0.7rem;
+            font-size: 0.85rem;
         }
         #playerPopup th, #playerPopup td {
             border: 1px solid #333;
-            padding: 4px;
+            padding: 8px 6px;
             text-align: center;
             word-wrap: break-word;
         }
         #playerPopup th {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: 600;
             background-color: #222;
         }
         #playerPopup td {
-            font-size: 0.65rem;
+            font-size: 0.8rem;
         }
         #betHeader {
             text-align: center;
@@ -926,86 +926,10 @@
                 padding: 6px 12px;
             }
             #playerPopup table {
-                font-size: 0.6rem;
+                font-size: 0.7rem;
             }
             #playerPopup th, #playerPopup td {
-                padding: 2px;
-            }
-            #playerPopup table {
-                border: 0;
-            }
-            #playerPopup table thead {
-                display: none;
-            }
-            #playerPopup table tr {
-                display: block;
-                margin-bottom: 10px;
-                border: 1px solid #333;
-                border-radius: 8px;
-                padding: 5px;
-            }
-            #playerPopup table td {
-                display: block;
-                text-align: right;
-                border: none;
-                border-bottom: 1px solid #333;
-                position: relative;
-                padding-left: 50%;
-                padding-right: 10px;
-                font-size: 0.8rem;
-            }
-            #playerPopup table td:last-child {
-                border-bottom: none;
-            }
-            #playerPopup table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 10px;
-                width: calc(50% - 10px);
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: #ccc;
-            }
-            #playerPopup table .averages-row td {
-                background-color: #333;
-                font-weight: bold;
-            }
-            #content table {
-                border: 0;
-            }
-            #content table thead {
-                display: none;
-            }
-            #content table tr {
-                display: block;
-                margin-bottom: 10px;
-                border: 1px solid #333;
-                border-radius: 8px;
-                padding: 5px;
-            }
-            #content table td {
-                display: block;
-                text-align: right;
-                border: none;
-                border-bottom: 1px solid #333;
-                position: relative;
-                padding-left: 50%;
-                padding-right: 10px;
-                font-size: 0.8rem;
-            }
-            #content table td:last-child {
-                border-bottom: none;
-            }
-            #content table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 10px;
-                width: calc(50% - 10px);
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 600;
-                color: #ccc;
+                padding: 6px 4px;
             }
         }
         @media (min-width: 601px) {
@@ -1053,6 +977,7 @@
     </div>
     <div class="tabs"></div>
     <div id="content"></div>
+
     <!-- Player Popup -->
     <div id="playerPopup">
         <span id="closePlayerPopup">×</span>
@@ -1076,6 +1001,7 @@
         <div class="tabs" id="popupTabs"></div>
         <div class="tab-content" id="popupContent"></div>
     </div>
+
     <!-- Filter Popup -->
     <div id="popup" class="popup">
         <button id="applyFilter">Apply</button>
@@ -1088,6 +1014,7 @@
         <button id="deselectAllTeams" class="select-btn">Deselect All</button>
         <div id="teamsList"></div>
     </div>
+
     <!-- Callout Popup -->
     <div id="calloutPopup" class="popup">
         <button id="applyCalloutFilter">Apply</button>
@@ -1096,6 +1023,7 @@
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
         <div id="calloutsList"></div>
     </div>
+
     <!-- Advanced Filter Popup -->
     <div id="advancedFilterPopup" class="popup">
         <button id="applyAdvancedFilter">Apply</button>
@@ -1112,6 +1040,7 @@
         <button id="deselectAllGameTypes" class="select-btn">Deselect All</button>
         <div id="gameTypesList"></div>
     </div>
+
     <!-- Bet Slip Popup -->
     <div id="betslipPopup" class="popup">
         <button id="closeBetSlip">Close</button>
@@ -1137,6 +1066,7 @@
             </table>
         </div>
     </div>
+
     <!-- Tool Info Popup -->
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
@@ -1152,6 +1082,7 @@
             <li>Click the info icon on cards for detailed player info, game logs, splits, etc.</li>
         </ul>
     </div>
+
     <script>
         let allData = [];
         let gameLogs = [];
@@ -1180,10 +1111,13 @@
         let currentRow = null;
         let gameToTime = new Map();
         let showSelectedOnly = false;
+
         const contentDiv = document.getElementById('content');
         contentDiv.innerHTML = '<div class="loading">Loading MLB data + game logs...</div>';
+
         const prizePicksUrl = './data/prizepicks-mlb.csv';
         const gameLogUrl = "https://raw.githubusercontent.com/925Sports/mlb-player-game-logs/refs/heads/main/mlb_2026_season_game_logs.csv";
+
         const predefinedCombinations = {
             2: [[1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10],
                 [2,3], [2,4], [2,5], [2,6], [2,7], [2,8], [2,9], [2,10],
@@ -1229,6 +1163,7 @@
                 [3,4,5,6,7,9], [3,4,5,6,8,9], [3,4,6,7,8,9], [3,5,6,7,8,9], [3,6,7,8,9,10], [4,5,6,7,8,9],
                 [4,5,6,7,8,10], [4,5,6,7,9,10], [4,5,7,8,9,10], [5,6,7,8,9,10]]
         };
+
         Promise.all([
             fetch(prizePicksUrl).then(res => res.text()),
             fetch(gameLogUrl).then(res => res.text())
@@ -1236,25 +1171,30 @@
         .then(([ppCsv, logCsv]) => {
             allData = Papa.parse(ppCsv, { header: true, skipEmptyLines: true }).data;
             gameLogs = Papa.parse(logCsv, { header: true, skipEmptyLines: true }).data;
+
             allData.forEach(row => {
                 if (row['Game Short Title'] && row['Scheduled At'] && !gameToTime.has(row['Game Short Title'])) {
                     gameToTime.set(row['Game Short Title'], row['Scheduled At']);
                 }
             });
+
             uniqueGames = Array.from(gameToTime.entries()).sort((a, b) => new Date(a[1]) - new Date(b[1])).map(entry => entry[0]);
             uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
             uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
             uniqueBetTags = [...new Set(allData.map(row => row['Bet Tag']).filter(Boolean))].sort();
+
             selectedGames = new Set(uniqueGames);
             selectedTeams = new Set(uniqueTeams);
             selectedCallouts = new Set(uniqueCallouts);
             selectedBetTags = new Set(uniqueBetTags);
             selectedFav = new Set(['Yes', 'No']);
             selectedGameTypes = new Set(['High', 'Normal', 'Low']);
+
             let uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
             if (!uniqueStatTypes.includes('Hitter Fantasy Score')) uniqueStatTypes.push('Hitter Fantasy Score');
             if (!uniqueStatTypes.includes('Pitcher Fantasy Score')) uniqueStatTypes.push('Pitcher Fantasy Score');
             uniqueStatTypes.sort();
+
             const tabsDiv = document.querySelector('.tabs');
             tabsDiv.innerHTML = '';
             uniqueStatTypes.forEach((tab, index) => {
@@ -1272,6 +1212,7 @@
                 };
                 tabsDiv.appendChild(btn);
             });
+
             const viewSwitch = document.createElement('div');
             viewSwitch.classList.add('view-switch');
             viewSwitch.innerHTML = `
@@ -1283,6 +1224,7 @@
                 <span>Table</span>
             `;
             tabsDiv.appendChild(viewSwitch);
+
             const betTypeSelect = document.getElementById('betTypeSelect');
             betTypeSelect.innerHTML = '';
             uniqueStatTypes.forEach(tab => {
@@ -1299,6 +1241,7 @@
                 if (activeTab) activeTab.classList.add('active');
                 renderContent();
             });
+
             const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
             const oddsSelect = document.getElementById('oddsSelect');
             oddsSelect.innerHTML = '';
@@ -1316,6 +1259,7 @@
                 if (activeBtn) activeBtn.classList.add('active');
                 renderContent();
             });
+
             const viewSelect = document.getElementById('viewSelect');
             viewSelect.value = 'cards';
             viewSelect.addEventListener('change', () => {
@@ -1323,10 +1267,12 @@
                 document.getElementById('viewToggle').checked = currentView === 'table';
                 renderContent();
             });
+
             document.getElementById('search').addEventListener('input', (e) => {
                 searchTerm = e.target.value.toLowerCase();
                 renderContent();
             });
+
             document.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
@@ -1336,15 +1282,18 @@
                     renderContent();
                 });
             });
+
             document.getElementById('viewToggle').addEventListener('change', (e) => {
                 currentView = e.target.checked ? 'table' : 'cards';
                 viewSelect.value = currentView;
                 renderContent();
             });
+
             document.getElementById('selectedToggle').addEventListener('change', (e) => {
                 showSelectedOnly = e.target.checked;
                 renderContent();
             });
+
             document.getElementById('filterBtn').addEventListener('click', () => {
                 const popup = document.getElementById('popup');
                 popup.style.display = 'block';
@@ -1386,12 +1335,14 @@
                 document.getElementById('selectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                 document.getElementById('deselectAllTeams').onclick = () => teamsList.querySelectorAll('input').forEach(cb => cb.checked = false);
             });
+
             document.getElementById('applyFilter').addEventListener('click', () => {
                 selectedGames = new Set(Array.from(document.getElementById('gamesList').querySelectorAll('input:checked')).map(cb => cb.value));
                 selectedTeams = new Set(Array.from(document.getElementById('teamsList').querySelectorAll('input:checked')).map(cb => cb.value));
                 document.getElementById('popup').style.display = 'none';
                 renderContent();
             });
+
             document.getElementById('calloutFilterBtn').addEventListener('click', () => {
                 const popup = document.getElementById('calloutPopup');
                 popup.style.display = 'block';
@@ -1411,11 +1362,13 @@
                 document.getElementById('selectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = true);
                 document.getElementById('deselectAllCallouts').onclick = () => calloutsList.querySelectorAll('input').forEach(cb => cb.checked = false);
             });
+
             document.getElementById('applyCalloutFilter').addEventListener('click', () => {
                 selectedCallouts = new Set(Array.from(document.getElementById('calloutsList').querySelectorAll('input:checked')).map(cb => cb.value));
                 document.getElementById('calloutPopup').style.display = 'none';
                 renderContent();
             });
+
             document.getElementById('advancedFilterBtn').addEventListener('click', () => {
                 const popup = document.getElementById('advancedFilterPopup');
                 popup.style.display = 'block';
@@ -1465,6 +1418,7 @@
                 document.getElementById('selectAllGameTypes').onclick = () => document.querySelectorAll('#gameTypesList input').forEach(cb => cb.checked = true);
                 document.getElementById('deselectAllGameTypes').onclick = () => document.querySelectorAll('#gameTypesList input').forEach(cb => cb.checked = false);
             });
+
             document.getElementById('applyAdvancedFilter').addEventListener('click', () => {
                 selectedBetTags = new Set(Array.from(document.querySelectorAll('#betTagsList input:checked')).map(cb => cb.value));
                 selectedFav = new Set(Array.from(document.querySelectorAll('#favList input:checked')).map(cb => cb.value));
@@ -1472,23 +1426,28 @@
                 document.getElementById('advancedFilterPopup').style.display = 'none';
                 renderContent();
             });
+
             document.getElementById('betslipBtn').addEventListener('click', () => {
                 document.getElementById('overlay').style.display = 'block';
                 document.getElementById('betslipPopup').style.display = 'block';
                 filterBetSlips();
             });
+
             document.getElementById('closeBetSlip').addEventListener('click', () => {
                 document.getElementById('betslipPopup').style.display = 'none';
                 document.getElementById('overlay').style.display = 'none';
             });
+
             document.getElementById('tool-info').addEventListener('click', () => {
                 document.getElementById('overlay').style.display = 'block';
                 document.getElementById('toolInfoPopup').style.display = 'block';
             });
+
             document.getElementById('closeToolInfo').addEventListener('click', () => {
                 document.getElementById('toolInfoPopup').style.display = 'none';
                 document.getElementById('overlay').style.display = 'none';
             });
+
             document.addEventListener('click', (event) => {
                 const popups = ['popup', 'calloutPopup', 'betslipPopup', 'toolInfoPopup', 'advancedFilterPopup'];
                 popups.forEach(p => {
@@ -1501,6 +1460,7 @@
                     }
                 });
             }, true);
+
             renderContent();
         })
         .catch(error => {
@@ -1551,6 +1511,7 @@
         function updateBetSlip() {
             filterBetSlips();
         }
+
         function generateCombinations(bets) {
             let allCombinations = { 2: [], 3: [], 4: [], 5: [], 6: [] };
             const betCount = bets.length;
@@ -1613,10 +1574,12 @@
             }
             return allCombinations;
         }
+
         function filterBetSlips() {
             selectedPayout = document.getElementById('payoutFilter').value;
             renderBetSlips();
         }
+
         function renderBetSlips() {
             const header = document.getElementById('betslipsHeader');
             const body = document.getElementById('betslipsBody');
@@ -1698,6 +1661,7 @@
                 body.appendChild(detailRow);
             });
         }
+
         function toggleBetSlipDetail(index, playersKey) {
             if (expandedCombinations.has(playersKey)) {
                 expandedCombinations.delete(playersKey);
@@ -1706,6 +1670,7 @@
             }
             renderBetSlips();
         }
+
         function sortBetSlips(column) {
             if (betSlipsSortColumn === column) {
                 betSlipsSortDirection = betSlipsSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1715,27 +1680,33 @@
             }
             filterBetSlips();
         }
+
         function showPlayerPopup(row, currentIndex) {
             currentRow = row;
             const popup = document.getElementById('playerPopup');
             const overlay = document.getElementById('overlay');
             popup.style.display = 'block';
             overlay.style.display = 'block';
+
             document.getElementById('popupHeadshot').src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
+
             const betTagLower = (row['Bet Tag'] || '').toLowerCase();
             const isOver = betTagLower.includes('over') || betTagLower.includes('more');
             const arrowColor = isOver ? '#4dff4d' : '#ff4d4d';
             const arrowSymbol = isOver ? '↑' : '↓';
+
             document.getElementById('popupName').innerHTML = `${row['Player Name']}: <span style="color: ${arrowColor};">${arrowSymbol}</span> ${row['Line Score']} ${row['Stat Type']} (${parseFloat(row['Edge %'] || 0).toFixed(1)}%)`;
             document.getElementById('popupTeamPos').textContent = `${row.Team || ''} | ${row.Position || ''}`;
             document.getElementById('popupGame').textContent = `${row.Team || ''} @ ${row.Opp || row['Opponent'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
+
             const spread = parseFloat(row.Spread) || 0;
             const ou = parseFloat(row['O/U']) || 0;
             document.getElementById('popupSpreadOU').innerHTML = `
                 <span class="spread-red">Spread: ${spread}</span>
                 <span class="${ou < 230 ? 'ou-red' : 'ou-green'}">O/U: ${ou}</span>
             `;
+
             const statsBoxes = document.getElementById('statsBoxes');
             statsBoxes.innerHTML = '';
             const stats = [
@@ -1751,6 +1722,7 @@
                 `;
                 statsBoxes.appendChild(box);
             });
+
             const popupTabs = document.getElementById('popupTabs');
             popupTabs.innerHTML = '';
             const tabNames = ['Overview', 'Game Log', 'Splits', 'News', 'Other Bets', 'Matchup'];
@@ -1766,7 +1738,9 @@
                 };
                 popupTabs.appendChild(btn);
             });
+
             renderPopupContent('Overview', row);
+
             const prevBtn = document.getElementById('prevPlayer');
             const nextBtn = document.getElementById('nextPlayer');
             prevBtn.disabled = currentIndex <= 0;
@@ -1777,49 +1751,48 @@
             nextBtn.onclick = () => {
                 if (currentIndex < currentFiltered.length - 1) showPlayerPopup(currentFiltered[currentIndex + 1], currentIndex + 1);
             };
+
             document.getElementById('closePlayerPopup').onclick = () => {
                 popup.style.display = 'none';
                 overlay.style.display = 'none';
             };
         }
+
         function renderPopupContent(tab, row) {
             const content = document.getElementById('popupContent');
             content.innerHTML = '';
+
             if (tab === 'Overview') {
                 const recentAvg = getGameLogStats(row['Player Name'], row['Stat Type']);
                 const recentText = recentAvg !== null ? `Recent Avg from Game Logs: ${parseFloat(recentAvg).toFixed(2)}` : 'Recent Avg from Game Logs: N/A';
+
                 const chartContainer = document.createElement('div');
                 chartContainer.id = 'chartContainer';
                 const canvas = document.createElement('canvas');
                 canvas.id = 'projectionChart';
                 chartContainer.appendChild(canvas);
                 content.appendChild(chartContainer);
+
                 const avgProjected = parseFloat(row['Average Projected'] || row['Proj'] || 0);
                 const dvpAdjusted = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0);
                 const totalProjection = parseFloat(row['Total Projection'] || row['Total'] || 0);
                 const udLine = parseFloat(row['Underdog Line'] || 0);
                 const truePtAvg = parseFloat(row['True Point Average Line'] || row['True Point Average'] || row['True Point Avg'] || 0);
                 const lineScore = parseFloat(row['Line Score'] || 0);
+
                 let projections = [
-                    {name: 'Avg Proj', value: avgProjected},
+                    {name: 'True Pt Avg', value: truePtAvg},
+                    {name: 'Line', value: lineScore},
                     {name: 'DVP Adj', value: dvpAdjusted},
                     {name: 'Total Proj', value: totalProjection},
-                    {name: 'UD Line', value: udLine},
-                    {name: 'True Pt Avg', value: truePtAvg}
-                ];
-                projections = projections.filter(p => p.value > 0);
-                projections.sort((a, b) => b.value - a.value);
-                const overProjs = projections.filter(p => p.value > lineScore);
-                const underProjs = projections.filter(p => p.value < lineScore);
-                const equalProjs = projections.filter(p => p.value === lineScore);
-                const labels = overProjs.map(p => p.name).concat(equalProjs.map(p => p.name), ['Line'], underProjs.map(p => p.name));
-                const dataPoints = overProjs.map(p => p.value).concat(equalProjs.map(p => p.value), [lineScore], underProjs.map(p => p.value));
-                const colors = overProjs.map(() => 'rgba(75, 192, 75, 0.6)')
-                    .concat(equalProjs.map(() => 'rgba(0, 255, 204, 0.6)'), 'rgba(255, 255, 255, 0.6)')
-                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 0.6)'));
-                const borderColors = overProjs.map(() => 'rgba(75, 192, 75, 1)')
-                    .concat(equalProjs.map(() => 'rgba(0, 255, 204, 1)'), 'rgba(255, 255, 255, 1)')
-                    .concat(underProjs.map(() => 'rgba(255, 99, 132, 1)'));
+                    {name: 'Avg Proj', value: avgProjected}
+                ].filter(p => p.value > 0).sort((a, b) => b.value - a.value);
+
+                const labels = projections.map(p => p.name);
+                const dataPoints = projections.map(p => p.value);
+                const colors = projections.map(p => p.value > lineScore ? 'rgba(75, 192, 75, 0.8)' : p.value < lineScore ? 'rgba(255, 99, 132, 0.8)' : 'rgba(0, 255, 204, 0.8)');
+                const borderColors = projections.map(p => p.value > lineScore ? 'rgba(75, 192, 75, 1)' : p.value < lineScore ? 'rgba(255, 99, 132, 1)' : 'rgba(0, 255, 204, 1)');
+
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
@@ -1830,8 +1803,8 @@
                             data: dataPoints,
                             backgroundColor: colors,
                             borderColor: borderColors,
-                            borderWidth: 1,
-                            borderRadius: 5
+                            borderWidth: 2,
+                            borderRadius: 6
                         }]
                     },
                     options: {
@@ -1847,9 +1820,9 @@
                                         type: 'line',
                                         yMin: lineScore,
                                         yMax: lineScore,
-                                        borderColor: '#808080',
+                                        borderColor: '#ffffff',
                                         borderWidth: 2,
-                                        borderDash: [5, 5]
+                                        borderDash: [4, 2]
                                     }
                                 }
                             },
@@ -1864,6 +1837,7 @@
                     },
                     plugins: [ChartDataLabels]
                 });
+
                 const recentDiv = document.createElement('div');
                 recentDiv.style.marginTop = '20px';
                 recentDiv.style.padding = '12px';
@@ -1874,6 +1848,7 @@
                 recentDiv.style.color = '#00ffcc';
                 recentDiv.textContent = recentText;
                 content.appendChild(recentDiv);
+
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.classList.add('popup-buttons');
                 buttonsDiv.innerHTML = `
@@ -1882,55 +1857,99 @@
                     <button id="popupMore" class="button more">↑ More</button>
                 `;
                 content.appendChild(buttonsDiv);
-            } else if (tab === 'Game Log') {
+            } 
+            else if (tab === 'Game Log') {
                 const playerName = row['Player Name'];
-                const playerLogs = gameLogs.filter(log => {
-                    const logName = (log.fullName || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    return logName === playerName.toLowerCase().trim() || 
-                           logName.includes(playerName.toLowerCase().split(' ').pop());
+                let playerLogs = gameLogs.filter(log => {
+                    const logName = (log.fullName || log['fullName'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
+                    const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
+                    return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
                 });
-                let logHTML = `<h3 style="margin-top:0;">Full Season Game Log</h3>`;
+
+                let logHTML = `<h3 style="margin-top:0;">Full Season Game Log (${playerLogs.length} games)</h3>`;
+
                 if (playerLogs.length > 0) {
-                    logHTML += `<div style="overflow-x:auto;"><table style="width:100%; font-size:14px;"><thead><tr>
-                        <th>Date</th><th>Team</th><th>Opp</th><th>Pos</th><th>AB</th><th>H</th><th>R</th><th>RBI</th><th>HR</th><th>K</th><th>Summary</th>
-                    </tr></thead><tbody>`;
-                    playerLogs.forEach(log => {
-                        logHTML += `<tr>
-                            <td>${log.date || ''}</td>
-                            <td>${log.teamAbbrev || log.team || ''}</td>
-                            <td>${log.opponent || ''}</td>
-                            <td>${log.position || log.Pos || ''}</td>
-                            <td>${log.atBats || log.AB || ''}</td>
-                            <td>${log.hits || log.H || ''}</td>
-                            <td>${log.runs || log.R || ''}</td>
-                            <td>${log.rbi || log.RBI || ''}</td>
-                            <td>${log.homeRuns || log.HR || ''}</td>
-                            <td>${log.strikeOuts || log.K || ''}</td>
-                            <td>${log.gameLogSummary || log.Summary || ''}</td>
-                        </tr>`;
+                    logHTML += `
+                        <input type="text" id="gameLogSearch" placeholder="Filter by Opponent (e.g. LAD, NYY)...">
+                        <div class="table-wrapper">
+                            <table style="font-size:0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Team</th>
+                                        <th>Opp</th>
+                                        <th>Pos</th>
+                                        <th>AB</th>
+                                        <th>H</th>
+                                        <th>R</th>
+                                        <th>RBI</th>
+                                        <th>HR</th>
+                                        <th>K</th>
+                                        <th>Summary</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gameLogBody"></tbody>
+                            </table>
+                        </div>
+                    `;
+                    content.innerHTML = logHTML;
+
+                    const tbody = document.getElementById('gameLogBody');
+                    const searchInput = document.getElementById('gameLogSearch');
+
+                    const renderGameLogTable = (logs) => {
+                        tbody.innerHTML = '';
+                        logs.forEach(log => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${log.date || ''}</td>
+                                <td>${log.teamAbbrev || log.team || ''}</td>
+                                <td>${log.opponent || log.Opp || ''}</td>
+                                <td>${log.position || log.Pos || ''}</td>
+                                <td>${log.atBats || log.AB || ''}</td>
+                                <td>${log.hits || log.H || ''}</td>
+                                <td>${log.runs || log.R || ''}</td>
+                                <td>${log.rbi || log.RBI || ''}</td>
+                                <td>${log.homeRuns || log.HR || ''}</td>
+                                <td>${log.strikeOuts || log.K || ''}</td>
+                                <td>${log.gameLogSummary || log.Summary || ''}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    };
+
+                    renderGameLogTable(playerLogs);
+
+                    searchInput.addEventListener('input', (e) => {
+                        const term = e.target.value.toUpperCase().trim();
+                        const filteredLogs = term ? playerLogs.filter(log => {
+                            const opp = (log.opponent || log.Opp || '').toUpperCase();
+                            return opp.includes(term);
+                        }) : playerLogs;
+                        renderGameLogTable(filteredLogs);
                     });
-                    logHTML += `</tbody></table></div>`;
                 } else {
-                    logHTML += `<p>No game log entries found for this player yet.</p>`;
+                    content.innerHTML = `<h3 style="margin-top:0;">Full Season Game Log</h3><p>No game log entries found for this player yet.</p>`;
                 }
-                content.innerHTML = logHTML;
-            } else if (tab === 'Splits') {
+            } 
+            else if (tab === 'Splits') {
                 const playerName = row['Player Name'];
-                const playerLogs = gameLogs.filter(log => {
-                    const logName = (log.fullName || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    return logName === playerName.toLowerCase().trim() || 
-                           logName.includes(playerName.toLowerCase().split(' ').pop());
+                let playerLogs = gameLogs.filter(log => {
+                    const logName = (log.fullName || log['fullName'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
+                    const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
+                    return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
                 });
+
                 if (playerLogs.length === 0) {
                     content.innerHTML = `<p>No splits data available yet for this player.</p>`;
                     return;
                 }
-                // NBA-style splits: Home / Away counts + recent games bar chart for the specific Stat Type
+
                 const homeLogs = playerLogs.filter(l => (l.home_team_abbreviation === l.teamAbbrev) || (l.isHome === 'true') || (l.isHome === true));
                 const awayLogs = playerLogs.filter(l => !homeLogs.includes(l));
-                // Recent games for the current Stat Type
-                const recentLogs = playerLogs.slice(0, 20).reverse(); // last 20 games (most recent first for chart)
-                // Calculate hit rate for L5, L10, L20
+
+                const recentLogs = playerLogs.slice(0, 20).reverse();
+
                 const calculateHitRate = (logs, statType) => {
                     if (!logs.length) return 0;
                     let hits = 0;
@@ -1957,36 +1976,39 @@
                     });
                     return ((hits / logs.length) * 100).toFixed(0);
                 };
+
                 const l5Hit = calculateHitRate(playerLogs.slice(0, 5), row['Stat Type']);
                 const l10Hit = calculateHitRate(playerLogs.slice(0, 10), row['Stat Type']);
                 const l20Hit = calculateHitRate(playerLogs.slice(0, 20), row['Stat Type']);
+
                 let html = `
                     <h3 style="margin-top:0;">Splits for ${playerName}</h3>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
                         <div style="background:#222;padding:16px;border-radius:12px;text-align:center;">
                             <div style="font-size:13px;color:#888;">Home Games</div>
-                            <div style="font-size:32px;font-weight:700;">${homeLogs.length}</div>
+                            <div style="font-size:32px;font-weight:700;color:#4dff4d;">${homeLogs.length}</div>
                         </div>
                         <div style="background:#222;padding:16px;border-radius:12px;text-align:center;">
                             <div style="font-size:13px;color:#888;">Away Games</div>
-                            <div style="font-size:32px;font-weight:700;">${awayLogs.length}</div>
+                            <div style="font-size:32px;font-weight:700;color:#ff4d4d;">${awayLogs.length}</div>
                         </div>
                     </div>
                     <div style="margin-bottom:12px;font-size:13px;color:#888;">Recent Performance (${row['Stat Type']})</div>
-                    <canvas id="splitsChart" width="400" height="220"></canvas>
+                    <canvas id="splitsChart" width="400" height="240"></canvas>
                     <div style="margin-top:16px;display:flex;justify-content:space-around;font-size:13px;">
-                        <div>L5 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l5Hit}%</span></div>
-                        <div>L10 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l10Hit}%</span></div>
-                        <div>L20 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l20Hit}%</span></div>
+                        <div>L5: <span style="color:#00ffcc;font-weight:700;">${l5Hit}%</span></div>
+                        <div>L10: <span style="color:#00ffcc;font-weight:700;">${l10Hit}%</span></div>
+                        <div>L20: <span style="color:#00ffcc;font-weight:700;">${l20Hit}%</span></div>
                     </div>
                 `;
                 content.innerHTML = html;
-                // NBA-style bar chart: dates on x, performance value on y, green/red for over/under line
+
                 setTimeout(() => {
                     const ctx = document.getElementById('splitsChart');
                     if (!ctx) return;
+
                     const lineScore = parseFloat(row['Line Score']) || 1.5;
-                    const chartLabels = recentLogs.map(log => log.date || '');
+                    const chartLabels = recentLogs.map(log => log.date || '').reverse();
                     const chartValues = recentLogs.map(log => {
                         const lowerStat = row['Stat Type'].toLowerCase().replace(/[^a-z0-9+]/g, '');
                         let value = 0;
@@ -2006,8 +2028,10 @@
                             value = parseFloat(log.inningsPitched || 0);
                         }
                         return value;
-                    });
-                    const barColors = chartValues.map(v => v > lineScore ? '#00ffcc' : '#ff4d4d');
+                    }).reverse();
+
+                    const barColors = chartValues.map(v => v > lineScore ? '#4dff4d' : '#ff4d4d');
+
                     new Chart(ctx, {
                         type: 'bar',
                         data: {
@@ -2016,15 +2040,27 @@
                                 label: row['Stat Type'],
                                 data: chartValues,
                                 backgroundColor: barColors,
-                                borderColor: '#fff',
-                                borderWidth: 1
+                                borderColor: '#ffffff',
+                                borderWidth: 1.5
                             }]
                         },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
                             scales: {
-                                y: { beginAtZero: true, grid: { color: '#333' }, ticks: { color: '#fff' } },
-                                x: { grid: { color: '#333' }, ticks: { color: '#fff', maxRotation: 45 } }
+                                y: { 
+                                    beginAtZero: true, 
+                                    grid: { color: '#333' }, 
+                                    ticks: { color: '#fff' } 
+                                },
+                                x: { 
+                                    grid: { color: '#333' }, 
+                                    ticks: { 
+                                        color: '#fff', 
+                                        maxRotation: 45,
+                                        minRotation: 45 
+                                    } 
+                                }
                             },
                             plugins: {
                                 legend: { display: false },
@@ -2032,15 +2068,16 @@
                                     anchor: 'end',
                                     align: 'end',
                                     color: '#fff',
-                                    font: { weight: 'bold' },
+                                    font: { weight: 'bold', size: 11 },
                                     formatter: (value) => value.toFixed(1)
                                 }
                             }
                         },
                         plugins: [ChartDataLabels]
                     });
-                }, 150);
-            } else if (tab === 'News') {
+                }, 200);
+            } 
+            else if (tab === 'News') {
                 content.innerHTML = `
                     <table style="width:100%; border-collapse:collapse;">
                         <tr><td style="padding:8px; border:1px solid #333;">EST. Return Date</td><td style="padding:8px; border:1px solid #333;">${row['EST. Return Date'] || '-'}</td></tr>
@@ -2048,12 +2085,15 @@
                         <tr><td style="padding:8px; border:1px solid #333;">Comment</td><td style="padding:8px; border:1px solid #333;">${row.Comment || '-'}</td></tr>
                     </table>
                 `;
-            } else if (tab === 'Other Bets') {
+            } 
+            else if (tab === 'Other Bets') {
                 content.innerHTML = '<p>Other bets for this player coming soon.</p>';
-            } else if (tab === 'Matchup') {
+            } 
+            else if (tab === 'Matchup') {
                 content.innerHTML = '<p>Matchup details coming soon.</p>';
             }
         }
+
         function sortContentTable(column) {
             if (contentSortColumn === column) {
                 contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -2063,6 +2103,7 @@
             }
             renderContent();
         }
+
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
@@ -2109,6 +2150,7 @@
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
                     filtered = filtered.filter(row => selectedKeys.has(`${row['Player Name']}-${row['Stat Type']}`));
                 }
+
                 filtered.sort((a, b) => {
                     let aVal = 0, bVal = 0;
                     if (contentSortColumn === 'Edge') {
@@ -2154,16 +2196,19 @@
                         return bVal - aVal;
                     }
                 });
+
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
                 contentDiv.classList.remove('table-view');
                 if (currentView === 'table') {
                     contentDiv.classList.add('table-view');
                 }
+
                 if (filtered.length === 0) {
                     contentDiv.innerHTML = '<div class="loading">No data available for this selection. Try switching the odds type...</div>';
                     return;
                 }
+
                 if (currentView === 'cards') {
                     filtered.forEach((row, index) => {
                         row.id = index + 1;
@@ -2208,6 +2253,7 @@
                             <div class="info-icon" title="Player Info" data-index="${index}">ℹ️</div>
                         `;
                         contentDiv.appendChild(card);
+
                         const buttons = card.querySelectorAll('.button');
                         buttons.forEach(btn => {
                             btn.addEventListener('click', () => {
@@ -2418,15 +2464,7 @@
                 }
             }, 100);
         }
-        function sortContentTable(column) {
-            if (contentSortColumn === column) {
-                contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                contentSortColumn = column;
-                contentSortDirection = 'asc';
-            }
-            renderContent();
-        }
+
         window.onload = () => {
             // Data fetching is handled in the Promise above
         };
