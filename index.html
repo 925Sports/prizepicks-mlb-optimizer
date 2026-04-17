@@ -21,19 +21,10 @@
             touch-action: manipulation;
             -webkit-overflow-scrolling: touch;
         }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #777;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #777; }
         .title-header {
             display: flex;
             align-items: center;
@@ -45,11 +36,7 @@
             z-index: 30;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-        .title-header h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 700;
-        }
+        .title-header h1 { margin: 0; font-size: 24px; font-weight: 700; }
         .title-header .info-icon {
             margin-left: 8px;
             cursor: pointer;
@@ -57,9 +44,7 @@
             color: #00ffcc;
             transition: color 0.2s;
         }
-        .title-header .info-icon:hover {
-            color: #00e6b3;
-        }
+        .title-header .info-icon:hover { color: #00e6b3; }
         .controls {
             display: flex;
             justify-content: space-between;
@@ -82,10 +67,7 @@
             width: 200px;
             transition: border-color 0.2s;
         }
-        #search:focus {
-            border-color: #00ffcc;
-            outline: none;
-        }
+        #search:focus { border-color: #00ffcc; outline: none; }
         .filter-btn {
             padding: 10px 20px;
             background: #00ffcc;
@@ -119,25 +101,10 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        .toggle button.active {
-            background: #00ffcc;
-            color: #000;
-        }
-        .view-switch, .selected-switch {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .view-switch span, .selected-switch span {
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 24px;
-        }
+        .toggle button.active { background: #00ffcc; color: #000; }
+        .view-switch, .selected-switch { display: flex; align-items: center; gap: 8px; }
+        .view-switch span, .selected-switch span { font-size: 12px; font-weight: 500; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
@@ -251,7 +218,7 @@
         .icon { position: absolute; top: 40px; right: 16px; font-size: 20px; }
         .loading { text-align: center; padding: 20px; font-size: 18px; color: #00ffcc; }
 
-        /* POPUP STYLES MATCHING EXACTLY THE NBA OPTIMIZER (only these rules were changed) */
+        /* POPUP STYLES (unchanged) */
         #popup, #calloutPopup, #advancedFilterPopup, #betslipPopup, #toolInfoPopup {
             display: none;
             position: fixed;
@@ -269,14 +236,8 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
             -webkit-overflow-scrolling: touch;
         }
-        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3, #advancedFilterPopup h3 {
-            margin-top: 20px;
-            font-weight: 600;
-        }
-        #popup label, #calloutPopup label, #advancedFilterPopup label {
-            display: block;
-            font-size: 14px;
-        }
+        #popup h3, #betslipPopup h3, #calloutPopup h3, #toolInfoPopup h3, #advancedFilterPopup h3 { margin-top: 20px; font-weight: 600; }
+        #popup label, #calloutPopup label, #advancedFilterPopup label { display: block; font-size: 14px; }
         #filterBtn, #betslipBtn, #calloutFilterBtn, #advancedFilterBtn {
             padding: 8px 20px;
             background: #00ffcc;
@@ -287,9 +248,7 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover, #advancedFilterBtn:hover {
-            background: #00e6b3;
-        }
+        #filterBtn:hover, #betslipBtn:hover, #calloutFilterBtn:hover, #advancedFilterBtn:hover { background: #00e6b3; }
         #applyFilter, #closeBetSlip, #applyCalloutFilter, #closeToolInfo, #applyAdvancedFilter {
             margin-bottom: 20px;
             padding: 8px 20px;
@@ -301,9 +260,7 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover, #applyAdvancedFilter:hover {
-            background: #66ff66;
-        }
+        #applyFilter:hover, #closeBetSlip:hover, #applyCalloutFilter:hover, #closeToolInfo:hover, #applyAdvancedFilter:hover { background: #66ff66; }
         .select-btn {
             margin: 5px 0;
             padding: 6px 12px;
@@ -315,14 +272,8 @@
             font-weight: 500;
             transition: background 0.2s;
         }
-        .select-btn:hover {
-            background: #444;
-        }
-        .payout-filter-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .select-btn:hover { background: #444; }
+        .payout-filter-container { display: flex; align-items: center; gap: 0.5rem; }
         #payoutFilter {
             padding: 0.5rem 1rem;
             background: #1a1a1a;
@@ -356,27 +307,13 @@
             top: 0;
             color: #f0f0f0;
         }
-        tr:nth-child(even) {
-            background: #181818;
-        }
-        th.asc::after {
-            content: ' ↑';
-        }
-        th.desc::after {
-            content: ' ↓';
-        }
-        .error-message {
-            color: #ff4d4d;
-            text-align: center;
-            margin: 1rem;
-        }
-        .expanded-details td {
-            background-color: #121212;
-            padding: 1rem;
-            text-align: left;
-        }
+        tr:nth-child(even) { background: #181818; }
+        th.asc::after { content: ' ↑'; }
+        th.desc::after { content: ' ↓'; }
+        .error-message { color: #ff4d4d; text-align: center; margin: 1rem; }
+        .expanded-details td { background-color: #121212; padding: 1rem; text-align: left; }
 
-        /* REST OF THE STYLES (unchanged - everything else is exactly the same as before) */
+        /* REST OF THE STYLES (unchanged) */
         #playerPopup {
             display: none;
             position: fixed;
@@ -647,6 +584,7 @@
                 [3,4,5,6,7,9], [3,4,5,6,8,9], [3,4,6,7,8,9], [3,5,6,7,8,9], [3,6,7,8,9,10], [4,5,6,7,8,9],
                 [4,5,6,7,8,10], [4,5,6,7,9,10], [4,5,7,8,9,10], [5,6,7,8,9,10]]
         };
+
         Promise.all([
             fetch(prizePicksUrl).then(res => res.text()),
             fetch(gameLogUrl).then(res => res.text())
@@ -681,7 +619,6 @@
                 if (index === 0) btn.classList.add('active');
                 btn.textContent = tab;
                 btn.onclick = () => {
-                    if (btn.classList.contains('inactive')) return;
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     btn.classList.add('active');
                     currentTab = tab;
@@ -925,6 +862,7 @@
             console.error('Error fetching CSV:', error);
             contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
         });
+
         function cleanName(name) {
             if (!name) return '';
             return name.toLowerCase().trim().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
@@ -988,44 +926,21 @@
             }
             return parseFloat(log[statType] || log[statType.replace(/\s+/g, '')] || 0);
         }
+
+        /* ONLY THIS FUNCTION WAS CHANGED */
         function getGameLogStats(playerName, statType) {
             if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
             const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
             if (matchingLogs.length === 0) return null;
+
             let total = 0;
-            const lowerStat = statType.toLowerCase().replace(/[^a-z0-9+]/g, '');
-            if (lowerStat.includes('hitsrunsrbis') || lowerStat.includes('hitrunsrbi') || lowerStat.includes('hrrbi')) {
-                matchingLogs.forEach(log => {
-                    total += (parseFloat(log.hits) || 0) + (parseFloat(log.runs) || 0) + (parseFloat(log.rbi || log.RBI) || 0);
-                });
-            } else if (lowerStat.includes('strikeout') || lowerStat.includes('k')) {
-                matchingLogs.forEach(log => total += parseFloat(log.strikeOuts || log.K || log.strikeOutsPitching || 0));
-            } else if (lowerStat.includes('homerun') || lowerStat.includes('hr')) {
-                matchingLogs.forEach(log => total += parseFloat(log.homeRuns || log.HR || 0));
-            } else if (lowerStat.includes('hit')) {
-                matchingLogs.forEach(log => total += parseFloat(log.hits || log.H || 0));
-            } else if (lowerStat.includes('rbi')) {
-                matchingLogs.forEach(log => total += parseFloat(log.rbi || log.RBI || 0));
-            } else if (lowerStat.includes('run')) {
-                matchingLogs.forEach(log => total += parseFloat(log.runs || log.R || 0));
-            } else if (lowerStat.includes('inning') || lowerStat.includes('ip')) {
-                matchingLogs.forEach(log => total += parseFloat(log.inningsPitched || 0));
-            } else if (lowerStat.includes('earned') || lowerStat.includes('er')) {
-                matchingLogs.forEach(log => total += parseFloat(log.earnedRuns || log.ER || 0));
-            } else {
-                const possible = ['hits','runs','rbi','homeRuns','strikeOuts','inningsPitched','earnedRuns','atBats'];
-                for (let key of possible) {
-                    if (lowerStat.includes(key.toLowerCase())) {
-                        matchingLogs.forEach(log => total += parseFloat(log[key] || 0));
-                        break;
-                    }
-                }
-            }
+            matchingLogs.forEach(log => {
+                total += getStatValue(log, statType);
+            });
             return (total / matchingLogs.length).toFixed(2);
         }
-        function updateBetSlip() {
-            filterBetSlips();
-        }
+
+        function updateBetSlip() { filterBetSlips(); }
         function generateCombinations(bets) {
             let allCombinations = { 2: [], 3: [], 4: [], 5: [], 6: [] };
             const betCount = bets.length;
