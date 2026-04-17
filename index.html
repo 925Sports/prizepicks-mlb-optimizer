@@ -241,22 +241,106 @@
         .info-icon { position: absolute; top: 16px; right: 16px; cursor: pointer; font-size: 18px; color: #00ffcc; }
         .icon { position: absolute; top: 40px; right: 16px; font-size: 20px; }
         .loading { text-align: center; padding: 20px; font-size: 18px; color: #00ffcc; }
-        #popup, #betslipPopup, #calloutPopup, #toolInfoPopup, #advancedFilterPopup {
+
+        /* IMPROVED POPUP STYLING - clean modern NBA look */
+        #popup, #calloutPopup, #advancedFilterPopup, #betslipPopup, #toolInfoPopup {
             display: none;
             position: fixed;
-            top: 10%;
+            top: 50%;
             left: 50%;
-            transform: translate(-50%, 0);
-            background: #1a1a1a;
-            padding: 20px;
+            transform: translate(-50%, -50%);
+            background: #111827;
+            color: #f1f5f9;
+            padding: 24px;
             border-radius: 16px;
-            z-index: 40;
-            max-height: 80vh;
+            z-index: 9999;
+            max-height: 85vh;
             overflow-y: auto;
-            width: 90%;
-            max-width: 800px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            width: 92%;
+            max-width: 520px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+            border: 1px solid #00ffcc;
         }
+        .popup h3 {
+            margin: 0 0 16px 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .select-btn {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .select-btn:hover {
+            background: #00e6b3;
+        }
+        #gamesList, #teamsList, #calloutsList, #betTagsList, #favList, #gameTypesList {
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        #gamesList label, #teamsList label, #calloutsList label, #betTagsList label, #favList label, #gameTypesList label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 4px;
+            background: #1e2937;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #gamesList label:hover, #teamsList label:hover, #calloutsList label:hover, #betTagsList label:hover, #favList label:hover, #gameTypesList label:hover {
+            background: #334155;
+        }
+        #gamesList input[type="checkbox"], #teamsList input[type="checkbox"], #calloutsList input[type="checkbox"], #betTagsList input[type="checkbox"], #favList input[type="checkbox"], #gameTypesList input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #00ffcc;
+        }
+        .popup button#applyFilter, .popup button#applyCalloutFilter, .popup button#applyAdvancedFilter {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 9999px;
+            font-size: 16px;
+            font-weight: 700;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 255, 204, 0.4);
+        }
+        .popup button#applyFilter:hover, .popup button#applyCalloutFilter:hover, .popup button#applyAdvancedFilter:hover {
+            background: #00e6b3;
+            transform: translateY(-2px);
+        }
+        #betslipPopup {
+            max-width: 680px;
+        }
+        #toolInfoPopup {
+            max-width: 460px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.85);
+            z-index: 9998;
+            backdrop-filter: blur(4px);
+        }
+
         #playerPopup {
             display: none;
             position: fixed;
@@ -287,7 +371,6 @@
         #playerPopup th { font-size: 0.7rem; font-weight: 600; background-color: #222; cursor: pointer; }
         #playerPopup td { font-size: 0.65rem; }
         #chartContainer { margin: 20px 0; max-width: 100%; overflow-x: auto; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 35; }
         #popupName { font-size: 24px; font-weight: 700; color: #f0f0f0; display: inline-flex; align-items: center; word-break: break-word; width: 100%; text-align: left; }
         #popupGame, #popupScheduledAt { font-size: 14px; font-weight: 600; }
         .stats-boxes { display: flex; justify-content: space-between; flex-wrap: nowrap; }
