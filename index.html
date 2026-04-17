@@ -367,7 +367,7 @@
             overflow: hidden; 
             width: fit-content; 
             margin: 10px auto 10px; 
-            position: relative; /* ONLY CHANGE: ensures divider stays contained to Less/More section only (no full popup line) */
+            position: relative;
         }
         .popup-buttons .button { flex: 1; padding: 4px 40px; font-size: 14px; font-weight: 600; white-space: nowrap; }
         #betTypeSelect, #oddsSelect, #viewSelect { padding: 10px; border-radius: 9999px; border: 1px solid #333; background: #1a1a1a; color: #f0f0f0; margin: 10px 0; width: 100%; display: none; font-weight: 500; }
@@ -940,15 +940,27 @@
             if (lowerStat.includes('home run') || lowerStat.includes('hr')) return parseFloat(log.homeRuns || log.HR || 0);
             if (lowerStat.includes('inning') || lowerStat.includes('ip')) return parseFloat(log.inningsPitched || log.IP || 0);
             if (lowerStat.includes('earned run') || lowerStat.includes('er')) return parseFloat(log.earnedRuns || log.ER || 0);
-            if (lowerStat.includes('bb') || lowerStat.includes('walk')) return parseFloat(log.baseOnBallsPitching || log.BB || 0);
-            if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return parseFloat(log.atBats || log.AB || 0);
-            // Improved combo stat handling (fixes Splits tab accuracy for "Hits+Runs+RBIs", "1.5 Hits+Runs+RBIs", walks on specific dates, etc.)
-            if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || lowerStat.includes('hits + runs + rbi')) {
-                return parseFloat(log.hits || log.H || 0) + parseFloat(log.runs || log.R || 0) + parseFloat(log.rbi || log.RBI || 0);
+            if (lowerStat.includes('walk') || lowerStat.includes('bb') || lowerStat.includes('base on balls')) {
+                return parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || 0);
             }
+            if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return parseFloat(log.atBats || log.AB || 0);
             return parseFloat(log[statType] || log[statType.replace(/\s+/g, '')] || 0);
         }
-        // ONLY CHANGE FOR RECENT AVG: now uses last 5 games only (most recent first)
+        function getHotColdStatus(playerName) {
+            const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
+            if (matchingLogs.length === 0) return 'Neutral';
+            const recent = matchingLogs.slice(0, 7);
+            let hits = 0, ab = 0;
+            recent.forEach(log => {
+                hits += parseFloat(log.hits || log.H || 0);
+                ab += parseFloat(log.atBats || log.AB || 0);
+            });
+            if (ab < 10) return 'Neutral';
+            const ba = hits / ab;
+            if (ba >= 0.320) return 'Hot';
+            if (ba <= 0.180) return 'Cold';
+            return 'Neutral';
+        }
         function getGameLogStats(playerName, statType) {
             if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
             let matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
@@ -1281,14 +1293,15 @@
                                 }
                             },
                             datalabels: {
-                                anchor: 'end',
-                                align: 'end',
+                                anchor: 'center',
+                                align: 'center',
                                 color: '#fff',
-                                font: { weight: 'bold' },
+                                font: { weight: 'bold', size: 12 },
                                 formatter: (value) => value.toFixed(1)
                             }
                         }
-                    }
+                    },
+                    plugins: [ChartDataLabels]
                 });
                
                 const recentDiv = document.createElement('div');
@@ -1433,19 +1446,24 @@
                     }
                 }, 50);
             } else if (tab === 'Splits') {
-                // ONLY CHANGE: sort logs exactly like Game Log tab so Splits directly matches exact stat values from game logs (e.g. walks on 4/16, H+R+RBI on 4/15)
                 let playerLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
                 if (isHitter) playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
                 else playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
                 playerLogs.sort((a, b) => new Date(b.gameDate || b['gameDate'] || b.date || 0) - new Date(a.gameDate || a['gameDate'] || a.date || 0));
                 const recentLogs = playerLogs.slice(0, 20);
                 const lineScore = parseFloat(row['Line Score']) || 1.5;
+                const betTagLower = (row['Bet Tag'] || '').toLowerCase();
+                const isMoreBet = betTagLower.includes('↑') || betTagLower.includes('more') || betTagLower.includes('over');
                 const calculateHitRate = (logs) => {
                     if (!logs.length) return 0;
                     let hits = 0;
                     logs.forEach(log => {
                         let value = getStatValue(log, row['Stat Type']);
-                        if (value > lineScore) hits++;
+                        if (isMoreBet) {
+                            if (value > lineScore) hits++;
+                        } else {
+                            if (value < lineScore) hits++;
+                        }
                     });
                     return ((hits / logs.length) * 100).toFixed(0);
                 };
