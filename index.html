@@ -574,7 +574,7 @@
         #closePlayerPopup:hover {
             color: #ff4d4d;
         }
-        #gameLogSearch, #otherBetsSearch {
+        #gameLogSearch {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
@@ -658,9 +658,9 @@
 
     <!-- Player Popup -->
     <div id="playerPopup">
-        <span id="closePlayerPopup">×</span>
+        <span id="closePlayerPopup" style="position:absolute;top:10px;right:20px;cursor:pointer;font-size:24px;color:#f0f0f0;">×</span>
         <div class="header">
-            <div id="popupName"></div>
+            <div id="popupName" style="font-size:24px;font-weight:700;color:#f0f0f0;"></div>
             <div class="bottom-header">
                 <div class="left-header">
                     <img id="popupHeadshot" class="headshot" src="" alt="">
@@ -674,8 +674,8 @@
                 <div id="statsBoxes" class="stats-boxes"></div>
             </div>
         </div>
-        <button id="prevPlayer"><</button>
-        <button id="nextPlayer">></button>
+        <button id="prevPlayer" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:51;">‹</button>
+        <button id="nextPlayer" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:51;">›</button>
         <div class="tabs" id="popupTabs"></div>
         <div class="tab-content" id="popupContent"></div>
     </div>
@@ -1125,6 +1125,41 @@
             if (logParts[logParts.length - 1] === playerParts[playerParts.length - 1]) return true;
             return false;
         }
+        function getGameLogStats(playerName, statType) {
+            if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
+            const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
+            if (matchingLogs.length === 0) return null;
+            const lowerStat = statType.toLowerCase().replace(/[^a-z0-9+]/g, '');
+            let total = 0;
+            if (lowerStat.includes('hitsrunsrbis') || lowerStat.includes('hitrunsrbi') || lowerStat.includes('hrrbi')) {
+                matchingLogs.forEach(log => {
+                    total += (parseFloat(log.hits) || 0) + (parseFloat(log.runs) || 0) + (parseFloat(log.rbi || log.RBI) || 0);
+                });
+            } else if (lowerStat.includes('strikeout') || lowerStat.includes('k')) {
+                matchingLogs.forEach(log => total += parseFloat(log.strikeOuts || log.K || log.strikeOutsPitching || 0));
+            } else if (lowerStat.includes('homerun') || lowerStat.includes('hr')) {
+                matchingLogs.forEach(log => total += parseFloat(log.homeRuns || log.HR || 0));
+            } else if (lowerStat.includes('hit')) {
+                matchingLogs.forEach(log => total += parseFloat(log.hits || log.H || 0));
+            } else if (lowerStat.includes('rbi')) {
+                matchingLogs.forEach(log => total += parseFloat(log.rbi || log.RBI || 0));
+            } else if (lowerStat.includes('run')) {
+                matchingLogs.forEach(log => total += parseFloat(log.runs || log.R || 0));
+            } else if (lowerStat.includes('inning') || lowerStat.includes('ip')) {
+                matchingLogs.forEach(log => total += parseFloat(log.inningsPitched || 0));
+            } else if (lowerStat.includes('earned') || lowerStat.includes('er')) {
+                matchingLogs.forEach(log => total += parseFloat(log.earnedRuns || log.ER || 0));
+            } else {
+                const possible = ['hits','runs','rbi','homeRuns','strikeOuts','inningsPitched','earnedRuns','atBats'];
+                for (let key of possible) {
+                    if (lowerStat.includes(key.toLowerCase())) {
+                        matchingLogs.forEach(log => total += parseFloat(log[key] || 0));
+                        break;
+                    }
+                }
+            }
+            return (total / matchingLogs.length).toFixed(2);
+        }
         function calculateFantasyScore(log, isHitter) {
             if (isHitter) {
                 const h = parseFloat(log.hits || log.H || 0);
@@ -1378,7 +1413,6 @@
             content.innerHTML = '';
             const playerName = row['Player Name'];
             const isHitter = !(row.Position || row.Pos || '').toUpperCase().includes('P') && !row['Stat Type'].toLowerCase().includes('pitcher');
-
             if (tab === 'Overview') {
                 const recentAvg = getGameLogStats(row['Player Name'], row['Stat Type']);
                 const recentText = recentAvg !== null ? `Recent Avg from Game Logs: ${parseFloat(recentAvg).toFixed(2)}` : 'Recent Avg from Game Logs: N/A';
@@ -1500,8 +1534,8 @@
                     logHTML += `</tr></thead><tbody>`;
                     playerLogs.forEach(log => {
                         let opp = row.Opp || row['Opponent'] || '';
-                        let starter = isHitter ? (log.oppStarter || log.opposingStarter || 'N/A') : '';
-                        const fantasy = calculateFantasyScore(log, isHitter);
+                        let starter = isHitter ? (log.oppStarter || 'N/A') : '';
+                        let fantasy = calculateFantasyScore(log, isHitter);
                         let hrrbi = isHitter ? (parseFloat(log.hits||0) + parseFloat(log.runs||0) + parseFloat(log.rbi||log.RBI||0)) : '';
                         let trHTML = `<tr>`;
                         trHTML += `<td>${log.gameDate || log['gameDate'] || log.date || ''}</td>`;
@@ -1516,8 +1550,7 @@
                             const rbi = parseFloat(log.rbi || log.RBI || 0);
                             const hr = parseFloat(log.homeRuns || log.HR || 0);
                             const k = parseFloat(log.strikeOuts || log.K || 0);
-                            trHTML += `<td>${ab}</td><td>${h}</td><td>${r}</td><td>${rbi}</td><td>${hr}</td><td>${k}</td>`;
-                            trHTML += `<td>${hrrbi}</td>`;
+                            trHTML += `<td>${ab}</td><td>${h}</td><td>${r}</td><td>${rbi}</td><td>${hr}</td><td>${k}</td><td>${hrrbi}</td>`;
                             trHTML += `<td style="font-weight:700;color:#00ffcc;">${fantasy.toFixed(1)}</td>`;
                             trHTML += `<td>${log.gameLogSummary || log.Summary || ''}</td>`;
                         } else {
@@ -1580,15 +1613,18 @@
                 }, 50);
             } else if (tab === 'Splits') {
                 let playerLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
-                if (isHitter) playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
-                else playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
+                if (isHitter) {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
+                } else {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
+                }
                 const recentLogs = playerLogs.slice(0, 20).reverse();
                 const lineScore = parseFloat(row['Line Score']) || 1.5;
                 const calculateHitRate = (logs) => {
                     if (!logs.length) return 0;
                     let hits = 0;
                     logs.forEach(log => {
-                        const value = calculateFantasyScore(log, isHitter);
+                        let value = calculateFantasyScore(log, isHitter);
                         if (value > lineScore) hits++;
                     });
                     return ((hits / logs.length) * 100).toFixed(0);
@@ -1663,8 +1699,7 @@
                     content.innerHTML = `<p>No other bets found for this player.</p>`;
                     return;
                 }
-                let html = `<h3 style="margin-top:0;">Other Bets for ${playerName}</h3>
-                    <input id="otherBetsSearch" type="text" placeholder="Search Stat Type..." style="width:100%;padding:8px;margin-bottom:10px;border-radius:9999px;border:1px solid #333;background:#1a1a1a;color:#f0f0f0;">`;
+                let html = `<h3 style="margin-top:0;">Other Bets for ${playerName}</h3><input id="otherBetsSearch" type="text" placeholder="Search Stat Type..." style="width:100%;padding:8px;margin-bottom:10px;border-radius:9999px;border:1px solid #333;background:#1a1a1a;color:#f0f0f0;">`;
                 html += `<div class="table-wrapper"><table><thead><tr><th>Stat Type</th><th>Line</th><th>Edge %</th><th>Odds Type</th><th>Bet Tag</th></tr></thead><tbody>`;
                 otherBets.forEach((bet, idx) => {
                     const oddsType = bet['Odds Type'] || '';
