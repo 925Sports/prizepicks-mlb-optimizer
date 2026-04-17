@@ -926,8 +926,11 @@
         }
         function getBBFromSummary(summary) {
             if (!summary) return 0;
-            const match = summary.match(/(\d+)\s*BB/);
-            return match ? parseFloat(match[1]) : 0;
+            // More robust BB parsing from Summary column (e.g. "2 BB", "1 BB", "BB", "3 BB")
+            const match = summary.match(/(\d+)\s*BB/i);
+            if (match) return parseFloat(match[1]);
+            if (summary.toUpperCase().includes('BB')) return 1; // at least one BB
+            return 0;
         }
         function getStatValue(log, statType) {
             if (!log || !statType) return 0;
@@ -945,15 +948,14 @@
             if (lowerStat.includes('home run') || lowerStat.includes('hr')) return parseFloat(log.homeRuns || log.HR || 0);
             if (lowerStat.includes('inning') || lowerStat.includes('ip')) return parseFloat(log.inningsPitched || log.IP || 0);
             if (lowerStat.includes('earned run') || lowerStat.includes('er')) return parseFloat(log.earnedRuns || log.ER || 0);
+            // IMPROVED: Hits+Runs+RBIs - direct column from Game Log CSV first
             if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || lowerStat.includes('hits + runs + rbi')) {
-                // Direct pull from H+R+RBI column (preferred) or calculate as fallback
-                return parseFloat(log['H+R+RBI'] || log.hrrbi || 0) ||
+                return parseFloat(log['H+R+RBI'] || log['H + R + RBI'] || log.hrrbi || 0) ||
                        (parseFloat(log.hits || log.H || 0) + parseFloat(log.runs || log.R || 0) + parseFloat(log.rbi || log.RBI || 0));
             }
+            // IMPROVED: Walks - standard fields + robust Summary column parsing (BB)
             if (lowerStat.includes('walk') || lowerStat.includes('bb') || lowerStat.includes('base on balls')) {
-                // Standard fields first
                 let val = parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || 0);
-                // Fallback to Summary column (marked as "BB" per game log)
                 if (val === 0 && (log.gameLogSummary || log.Summary)) {
                     val = getBBFromSummary(log.gameLogSummary || log.Summary);
                 }
