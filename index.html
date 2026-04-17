@@ -429,6 +429,7 @@
             font-size: 0.7rem;
             font-weight: 600;
             background-color: #222;
+            cursor: pointer;
         }
         #playerPopup td {
             font-size: 0.65rem;
@@ -1110,13 +1111,22 @@
             console.error('Error fetching CSV:', error);
             contentDiv.innerHTML = `<div class="loading" style="color:#ff4d4d;">Data is loading...<br>Please try again later or refresh the page.</div>`;
         });
+        function cleanName(name) {
+            if (!name) return '';
+            return name.toLowerCase().trim().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
+        }
+        function nameMatches(logName, playerName) {
+            const cleanLog = cleanName(logName);
+            const cleanPlayer = cleanName(playerName);
+            if (cleanLog === cleanPlayer) return true;
+            const logParts = cleanLog.split(' ');
+            const playerParts = cleanPlayer.split(' ');
+            if (logParts[logParts.length - 1] === playerParts[playerParts.length - 1]) return true;
+            return false;
+        }
         function getGameLogStats(playerName, statType) {
             if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
-            const cleanName = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
-            const matchingLogs = gameLogs.filter(log => {
-                const logName = (log.fullName || log['fullName'] || log['Player Name'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                return logName === cleanName || logName.includes(cleanName.split(' ').pop());
-            });
+            const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
             if (matchingLogs.length === 0) return null;
             const lowerStat = statType.toLowerCase().replace(/[^a-z0-9+]/g, '');
             let total = 0;
@@ -1148,6 +1158,20 @@
                 }
             }
             return (total / matchingLogs.length).toFixed(2);
+        }
+        function calculateFantasyScore(log, isHitter) {
+            if (isHitter) {
+                const h = parseFloat(log.hits || log.H || 0);
+                const r = parseFloat(log.runs || log.R || 0);
+                const rbi = parseFloat(log.rbi || log.RBI || 0);
+                const hr = parseFloat(log.homeRuns || log.HR || 0);
+                return h + r + rbi + (hr * 2);
+            } else {
+                const ip = parseFloat(log.inningsPitched || log.IP || 0);
+                const er = parseFloat(log.earnedRuns || log.ER || 0);
+                const k = parseFloat(log.strikeOuts || log.K || 0);
+                return (ip * 3) - (er * 2) + k;
+            }
         }
         function updateBetSlip() {
             filterBetSlips();
@@ -1484,96 +1508,107 @@
                 content.appendChild(buttonsDiv);
             } else if (tab === 'Game Log') {
                 const playerName = row['Player Name'];
-                const isPitcher = (row.Position || row.Pos || '').toUpperCase().includes('P') ||
-                                  row['Stat Type'].toLowerCase().includes('pitcher') ||
-                                  row['Stat Type'].toLowerCase().includes('fantasy score') && row['Line Score'].includes('.');
-                let playerLogs = gameLogs.filter(log => {
-                    const logName = (log.fullName || log['fullName'] || log['Player Name'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
-                });
-                if (isPitcher) {
-                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || log.innings_pitched || 0) > 0);
+                const isHitter = !(row.Position || row.Pos || '').toUpperCase().includes('P') && !row['Stat Type'].toLowerCase().includes('pitcher');
+                let playerLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
+                if (isHitter) {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
                 } else {
-                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || log.at_bats || 0) > 0);
+                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
                 }
-                let logHTML = `<h3 style="margin-top:0;">Full Season Game Log (${playerLogs.length} games)</h3>`;
+                playerLogs.sort((a, b) => new Date(b.gameDate || b['gameDate'] || b.date || 0) - new Date(a.gameDate || a['gameDate'] || a.date || 0));
+                let logHTML = `<h3 style="margin-top:0;">Full Season Game Log (${playerLogs.length} games) — Most Recent First</h3>`;
                 if (playerLogs.length > 0) {
                     logHTML += `<input type="text" id="gameLogSearch" placeholder="Filter by Opponent (e.g. LAD, NYY)...">`;
-                    if (isPitcher) {
-                        logHTML += `<div class="table-wrapper"><table><thead><tr>
-                            <th>Date</th>
-                            <th>Team</th>
-                            <th>Opp</th>
-                            <th>Pos</th>
-                            <th>IP</th><th>ER</th><th>H</th><th>K</th><th>BB</th><th>Decision</th><th>Fantasy Score</th><th>Summary</th>
-                        </tr></thead><tbody>`;
-                        playerLogs.forEach(log => {
-                            const ip = parseFloat(log.inningsPitched || log.IP || log.innings_pitched || 0);
-                            const er = parseFloat(log.earnedRuns || log.ER || log.earned_runs || 0);
-                            const h = parseFloat(log.hitsAllowed || log.H || log.hits_allowed || 0);
-                            const k = parseFloat(log.strikeOuts || log.K || log.strikeouts || 0);
-                            const bb = parseFloat(log.walks || log.BB || log.walks_allowed || 0);
-                            const decision = log.decision || log.Decision || log['Decision'] || '';
-                            const fantasyScore = (ip * 3) - (er * 2) + k;
-                            logHTML += `<tr>
-                                <td>${log.gameDate || log['gameDate'] || log.date || ''}</td>
-                                <td>${row.Team || ''}</td>
-                                <td>${row.Opp || row['Opponent'] || ''}</td>
-                                <td>${log.primaryPosition_name || log.primaryPosition_code || 'P'}</td>
-                                <td>${ip.toFixed(1)}</td>
-                                <td>${er}</td>
-                                <td>${h}</td>
-                                <td>${k}</td>
-                                <td>${bb}</td>
-                                <td>${decision}</td>
-                                <td style="font-weight:700;color:#00ffcc;">${fantasyScore.toFixed(1)}</td>
-                                <td>${log.gameLogSummary || log.Summary || ''}</td>
-                            </tr>`;
-                        });
+                    logHTML += `<div class="table-wrapper"><table id="gameLogTable"><thead><tr>`;
+                    logHTML += `<th data-col="date">Date</th>`;
+                    logHTML += `<th data-col="team">Team</th>`;
+                    logHTML += `<th data-col="opp">Opp</th>`;
+                    logHTML += `<th data-col="pos">Pos</th>`;
+                    if (isHitter) {
+                        logHTML += `<th data-col="ab">AB</th><th data-col="h">H</th><th data-col="r">R</th><th data-col="rbi">RBI</th><th data-col="hr">HR</th><th data-col="k">K</th>`;
+                        logHTML += `<th data-col="fantasy">Fantasy Score</th>`;
+                        logHTML += `<th data-col="summary">Summary</th>`;
                     } else {
-                        logHTML += `<div class="table-wrapper"><table><thead><tr>
-                            <th>Date</th>
-                            <th>Team</th>
-                            <th>Opp</th>
-                            <th>Pos</th>
-                            <th>AB</th><th>H</th><th>R</th><th>RBI</th><th>HR</th><th>K</th><th>Fantasy Score</th><th>Summary</th>
-                        </tr></thead><tbody>`;
-                        playerLogs.forEach(log => {
-                            const ab = parseFloat(log.atBats || log.AB || log.at_bats || 0);
-                            const hits = parseFloat(log.hits || log.H || 0);
-                            const runs = parseFloat(log.runs || log.R || 0);
+                        logHTML += `<th data-col="ip">IP</th><th data-col="er">ER</th><th data-col="h">H</th><th data-col="k">K</th><th data-col="bb">BB</th>`;
+                        logHTML += `<th data-col="decision">Decision</th>`;
+                        logHTML += `<th data-col="fantasy">Fantasy Score</th>`;
+                        logHTML += `<th data-col="summary">Summary</th>`;
+                    }
+                    logHTML += `</tr></thead><tbody>`;
+                    playerLogs.forEach(log => {
+                        let opp = '';
+                        const homeAbbr = log.home_team_abbreviation || '';
+                        const awayAbbr = log.away_team_abbreviation || '';
+                        const playerTeam = row.Team || '';
+                        if (playerTeam === homeAbbr) opp = awayAbbr;
+                        else if (playerTeam === awayAbbr) opp = homeAbbr;
+                        if (!opp) opp = row.Opp || row['Opponent'] || '';
+                        const fantasy = calculateFantasyScore(log, isHitter);
+                        let trHTML = `<tr>`;
+                        trHTML += `<td>${log.gameDate || log['gameDate'] || log.date || ''}</td>`;
+                        trHTML += `<td>${row.Team || ''}</td>`;
+                        trHTML += `<td>${opp}</td>`;
+                        trHTML += `<td>${log.primaryPosition_name || log.primaryPosition_code || (isHitter ? 'H' : 'P')}</td>`;
+                        if (isHitter) {
+                            const ab = parseFloat(log.atBats || log.AB || 0);
+                            const h = parseFloat(log.hits || log.H || 0);
+                            const r = parseFloat(log.runs || log.R || 0);
                             const rbi = parseFloat(log.rbi || log.RBI || 0);
                             const hr = parseFloat(log.homeRuns || log.HR || 0);
                             const k = parseFloat(log.strikeOuts || log.K || 0);
-                            const fantasyScore = hits + runs + rbi + (hr * 2);
-                            logHTML += `<tr>
-                                <td>${log.gameDate || log['gameDate'] || log.date || ''}</td>
-                                <td>${row.Team || ''}</td>
-                                <td>${row.Opp || row['Opponent'] || ''}</td>
-                                <td>${log.primaryPosition_name || log.primaryPosition_code || ''}</td>
-                                <td>${ab}</td>
-                                <td>${hits}</td>
-                                <td>${runs}</td>
-                                <td>${rbi}</td>
-                                <td>${hr}</td>
-                                <td>${k}</td>
-                                <td style="font-weight:700;color:#00ffcc;">${fantasyScore.toFixed(1)}</td>
-                                <td>${log.gameLogSummary || log.Summary || ''}</td>
-                            </tr>`;
-                        });
-                    }
+                            const hrrbi = h + r + rbi;
+                            trHTML += `<td>${ab}</td><td>${h}</td><td>${r}</td><td>${rbi}</td><td>${hr}</td><td>${k}</td>`;
+                            trHTML += `<td style="font-weight:700;color:#00ffcc;">${fantasy.toFixed(1)}</td>`;
+                            trHTML += `<td>${log.gameLogSummary || log.Summary || ''}</td>`;
+                        } else {
+                            const ip = parseFloat(log.inningsPitched || log.IP || 0);
+                            const er = parseFloat(log.earnedRuns || log.ER || 0);
+                            const h = parseFloat(log.hitsAllowed || log.H || 0);
+                            const k = parseFloat(log.strikeOuts || log.K || 0);
+                            const bb = parseFloat(log.baseOnBallsPitching || log.BB || 0);
+                            const decision = log.decision || log.Decision || '';
+                            trHTML += `<td>${ip.toFixed(1)}</td><td>${er}</td><td>${h}</td><td>${k}</td><td>${bb}</td>`;
+                            trHTML += `<td>${decision}</td>`;
+                            trHTML += `<td style="font-weight:700;color:#00ffcc;">${fantasy.toFixed(1)}</td>`;
+                            trHTML += `<td>${log.gameLogSummary || log.Summary || ''}</td>`;
+                        }
+                        trHTML += `</tr>`;
+                        logHTML += trHTML;
+                    });
                     logHTML += `</tbody></table></div>`;
                 } else {
                     logHTML += `<p>No game log entries found for this player yet.</p>`;
                 }
                 content.innerHTML = logHTML;
                 setTimeout(() => {
+                    const table = document.getElementById('gameLogTable');
+                    if (!table) return;
+                    const ths = table.querySelectorAll('thead th');
+                    ths.forEach(th => {
+                        th.style.cursor = 'pointer';
+                        th.addEventListener('click', () => {
+                            const col = th.getAttribute('data-col');
+                            const tbody = table.querySelector('tbody');
+                            const rows = Array.from(tbody.querySelectorAll('tr'));
+                            rows.sort((a, b) => {
+                                let aVal = a.querySelector(`td:nth-child(${Array.from(ths).indexOf(th) + 1})`).textContent.trim();
+                                let bVal = b.querySelector(`td:nth-child(${Array.from(ths).indexOf(th) + 1})`).textContent.trim();
+                                if (col === 'date') {
+                                    return new Date(bVal) - new Date(aVal);
+                                }
+                                if (!isNaN(parseFloat(aVal)) && !isNaN(parseFloat(bVal))) {
+                                    return parseFloat(bVal) - parseFloat(aVal);
+                                }
+                                return bVal.localeCompare(aVal);
+                            });
+                            rows.forEach(row => tbody.appendChild(row));
+                        });
+                    });
                     const searchInput = document.getElementById('gameLogSearch');
                     if (searchInput) {
                         searchInput.addEventListener('input', (e) => {
                             const term = e.target.value.toUpperCase().trim();
-                            const rows = content.querySelectorAll('tbody tr');
+                            const rows = table.querySelectorAll('tbody tr');
                             rows.forEach(tr => {
                                 const oppTd = tr.cells[2];
                                 if (oppTd) {
@@ -1585,11 +1620,7 @@
                 }, 50);
             } else if (tab === 'Splits') {
                 const playerName = row['Player Name'];
-                let playerLogs = gameLogs.filter(log => {
-                    const logName = (log.fullName || log['fullName'] || log['Player Name'] || '').toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    const cleanPlayer = playerName.toLowerCase().trim().replace(/[^a-z\s]/g, '');
-                    return logName === cleanPlayer || logName.includes(cleanPlayer.split(' ').pop());
-                });
+                let playerLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
                 if (playerLogs.length === 0) {
                     content.innerHTML = `<p>No splits data available yet for this player.</p>`;
                     return;
@@ -1631,9 +1662,9 @@
                         <canvas id="splitsChart"></canvas>
                     </div>
                     <div style="margin-top:16px;display:flex;justify-content:space-around;font-size:13px;">
-                        <div>L5 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l5Hit}%</span></div>
-                        <div>L10 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l10Hit}%</span></div>
-                        <div>L20 Hit Rate: <span style="color:#00ffcc;font-weight:700;">${l20Hit}%</span></div>
+                        <div>L5 Hit Rate: <span style="color:#4dff4d;font-weight:700;">${l5Hit}%</span></div>
+                        <div>L10 Hit Rate: <span style="color:#4dff4d;font-weight:700;">${l10Hit}%</span></div>
+                        <div>L20 Hit Rate: <span style="color:#4dff4d;font-weight:700;">${l20Hit}%</span></div>
                     </div>
                 `;
                 content.innerHTML = html;
@@ -1711,19 +1742,39 @@
                     content.innerHTML = `<p>No other bets found for this player.</p>`;
                     return;
                 }
-                let html = `<h3 style="margin-top:0;">Other Bets for ${playerName}</h3><div class="table-wrapper"><table><thead><tr><th>Stat Type</th><th>Line</th><th>Edge %</th><th>Bet Tag</th></tr></thead><tbody>`;
-                otherBets.forEach(bet => {
-                    html += `<tr>
-                        <td>${bet['Stat Type']}</td>
-                        <td>${bet['Line Score']}</td>
-                        <td>${parseFloat(bet['Edge %'] || 0).toFixed(1)}%</td>
-                        <td>${bet['Bet Tag'] || ''}</td>
-                    </tr>`;
+                let html = `<h3 style="margin-top:0;">Other Bets for ${playerName}</h3><div class="table-wrapper"><table><thead><tr><th>Stat Type</th><th>Line</th><th>Edge %</th><th>Odds Type</th><th>Bet Tag</th></tr></thead><tbody>`;
+                otherBets.forEach((bet, idx) => {
+                    const oddsType = bet['Odds Type'] || '';
+                    let oddsDisplay = '';
+                    if (oddsType === 'demon') oddsDisplay = '👿 Demon';
+                    else if (oddsType === 'goblin') oddsDisplay = '👺 Goblin';
+                    else oddsDisplay = 'Standard';
+                    html += `<tr style="cursor:pointer;" onclick="showPlayerPopupFromOtherBet(${idx}, '${playerName}')">`;
+                    html += `<td>${bet['Stat Type']}</td>`;
+                    html += `<td>${bet['Line Score']}</td>`;
+                    html += `<td>${parseFloat(bet['Edge %'] || 0).toFixed(1)}%</td>`;
+                    html += `<td>${oddsDisplay}</td>`;
+                    html += `<td>${bet['Bet Tag'] || ''}</td>`;
+                    html += `</tr>`;
                 });
                 html += `</tbody></table></div>`;
                 content.innerHTML = html;
             } else if (tab === 'Matchup') {
                 content.innerHTML = '<p>Matchup details coming soon.</p>';
+            }
+        }
+        function showPlayerPopupFromOtherBet(idx, playerName) {
+            const otherBets = allData.filter(r => r['Player Name'] === playerName);
+            const targetBet = otherBets[idx];
+            if (targetBet) {
+                document.getElementById('playerPopup').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+                const indexInFiltered = currentFiltered.findIndex(r => r['Player Name'] === targetBet['Player Name'] && r['Stat Type'] === targetBet['Stat Type']);
+                if (indexInFiltered > -1) {
+                    showPlayerPopup(currentFiltered[indexInFiltered], indexInFiltered);
+                } else {
+                    showPlayerPopup(targetBet, 0);
+                }
             }
         }
         function sortContentTable(column) {
