@@ -1533,7 +1533,13 @@
                     }
                     logHTML += `</tr></thead><tbody>`;
                     playerLogs.forEach(log => {
-                        let opp = row.Opp || row['Opponent'] || '';
+                        let opp = '';
+                        const homeAbbr = log.home_team_abbreviation || '';
+                        const awayAbbr = log.away_team_abbreviation || '';
+                        const playerTeam = row.Team || '';
+                        if (playerTeam === homeAbbr) opp = awayAbbr;
+                        else if (playerTeam === awayAbbr) opp = homeAbbr;
+                        if (!opp) opp = row.Opp || row['Opponent'] || '';
                         let starter = isHitter ? (log.oppStarter || 'N/A') : '';
                         let fantasy = calculateFantasyScore(log, isHitter);
                         let hrrbi = isHitter ? (parseFloat(log.hits||0) + parseFloat(log.runs||0) + parseFloat(log.rbi||log.RBI||0)) : '';
