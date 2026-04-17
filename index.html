@@ -908,7 +908,7 @@
             return false;
         }
 
-        /* UPDATED FANTASY SCORE LOGIC (only this part was changed) */
+        /* UPDATED FANTASY SCORE LOGIC (Win + Quality Start now included) */
         function calculateFantasyScore(log, isHitter) {
             if (isHitter) {
                 const singles = parseFloat(log.hits || log.H || 0) - parseFloat(log.doubles || 0) - parseFloat(log.triples || 0) - parseFloat(log.homeRuns || log.HR || 0);
@@ -922,12 +922,14 @@
                 const sb = parseFloat(log.stolenBases || log.SB || 0);
                 return (singles * 3) + (doubles * 5) + (triples * 8) + (hr * 10) + (runs * 2) + (rbi * 2) + (bb * 2) + (hbp * 2) + (sb * 5);
             } else {
-                const outs = parseFloat(log.inningsPitched || log.IP || 0) * 3;
-                const win = (log.decision || log.Decision || '').toUpperCase() === 'W' ? 6 : 0;
-                const qs = 0; // Quality Start not always in basic boxscore – set to 0 for now
+                const ip = parseFloat(log.inningsPitched || log.IP || 0);
+                const outs = ip * 3;
                 const er = parseFloat(log.earnedRuns || log.ER || 0);
                 const k = parseFloat(log.strikeOutsPitching || log.strikeOuts || log.K || 0);
-                return win + qs + (outs * 1) + (k * 3) - (er * 3);
+                const decision = (log.decision || log.Decision || '').toUpperCase();
+                const win = decision === 'W' ? 6 : 0;
+                const qs = (ip >= 6 && er < 3) ? 4 : 0;
+                return win + qs + outs + (k * 3) - (er * 3);
             }
         }
 
@@ -1602,8 +1604,8 @@
                     filtered = filtered.filter(row => {
                         const ou = parseFloat(row['O/U'] || 0);
                         let type = 'Normal';
-                        if (ou >= 8.9) type = 'High';
-                        else if (ou < 7) type = 'Low';
+                        if (ou >= 9.6) type = 'High';
+                        else if (ou <= 8.4) type = 'Low';
                         return selectedGameTypes.has(type);
                     });
                 }
@@ -1793,8 +1795,8 @@
                     filtered.forEach((row, index) => {
                         row.id = index + 1;
                         const tr = document.createElement('tr');
-                        tr.style.cursor = 'pointer';   // NEW - makes whole row clickable
-                        tr.onclick = () => showPlayerPopup(row, index);   // NEW - click anywhere on row opens popup
+                        tr.style.cursor = 'pointer';
+                        tr.onclick = () => showPlayerPopup(row, index);
 
                         const detailsTd = document.createElement('td');
                         const img = document.createElement('img');
@@ -1815,7 +1817,7 @@
                         infoIcon.dataset.index = index;
                         infoIcon.style.marginLeft = '8px';
                         infoIcon.addEventListener('click', (e) => {
-                            e.stopPropagation();   // prevent double trigger
+                            e.stopPropagation();
                             showPlayerPopup(row, index);
                         });
                         let gameTime = `${row.Team || ''} @ ${row.Opp || row['Opponent'] || ''} ${row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString('en-US', {hour:'numeric', minute:'2-digit'}) : ''}`;
@@ -1901,10 +1903,12 @@
                         `;
                         actionsTd.appendChild(buttonsDiv);
                         tr.appendChild(actionsTd);
+
+                        /* NEW: stop row click when clicking Less/More buttons */
                         const buttons = buttonsDiv.querySelectorAll('.button');
                         buttons.forEach(btn => {
                             btn.addEventListener('click', (e) => {
-                                e.stopPropagation();   // prevent row click when clicking button
+                                e.stopPropagation();
                                 const choice = btn.dataset.choice;
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
