@@ -1139,6 +1139,41 @@
                 return (ip * 3) - (er * 2) + k;
             }
         }
+        function getGameLogStats(playerName, statType) {
+            if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
+            const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
+            if (matchingLogs.length === 0) return null;
+            let total = 0;
+            const lowerStat = statType.toLowerCase().replace(/[^a-z0-9+]/g, '');
+            if (lowerStat.includes('hitsrunsrbis') || lowerStat.includes('hitrunsrbi') || lowerStat.includes('hrrbi')) {
+                matchingLogs.forEach(log => {
+                    total += (parseFloat(log.hits) || 0) + (parseFloat(log.runs) || 0) + (parseFloat(log.rbi || log.RBI) || 0);
+                });
+            } else if (lowerStat.includes('strikeout') || lowerStat.includes('k')) {
+                matchingLogs.forEach(log => total += parseFloat(log.strikeOuts || log.K || log.strikeOutsPitching || 0));
+            } else if (lowerStat.includes('homerun') || lowerStat.includes('hr')) {
+                matchingLogs.forEach(log => total += parseFloat(log.homeRuns || log.HR || 0));
+            } else if (lowerStat.includes('hit')) {
+                matchingLogs.forEach(log => total += parseFloat(log.hits || log.H || 0));
+            } else if (lowerStat.includes('rbi')) {
+                matchingLogs.forEach(log => total += parseFloat(log.rbi || log.RBI || 0));
+            } else if (lowerStat.includes('run')) {
+                matchingLogs.forEach(log => total += parseFloat(log.runs || log.R || 0));
+            } else if (lowerStat.includes('inning') || lowerStat.includes('ip')) {
+                matchingLogs.forEach(log => total += parseFloat(log.inningsPitched || 0));
+            } else if (lowerStat.includes('earned') || lowerStat.includes('er')) {
+                matchingLogs.forEach(log => total += parseFloat(log.earnedRuns || log.ER || 0));
+            } else {
+                const possible = ['hits','runs','rbi','homeRuns','strikeOuts','inningsPitched','earnedRuns','atBats'];
+                for (let key of possible) {
+                    if (lowerStat.includes(key.toLowerCase())) {
+                        matchingLogs.forEach(log => total += parseFloat(log[key] || 0));
+                        break;
+                    }
+                }
+            }
+            return (total / matchingLogs.length).toFixed(2);
+        }
         function updateBetSlip() {
             filterBetSlips();
         }
@@ -1498,7 +1533,6 @@
                     }
                     logHTML += `</tr></thead><tbody>`;
                     playerLogs.forEach(log => {
-                        // Correct historical opponent from the log row
                         let opp = '';
                         const homeAbbr = log.home_team_abbreviation || '';
                         const awayAbbr = log.away_team_abbreviation || '';
@@ -1596,7 +1630,7 @@
                     if (!logs.length) return 0;
                     let hits = 0;
                     logs.forEach(log => {
-                        const value = calculateFantasyScore(log, isHitter);
+                        let value = calculateFantasyScore(log, isHitter);
                         if (value > lineScore) hits++;
                     });
                     return ((hits / logs.length) * 100).toFixed(0);
