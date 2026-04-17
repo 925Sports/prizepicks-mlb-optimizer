@@ -218,7 +218,6 @@
         .icon { position: absolute; top: 40px; right: 16px; font-size: 20px; }
         .loading { text-align: center; padding: 20px; font-size: 18px; color: #00ffcc; }
 
-        /* POPUP STYLES (unchanged) */
         #popup, #calloutPopup, #advancedFilterPopup, #betslipPopup, #toolInfoPopup {
             display: none;
             position: fixed;
@@ -313,7 +312,6 @@
         .error-message { color: #ff4d4d; text-align: center; margin: 1rem; }
         .expanded-details td { background-color: #121212; padding: 1rem; text-align: left; }
 
-        /* REST OF THE STYLES (unchanged) */
         #playerPopup {
             display: none;
             position: fixed;
@@ -452,7 +450,7 @@
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
         <div id="calloutsList"></div>
     </div>
-    <!-- Advanced Filter Popup (now includes Hot/Cold Batter) -->
+    <!-- Advanced Filter Popup -->
     <div id="advancedFilterPopup" class="popup">
         <button id="applyAdvancedFilter">Apply</button>
         <h3>Bet Tag (More / Less)</h3>
@@ -467,7 +465,7 @@
         <button id="selectAllGameTypes" class="select-btn">Select All</button>
         <button id="deselectAllGameTypes" class="select-btn">Deselect All</button>
         <div id="gameTypesList"></div>
-        <h3>Hot / Cold Batter (last 10 games)</h3>
+        <h3>Hot / Cold Batter</h3>
         <button id="selectAllHotCold" class="select-btn">Select All</button>
         <button id="deselectAllHotCold" class="select-btn">Deselect All</button>
         <div id="hotColdList"></div>
@@ -502,7 +500,7 @@
         <p>This tool helps you optimize your MLB bets on PrizePicks.</p>
         <ul>
             <li>Use the search bar to find players or stats.</li>
-            <li>Filter by games, teams, callouts, bet tags, fav status, game scoring, or Hot/Cold status.</li>
+            <li>Filter by games, teams, callouts, bet tags, fav status, game scoring, or hot/cold batters using the buttons.</li>
             <li>Select odds type: All, Standard, Demon, or Goblin.</li>
             <li>Switch tabs to view different stat categories.</li>
             <li>On each player card, click 'More' or 'Less' to add bets to your slip.</li>
@@ -529,7 +527,7 @@
         let selectedBetTags = new Set();
         let selectedFav = new Set();
         let selectedGameTypes = new Set();
-        let selectedHotCold = new Set();   /* NEW: Hot / Cold filter */
+        let selectedHotCold = new Set(['Hot', 'Cold', 'Neutral']);
         let selectedBets = [];
         let selectedPayout = 'all';
         let betSlipsSortColumn = 'Edge';
@@ -612,11 +610,13 @@
             selectedBetTags = new Set(uniqueBetTags);
             selectedFav = new Set(['Yes', 'No']);
             selectedGameTypes = new Set(['High', 'Normal', 'Low']);
-            selectedHotCold = new Set();   /* NEW */
+            selectedHotCold = new Set(['Hot', 'Cold', 'Neutral']);
+
             let uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
             if (!uniqueStatTypes.includes('Hitter Fantasy Score')) uniqueStatTypes.push('Hitter Fantasy Score');
             if (!uniqueStatTypes.includes('Pitcher Fantasy Score')) uniqueStatTypes.push('Pitcher Fantasy Score');
             uniqueStatTypes.sort();
+
             const tabsDiv = document.querySelector('.tabs');
             tabsDiv.innerHTML = '';
             uniqueStatTypes.forEach((tab, index) => {
@@ -633,6 +633,7 @@
                 };
                 tabsDiv.appendChild(btn);
             });
+
             const viewSwitch = document.createElement('div');
             viewSwitch.classList.add('view-switch');
             viewSwitch.innerHTML = `
@@ -644,6 +645,7 @@
                 <span>Table</span>
             `;
             tabsDiv.appendChild(viewSwitch);
+
             const betTypeSelect = document.getElementById('betTypeSelect');
             betTypeSelect.innerHTML = '';
             uniqueStatTypes.forEach(tab => {
@@ -660,6 +662,7 @@
                 if (activeTab) activeTab.classList.add('active');
                 renderContent();
             });
+
             const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
             const oddsSelect = document.getElementById('oddsSelect');
             oddsSelect.innerHTML = '';
@@ -677,6 +680,7 @@
                 if (activeBtn) activeBtn.classList.add('active');
                 renderContent();
             });
+
             const viewSelect = document.getElementById('viewSelect');
             viewSelect.value = 'cards';
             viewSelect.addEventListener('change', () => {
@@ -684,10 +688,12 @@
                 document.getElementById('viewToggle').checked = currentView === 'table';
                 renderContent();
             });
+
             document.getElementById('search').addEventListener('input', (e) => {
                 searchTerm = e.target.value.toLowerCase();
                 renderContent();
             });
+
             document.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
@@ -697,15 +703,18 @@
                     renderContent();
                 });
             });
+
             document.getElementById('viewToggle').addEventListener('change', (e) => {
                 currentView = e.target.checked ? 'table' : 'cards';
                 viewSelect.value = currentView;
                 renderContent();
             });
+
             document.getElementById('selectedToggle').addEventListener('change', (e) => {
                 showSelectedOnly = e.target.checked;
                 renderContent();
             });
+
             document.getElementById('filterBtn').addEventListener('click', () => {
                 const popup = document.getElementById('popup');
                 popup.style.display = 'block';
@@ -819,17 +828,16 @@
                     gameTypesList.appendChild(label);
                     gameTypesList.appendChild(document.createElement('br'));
                 });
-                /* NEW: Hot / Cold Batter section */
                 const hotColdList = document.getElementById('hotColdList');
                 hotColdList.innerHTML = '';
-                ['Hot Batter', 'Cold Batter'].forEach(option => {
+                ['Hot', 'Cold', 'Neutral'].forEach(status => {
                     const label = document.createElement('label');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
-                    checkbox.value = option;
-                    checkbox.checked = selectedHotCold.has(option);
+                    checkbox.value = status;
+                    checkbox.checked = selectedHotCold.has(status);
                     label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(option));
+                    label.appendChild(document.createTextNode(status + ' Batter'));
                     hotColdList.appendChild(label);
                     hotColdList.appendChild(document.createElement('br'));
                 });
@@ -846,7 +854,7 @@
                 selectedBetTags = new Set(Array.from(document.querySelectorAll('#betTagsList input:checked')).map(cb => cb.value));
                 selectedFav = new Set(Array.from(document.querySelectorAll('#favList input:checked')).map(cb => cb.value));
                 selectedGameTypes = new Set(Array.from(document.querySelectorAll('#gameTypesList input:checked')).map(cb => cb.value));
-                selectedHotCold = new Set(Array.from(document.querySelectorAll('#hotColdList input:checked')).map(cb => cb.value));   /* NEW */
+                selectedHotCold = new Set(Array.from(document.querySelectorAll('#hotColdList input:checked')).map(cb => cb.value));
                 document.getElementById('advancedFilterPopup').style.display = 'none';
                 renderContent();
             });
@@ -899,20 +907,30 @@
             if (logParts[logParts.length - 1] === playerParts[playerParts.length - 1]) return true;
             return false;
         }
+
+        /* UPDATED FANTASY SCORE LOGIC (only this part was changed) */
         function calculateFantasyScore(log, isHitter) {
             if (isHitter) {
-                const h = parseFloat(log.hits || log.H || 0);
-                const r = parseFloat(log.runs || log.R || 0);
-                const rbi = parseFloat(log.rbi || log.RBI || 0);
+                const singles = parseFloat(log.hits || log.H || 0) - parseFloat(log.doubles || 0) - parseFloat(log.triples || 0) - parseFloat(log.homeRuns || log.HR || 0);
+                const doubles = parseFloat(log.doubles || 0);
+                const triples = parseFloat(log.triples || 0);
                 const hr = parseFloat(log.homeRuns || log.HR || 0);
-                return h + r + rbi + (hr * 2);
+                const runs = parseFloat(log.runs || log.R || 0);
+                const rbi = parseFloat(log.rbi || log.RBI || 0);
+                const bb = parseFloat(log.baseOnBalls || log.BB || 0);
+                const hbp = parseFloat(log.hitByPitch || log.HBP || 0);
+                const sb = parseFloat(log.stolenBases || log.SB || 0);
+                return (singles * 3) + (doubles * 5) + (triples * 8) + (hr * 10) + (runs * 2) + (rbi * 2) + (bb * 2) + (hbp * 2) + (sb * 5);
             } else {
-                const ip = parseFloat(log.inningsPitched || log.IP || 0);
+                const outs = parseFloat(log.inningsPitched || log.IP || 0) * 3;
+                const win = (log.decision || log.Decision || '').toUpperCase() === 'W' ? 6 : 0;
+                const qs = 0; // Quality Start not always in basic boxscore – set to 0 for now
                 const er = parseFloat(log.earnedRuns || log.ER || 0);
-                const k = parseFloat(log.strikeOuts || log.K || 0);
-                return (ip * 3) - (er * 2) + k;
+                const k = parseFloat(log.strikeOutsPitching || log.strikeOuts || log.K || 0);
+                return win + qs + (outs * 1) + (k * 3) - (er * 3);
             }
         }
+
         function getStatValue(log, statType) {
             if (!log || !statType) return 0;
             const lowerStat = statType.toLowerCase().trim();
@@ -933,6 +951,23 @@
             if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return parseFloat(log.atBats || log.AB || 0);
             return parseFloat(log[statType] || log[statType.replace(/\s+/g, '')] || 0);
         }
+
+        function getHotColdStatus(playerName) {
+            const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
+            if (matchingLogs.length === 0) return 'Neutral';
+            const recent = matchingLogs.slice(0, 7);
+            let hits = 0, ab = 0;
+            recent.forEach(log => {
+                hits += parseFloat(log.hits || log.H || 0);
+                ab += parseFloat(log.atBats || log.AB || 0);
+            });
+            if (ab < 10) return 'Neutral';
+            const ba = hits / ab;
+            if (ba >= 0.320) return 'Hot';
+            if (ba <= 0.180) return 'Cold';
+            return 'Neutral';
+        }
+
         function getGameLogStats(playerName, statType) {
             if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
             const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
@@ -941,18 +976,9 @@
             matchingLogs.forEach(log => total += getStatValue(log, statType));
             return (total / matchingLogs.length).toFixed(2);
         }
-        /* NEW helper: recent average over last N games */
-        function getRecentAvg(playerName, statType, windowSize = 10) {
-            if (!playerName || !statType || !gameLogs || gameLogs.length === 0) return null;
-            let matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
-            if (matchingLogs.length === 0) return null;
-            matchingLogs.sort((a, b) => new Date(b.gameDate || b['gameDate'] || b.date || 0) - new Date(a.gameDate || a['gameDate'] || a.date || 0));
-            const recent = matchingLogs.slice(0, windowSize);
-            let total = 0;
-            recent.forEach(log => total += getStatValue(log, statType));
-            return (total / recent.length).toFixed(2);
-        }
+
         function updateBetSlip() { filterBetSlips(); }
+
         function generateCombinations(bets) {
             let allCombinations = { 2: [], 3: [], 4: [], 5: [], 6: [] };
             const betCount = bets.length;
@@ -1015,10 +1041,12 @@
             }
             return allCombinations;
         }
+
         function filterBetSlips() {
             selectedPayout = document.getElementById('payoutFilter').value;
             renderBetSlips();
         }
+
         function renderBetSlips() {
             const header = document.getElementById('betslipsHeader');
             const body = document.getElementById('betslipsBody');
@@ -1100,11 +1128,16 @@
                 body.appendChild(detailRow);
             });
         }
+
         function toggleBetSlipDetail(index, playersKey) {
-            if (expandedCombinations.has(playersKey)) expandedCombinations.delete(playersKey);
-            else expandedCombinations.add(playersKey);
+            if (expandedCombinations.has(playersKey)) {
+                expandedCombinations.delete(playersKey);
+            } else {
+                expandedCombinations.add(playersKey);
+            }
             renderBetSlips();
         }
+
         function sortBetSlips(column) {
             if (betSlipsSortColumn === column) {
                 betSlipsSortDirection = betSlipsSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1114,6 +1147,7 @@
             }
             filterBetSlips();
         }
+
         function showPlayerPopup(row, currentIndex) {
             currentRow = row;
             const popup = document.getElementById('playerPopup');
@@ -1181,6 +1215,7 @@
                 overlay.style.display = 'none';
             };
         }
+
         function renderPopupContent(tab, row) {
             const content = document.getElementById('popupContent');
             content.innerHTML = '';
@@ -1365,8 +1400,12 @@
                             rows.sort((a, b) => {
                                 let aVal = a.querySelector(`td:nth-child(${Array.from(ths).indexOf(th) + 1})`).textContent.trim();
                                 let bVal = b.querySelector(`td:nth-child(${Array.from(ths).indexOf(th) + 1})`).textContent.trim();
-                                if (col === 'date') return new Date(bVal) - new Date(aVal);
-                                if (!isNaN(parseFloat(aVal)) && !isNaN(parseFloat(bVal))) return parseFloat(bVal) - parseFloat(aVal);
+                                if (col === 'date') {
+                                    return new Date(bVal) - new Date(aVal);
+                                }
+                                if (!isNaN(parseFloat(aVal)) && !isNaN(parseFloat(bVal))) {
+                                    return parseFloat(bVal) - parseFloat(aVal);
+                                }
                                 return bVal.localeCompare(aVal);
                             });
                             rows.forEach(row => tbody.appendChild(row));
@@ -1379,15 +1418,20 @@
                             const rows = table.querySelectorAll('tbody tr');
                             rows.forEach(tr => {
                                 const oppTd = tr.cells[2];
-                                if (oppTd) tr.style.display = (term === '' || oppTd.textContent.toUpperCase().includes(term)) ? '' : 'none';
+                                if (oppTd) {
+                                    tr.style.display = (term === '' || oppTd.textContent.toUpperCase().includes(term)) ? '' : 'none';
+                                }
                             });
                         });
                     }
                 }, 50);
             } else if (tab === 'Splits') {
                 let playerLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
-                if (isHitter) playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
-                else playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
+                if (isHitter) {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.atBats || log.AB || 0) > 0);
+                } else {
+                    playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
+                }
                 const recentLogs = playerLogs.slice(0, 20).reverse();
                 const lineScore = parseFloat(row['Line Score']) || 1.5;
                 const calculateHitRate = (logs) => {
@@ -1496,6 +1540,7 @@
                 content.innerHTML = '<p>Matchup details coming soon.</p>';
             }
         }
+
         function showPlayerPopupFromOtherBet(idx, playerName) {
             const otherBets = allData.filter(r => r['Player Name'] === playerName);
             const targetBet = otherBets[idx];
@@ -1510,6 +1555,7 @@
                 }
             }
         }
+
         function sortContentTable(column) {
             if (contentSortColumn === column) {
                 contentSortDirection = contentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -1519,12 +1565,17 @@
             }
             renderContent();
         }
+
         function renderContent() {
             contentDiv.innerHTML = '<div class="loading">Loading...</div>';
             setTimeout(() => {
                 let filtered = allData.filter(row => (row['Stat Type'] || '').trim() !== '');
-                if (currentTab !== 'All') filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
-                if (currentOddsType !== 'all') filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
+                if (currentTab !== 'All') {
+                    filtered = filtered.filter(row => (row['Stat Type'] || '').trim() === currentTab);
+                }
+                if (currentOddsType !== 'all') {
+                    filtered = filtered.filter(row => row['Odds Type'] === currentOddsType);
+                }
                 if (searchTerm) {
                     filtered = filtered.filter(row =>
                         row['Player Name'].toLowerCase().includes(searchTerm) ||
@@ -1534,11 +1585,19 @@
                 filtered = filtered.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const isFantasyScore = statType === 'Hitter Fantasy Score' || statType === 'Pitcher Fantasy Score';
-                    if (isFantasyScore) return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team);
-                    else return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) && selectedCallouts.has(row['Callout Bet Tag']);
+                    if (isFantasyScore) {
+                        return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team);
+                    } else {
+                        return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) &&
+                               selectedCallouts.has(row['Callout Bet Tag']);
+                    }
                 });
-                if (selectedBetTags.size > 0) filtered = filtered.filter(row => selectedBetTags.has(row['Bet Tag']));
-                if (selectedFav.size > 0) filtered = filtered.filter(row => selectedFav.has(row['Fav'] || 'No'));
+                if (selectedBetTags.size > 0) {
+                    filtered = filtered.filter(row => selectedBetTags.has(row['Bet Tag']));
+                }
+                if (selectedFav.size > 0) {
+                    filtered = filtered.filter(row => selectedFav.has(row['Fav'] || 'No'));
+                }
                 if (selectedGameTypes.size > 0) {
                     filtered = filtered.filter(row => {
                         const ou = parseFloat(row['O/U'] || 0);
@@ -1548,17 +1607,13 @@
                         return selectedGameTypes.has(type);
                     });
                 }
-                /* NEW: Hot / Cold Batter filter */
-                if (selectedHotCold.size > 0) {
+                if (selectedHotCold.size > 0 && !selectedHotCold.has('Neutral')) {
                     filtered = filtered.filter(row => {
-                        const seasonAvg = parseFloat(getGameLogStats(row['Player Name'], row['Stat Type']) || 0);
-                        const recentAvg = parseFloat(getRecentAvg(row['Player Name'], row['Stat Type'], 10) || 0);
-                        if (!seasonAvg || !recentAvg) return false;
-                        const isHot = recentAvg > seasonAvg * 1.25;
-                        const isCold = recentAvg < seasonAvg * 0.75;
-                        return (selectedHotCold.has('Hot Batter') && isHot) || (selectedHotCold.has('Cold Batter') && isCold);
+                        const status = getHotColdStatus(row['Player Name']);
+                        return selectedHotCold.has(status);
                     });
                 }
+
                 filtered = filtered.filter(row => parseFloat(row['Edge %'] || 0) < 100);
                 if (showSelectedOnly) {
                     const selectedKeys = new Set(selectedBets.map(b => b.key));
@@ -1582,7 +1637,11 @@
                         if (aPPUD === null && bPPUD === null) return 0;
                         if (aPPUD === null) return 1;
                         if (bPPUD === null) return -1;
-                        return contentSortDirection === 'asc' ? aPPUD - bPPUD : bPPUD - aPPUD;
+                        if (contentSortDirection === 'asc') {
+                            return aPPUD - bPPUD;
+                        } else {
+                            return bPPUD - aPPUD;
+                        }
                     } else if (contentSortColumn === 'Line') {
                         aVal = parseFloat(a['Line Score']) || 0;
                         bVal = parseFloat(b['Line Score']) || 0;
@@ -1599,12 +1658,18 @@
                         aVal = parseFloat(a['Opportunities'] || 0) || 0;
                         bVal = parseFloat(b['Opportunities'] || 0) || 0;
                     }
-                    return contentSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                    if (contentSortDirection === 'asc') {
+                        return aVal - bVal;
+                    } else {
+                        return bVal - aVal;
+                    }
                 });
                 currentFiltered = filtered;
                 contentDiv.innerHTML = '';
                 contentDiv.classList.remove('table-view');
-                if (currentView === 'table') contentDiv.classList.add('table-view');
+                if (currentView === 'table') {
+                    contentDiv.classList.add('table-view');
+                }
                 if (filtered.length === 0) {
                     contentDiv.innerHTML = '<div class="loading">No data available for this selection. Try switching the odds type...</div>';
                     return;
@@ -1619,7 +1684,9 @@
                         if (row['Odds Type'] === 'demon') icon = '<div class="icon">👿</div>';
                         if (row['Odds Type'] === 'goblin') icon = '<div class="icon">👺</div>';
                         let gameTime = row['Game Short Title'] + ' ' + (row['Match Progress'] || '');
-                        if (row.Opp && row.Opp !== 'Multiple') gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
+                        if (row.Opp && row.Opp !== 'Multiple') {
+                            gameTime = '@ ' + row.Opp + ' ' + (row['Match Progress'] || '');
+                        }
                         let lessClass = 'button less';
                         let moreClass = 'button more';
                         const key = `${row['Player Name']}-${row['Stat Type']}`;
@@ -1627,12 +1694,17 @@
                         const betTagLower = (row['Bet Tag'] || '').toLowerCase();
                         const dividerClass = betTagLower.includes('more') || betTagLower.includes('over') ? 'more' : (betTagLower.includes('less') || betTagLower.includes('under') ? 'less' : '');
                         if (selectedBet) {
-                            if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
-                            else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
+                            if (selectedBet.choice === 'Less') {
+                                lessClass += ' selected selected-less';
+                            } else if (selectedBet.choice === 'More') {
+                                moreClass += ' selected selected-more';
+                            }
                         }
                         card.innerHTML = `
                             ${icon}
-                            <div class="header"><span class="pop">${edge}</span></div>
+                            <div class="header">
+                                <span class="pop">${edge}</span>
+                            </div>
                             <img class="headshot" src="${row['Headshot URL'] || row['Player Image'] || 'placeholder.png'}" alt="${row['Player Name']}">
                             <div class="team">${row.Team || ''}</div>
                             <div class="name">${row['Player Name']}</div>
@@ -1653,17 +1725,35 @@
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
                                 const prob = parseFloat(row['Edge %'] || 50) / 100;
-                                const betData = { key, player: row['Player Name'], choice, line: row['Line Score'], stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob, game: row['Game Short Title'], team: row.Team, id: row.id, projectionId: row['Data ID'] || '' };
+                                const betData = {
+                                    key,
+                                    player: row['Player Name'],
+                                    choice,
+                                    line: row['Line Score'],
+                                    stat: row['Stat Type'],
+                                    edge: parseFloat(row['Edge %']) || 0,
+                                    prob,
+                                    game: row['Game Short Title'],
+                                    team: row.Team,
+                                    id: row.id,
+                                    projectionId: row['Data ID'] || ''
+                                };
                                 if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
                                     selectedBets.splice(existingIndex, 1);
                                     btn.classList.remove('selected', 'selected-more', 'selected-less');
                                 } else {
-                                    if (existingIndex > -1) selectedBets[existingIndex] = betData;
-                                    else selectedBets.push(betData);
+                                    if (existingIndex > -1) {
+                                        selectedBets[existingIndex] = betData;
+                                    } else {
+                                        selectedBets.push(betData);
+                                    }
                                     card.querySelectorAll('.button').forEach(b => b.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline'));
                                     btn.classList.add('selected');
-                                    if (choice === 'More') btn.classList.add('selected-more');
-                                    else btn.classList.add('selected-less');
+                                    if (choice === 'More') {
+                                        btn.classList.add('selected-more');
+                                    } else {
+                                        btn.classList.add('selected-less');
+                                    }
                                 }
                                 updateBetSlip();
                             });
@@ -1703,6 +1793,9 @@
                     filtered.forEach((row, index) => {
                         row.id = index + 1;
                         const tr = document.createElement('tr');
+                        tr.style.cursor = 'pointer';   // NEW - makes whole row clickable
+                        tr.onclick = () => showPlayerPopup(row, index);   // NEW - click anywhere on row opens popup
+
                         const detailsTd = document.createElement('td');
                         const img = document.createElement('img');
                         img.src = row['Headshot URL'] || row['Player Image'] || 'placeholder.png';
@@ -1721,7 +1814,10 @@
                         infoIcon.textContent = 'ℹ️';
                         infoIcon.dataset.index = index;
                         infoIcon.style.marginLeft = '8px';
-                        infoIcon.addEventListener('click', (e) => { e.stopPropagation(); showPlayerPopup(row, index); });
+                        infoIcon.addEventListener('click', (e) => {
+                            e.stopPropagation();   // prevent double trigger
+                            showPlayerPopup(row, index);
+                        });
                         let gameTime = `${row.Team || ''} @ ${row.Opp || row['Opponent'] || ''} ${row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString('en-US', {hour:'numeric', minute:'2-digit'}) : ''}`;
                         const calloutTag = row['Callout Bet Tag'] ? ` | ${row['Callout Bet Tag']}` : '';
                         detailsTd.style.display = 'flex';
@@ -1792,8 +1888,11 @@
                         const betTagLower = (row['Bet Tag'] || '').toLowerCase();
                         const dividerClass = betTagLower.includes('more') || betTagLower.includes('over') ? 'more' : (betTagLower.includes('less') || betTagLower.includes('under') ? 'less' : '');
                         if (selectedBet) {
-                            if (selectedBet.choice === 'Less') lessClass += ' selected selected-less';
-                            else if (selectedBet.choice === 'More') moreClass += ' selected selected-more';
+                            if (selectedBet.choice === 'Less') {
+                                lessClass += ' selected selected-less';
+                            } else if (selectedBet.choice === 'More') {
+                                moreClass += ' selected selected-more';
+                            }
                         }
                         buttonsDiv.innerHTML = `
                             <button class="${lessClass}" data-choice="Less">↓ Less</button>
@@ -1804,21 +1903,40 @@
                         tr.appendChild(actionsTd);
                         const buttons = buttonsDiv.querySelectorAll('.button');
                         buttons.forEach(btn => {
-                            btn.addEventListener('click', () => {
+                            btn.addEventListener('click', (e) => {
+                                e.stopPropagation();   // prevent row click when clicking button
                                 const choice = btn.dataset.choice;
                                 const key = `${row['Player Name']}-${row['Stat Type']}`;
                                 const existingIndex = selectedBets.findIndex(b => b.key === key);
                                 const prob = parseFloat(row['Edge %'] || 50) / 100;
-                                const betData = { key, player: row['Player Name'], choice, line: row['Line Score'], stat: row['Stat Type'], edge: parseFloat(row['Edge %']) || 0, prob, game: row['Game Short Title'], team: row.Team, id: row.id, projectionId: row['Data ID'] || '' };
+                                const betData = {
+                                    key,
+                                    player: row['Player Name'],
+                                    choice,
+                                    line: row['Line Score'],
+                                    stat: row['Stat Type'],
+                                    edge: parseFloat(row['Edge %']) || 0,
+                                    prob,
+                                    game: row['Game Short Title'],
+                                    team: row.Team,
+                                    id: row.id,
+                                    projectionId: row['Data ID'] || ''
+                                };
                                 if (existingIndex > -1 && selectedBets[existingIndex].choice === choice) {
                                     selectedBets.splice(existingIndex, 1);
                                 } else {
-                                    if (existingIndex > -1) selectedBets[existingIndex] = betData;
-                                    else selectedBets.push(betData);
+                                    if (existingIndex > -1) {
+                                        selectedBets[existingIndex] = betData;
+                                    } else {
+                                        selectedBets.push(betData);
+                                    }
                                     buttonsDiv.querySelectorAll('.button').forEach(b => b.classList.remove('selected', 'selected-more', 'selected-less', 'green-outline', 'red-outline'));
                                     btn.classList.add('selected');
-                                    if (choice === 'More') btn.classList.add('selected-more');
-                                    else btn.classList.add('selected-less');
+                                    if (choice === 'More') {
+                                        btn.classList.add('selected-more');
+                                    } else {
+                                        btn.classList.add('selected-less');
+                                    }
                                 }
                                 updateBetSlip();
                                 renderContent();
