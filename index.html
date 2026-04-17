@@ -924,6 +924,11 @@
                 return win + qs + outs + (k * 3) - (er * 3);
             }
         }
+        function getBBFromSummary(summary) {
+            if (!summary) return 0;
+            const match = summary.match(/(\d+)\s*BB/);
+            return match ? parseFloat(match[1]) : 0;
+        }
         function getStatValue(log, statType) {
             if (!log || !statType) return 0;
             const lowerStat = statType.toLowerCase().trim();
@@ -940,8 +945,19 @@
             if (lowerStat.includes('home run') || lowerStat.includes('hr')) return parseFloat(log.homeRuns || log.HR || 0);
             if (lowerStat.includes('inning') || lowerStat.includes('ip')) return parseFloat(log.inningsPitched || log.IP || 0);
             if (lowerStat.includes('earned run') || lowerStat.includes('er')) return parseFloat(log.earnedRuns || log.ER || 0);
+            if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || lowerStat.includes('hits + runs + rbi')) {
+                // Direct pull from H+R+RBI column (preferred) or calculate as fallback
+                return parseFloat(log['H+R+RBI'] || log.hrrbi || 0) ||
+                       (parseFloat(log.hits || log.H || 0) + parseFloat(log.runs || log.R || 0) + parseFloat(log.rbi || log.RBI || 0));
+            }
             if (lowerStat.includes('walk') || lowerStat.includes('bb') || lowerStat.includes('base on balls')) {
-                return parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || 0);
+                // Standard fields first
+                let val = parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || 0);
+                // Fallback to Summary column (marked as "BB" per game log)
+                if (val === 0 && (log.gameLogSummary || log.Summary)) {
+                    val = getBBFromSummary(log.gameLogSummary || log.Summary);
+                }
+                return val;
             }
             if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return parseFloat(log.atBats || log.AB || 0);
             return parseFloat(log[statType] || log[statType.replace(/\s+/g, '')] || 0);
@@ -1512,8 +1528,8 @@
                             plugins: {
                                 legend: { display: false },
                                 datalabels: {
-                                    anchor: 'end',
-                                    align: 'end',
+                                    anchor: 'center',
+                                    align: 'center',
                                     color: '#fff',
                                     font: { weight: 'bold', size: 11 },
                                     formatter: (value) => value.toFixed(1)
