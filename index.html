@@ -70,16 +70,31 @@
             border: 1px solid #333;
             background: #1a1a1a;
             color: #f0f0f0;
-            width: 200px;
+            width: 220px;
             transition: border-color 0.2s;
         }
         #search:focus {
             border-color: #00ffcc;
             outline: none;
         }
+        .filter-btn {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 9999px;
+            padding: 8px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            background: #00e6b3;
+            transform: translateY(-1px);
+        }
         .toggle {
             display: flex;
-            gap: 12px;
+            gap: 6px;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -176,12 +191,6 @@
             background: #00ffcc;
             color: #000;
         }
-        .tab.inactive {
-            opacity: 0.45;
-            pointer-events: none;
-            background: #1a1a1a;
-            color: #666;
-        }
         #content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -199,6 +208,21 @@
         }
         #content.table-view table {
             width: 100%;
+            border-collapse: collapse;
+        }
+        #content.table-view th {
+            background: #1a1a1a;
+            color: #f0f0f0;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 2px solid #333;
+            white-space: nowrap;
+        }
+        #content.table-view td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #333;
+            vertical-align: middle;
         }
         .card {
             background: #1a1a1a;
@@ -629,10 +653,10 @@
     </div>
     <div class="controls">
         <input id="search" type="text" placeholder="Search players or stats...">
-        <button id="filterBtn">Filter Games/Teams</button>
-        <button id="calloutFilterBtn">Filter Callouts</button>
-        <button id="advancedFilterBtn">Filter Bet Tag / Fav / O/U</button>
-        <button id="betslipBtn">Generated Bet Slips</button>
+        <button id="filterBtn" class="filter-btn">Filter Games/Teams</button>
+        <button id="calloutFilterBtn" class="filter-btn">Filter Callouts</button>
+        <button id="advancedFilterBtn" class="filter-btn">Filter Bet Tag / Fav / O/U</button>
+        <button id="betslipBtn" class="filter-btn">Generated Bet Slips</button>
         <select id="oddsSelect"></select>
         <select id="betTypeSelect"></select>
         <select id="viewSelect">
@@ -682,7 +706,7 @@
 
     <!-- Filter Popup -->
     <div id="popup" class="popup">
-        <button id="applyFilter">Apply</button>
+        <button id="applyFilter" class="filter-btn">Apply</button>
         <h3>Games</h3>
         <button id="selectAllGames" class="select-btn">Select All</button>
         <button id="deselectAllGames" class="select-btn">Deselect All</button>
@@ -694,7 +718,7 @@
     </div>
     <!-- Callout Popup -->
     <div id="calloutPopup" class="popup">
-        <button id="applyCalloutFilter">Apply</button>
+        <button id="applyCalloutFilter" class="filter-btn">Apply</button>
         <h3>Callout Bet Tags</h3>
         <button id="selectAllCallouts" class="select-btn">Select All</button>
         <button id="deselectAllCallouts" class="select-btn">Deselect All</button>
@@ -702,7 +726,7 @@
     </div>
     <!-- Advanced Filter Popup -->
     <div id="advancedFilterPopup" class="popup">
-        <button id="applyAdvancedFilter">Apply</button>
+        <button id="applyAdvancedFilter" class="filter-btn">Apply</button>
         <h3>Bet Tag (More / Less)</h3>
         <button id="selectAllBetTags" class="select-btn">Select All</button>
         <button id="deselectAllBetTags" class="select-btn">Deselect All</button>
@@ -718,7 +742,7 @@
     </div>
     <!-- Bet Slip Popup -->
     <div id="betslipPopup" class="popup">
-        <button id="closeBetSlip">Close</button>
+        <button id="closeBetSlip" class="filter-btn">Close</button>
         <h3>Generated Bet Slips</h3>
         <div class="payout-filter-container">
             <label for="payoutFilter">Filter by Payout:</label>
@@ -743,7 +767,7 @@
     </div>
     <!-- Tool Info Popup -->
     <div id="toolInfoPopup" class="popup">
-        <button id="closeToolInfo">Close</button>
+        <button id="closeToolInfo" class="filter-btn">Close</button>
         <h3>How to Use PrizePicks MLB Optimizer</h3>
         <p>This tool helps you optimize your MLB bets on PrizePicks.</p>
         <ul>
@@ -1624,10 +1648,9 @@
                 } else {
                     playerLogs = playerLogs.filter(log => parseFloat(log.inningsPitched || log.IP || 0) > 0);
                 }
-                const recentLogs = playerLogs.slice(0, 20).reverse();
                 const lineScore = parseFloat(row['Line Score']) || 1.5;
                 const calculateHitRate = (logs) => {
-                    if (!logs.length) return 0;
+                    if (!logs.length) return '0';
                     let hits = 0;
                     logs.forEach(log => {
                         let value = calculateFantasyScore(log, isHitter);
@@ -1638,6 +1661,7 @@
                 const l5Hit = calculateHitRate(playerLogs.slice(0, 5));
                 const l10Hit = calculateHitRate(playerLogs.slice(0, 10));
                 const l20Hit = calculateHitRate(playerLogs.slice(0, 20));
+                const recentLogs = playerLogs.slice(0, 20).reverse();
                 let html = `
                     <h3 style="margin-top:0;">Splits for ${playerName}</h3>
                     <div style="margin-bottom:12px;font-size:13px;color:#888;">Recent Performance (${row['Stat Type']}) - Last 20 Games</div>
@@ -1945,15 +1969,27 @@
                 } else {
                     const table = document.createElement('table');
                     const thead = document.createElement('thead');
-                    const headers = ['Details', 'Stat', 'Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp', 'Actions'];
                     const headerTr = document.createElement('tr');
+                    const headers = [
+                        {text: 'Details', sortable: false},
+                        {text: 'Stat', sortable: false},
+                        {text: 'Edge', sortable: true, col: 'Edge'},
+                        {text: 'Line', sortable: true, col: 'Line'},
+                        {text: 'PP-UD', sortable: true, col: 'PP-UD'},
+                        {text: 'Avg Proj', sortable: true, col: 'Avg Proj'},
+                        {text: 'DVP Adj', sortable: true, col: 'DVP Adj'},
+                        {text: 'Total Proj', sortable: true, col: 'Total Proj'},
+                        {text: 'L5 Avg', sortable: false},
+                        {text: 'L5 Hit%', sortable: false},
+                        {text: 'Actions', sortable: false}
+                    ];
                     headers.forEach(h => {
                         const th = document.createElement('th');
-                        th.textContent = h;
-                        if (['Edge', 'Line', 'PP-UD', 'Avg Proj', 'DVP Adj', 'Total Proj', 'Opp'].includes(h)) {
-                            th.dataset.column = h;
-                            th.onclick = () => sortContentTable(h);
-                            if (h === contentSortColumn) th.classList.add(contentSortDirection);
+                        th.textContent = h.text;
+                        if (h.sortable) {
+                            th.dataset.column = h.col;
+                            th.onclick = () => sortContentTable(h.col);
+                            if (h.col === contentSortColumn) th.classList.add(contentSortDirection);
                         }
                         headerTr.appendChild(th);
                     });
@@ -1993,13 +2029,11 @@
                         detailsTd.appendChild(playerNameSpan);
                         detailsTd.appendChild(infoIcon);
                         detailsTd.appendChild(document.createTextNode(` (${row.Team || ''}) - ${gameTime}${calloutTag}`));
-                        detailsTd.setAttribute('data-label', 'Details');
                         detailsTd.style.cursor = 'pointer';
                         detailsTd.addEventListener('click', () => showPlayerPopup(row, index));
                         tr.appendChild(detailsTd);
                         const statTd = document.createElement('td');
                         statTd.textContent = row['Stat Type'];
-                        statTd.setAttribute('data-label', 'Stat');
                         tr.appendChild(statTd);
                         const edgeTd = document.createElement('td');
                         let icon = '';
@@ -2007,37 +2041,40 @@
                         if (row['Odds Type'] === 'goblin') icon = '👺 ';
                         const edge = isNaN(parseFloat(row['Edge %'])) ? 'N/A' : parseFloat(row['Edge %']).toFixed(1) + '%';
                         edgeTd.textContent = icon + edge;
-                        edgeTd.setAttribute('data-label', 'Edge');
                         tr.appendChild(edgeTd);
                         const lineTd = document.createElement('td');
                         lineTd.textContent = row['Line Score'];
-                        lineTd.setAttribute('data-label', 'Line');
                         tr.appendChild(lineTd);
                         const ppUdTd = document.createElement('td');
                         const udLineStr = row['Underdog Line'] || '';
                         const udLine = parseFloat(udLineStr);
                         const ppLine = parseFloat(row['Line Score']);
                         ppUdTd.textContent = (udLineStr && udLine !== 0 && !isNaN(udLine)) ? (ppLine - udLine).toFixed(1) : '';
-                        ppUdTd.setAttribute('data-label', 'PP-UD');
                         tr.appendChild(ppUdTd);
                         const avgProjTd = document.createElement('td');
                         avgProjTd.textContent = parseFloat(row['Average Projected'] || row['Proj'] || 0).toFixed(1) || '-';
-                        avgProjTd.setAttribute('data-label', 'Avg Proj');
                         tr.appendChild(avgProjTd);
                         const dvpAdjTd = document.createElement('td');
                         dvpAdjTd.textContent = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0).toFixed(1) || '-';
-                        dvpAdjTd.setAttribute('data-label', 'DVP Adj');
                         tr.appendChild(dvpAdjTd);
                         const totalProjTd = document.createElement('td');
                         totalProjTd.textContent = parseFloat(row['Total Projection'] || row['Total'] || 0).toFixed(1) || '-';
-                        totalProjTd.setAttribute('data-label', 'Total Proj');
                         tr.appendChild(totalProjTd);
-                        const oppTd = document.createElement('td');
-                        oppTd.textContent = parseFloat(row['Opportunities'] || 0).toFixed(1) || '-';
-                        oppTd.setAttribute('data-label', 'Opp');
-                        tr.appendChild(oppTd);
+                        const l5AvgTd = document.createElement('td');
+                        l5AvgTd.textContent = getGameLogStats(row['Player Name'], row['Stat Type']) || '-';
+                        tr.appendChild(l5AvgTd);
+                        const l5HitTd = document.createElement('td');
+                        const isHitter = !(row.Position || row.Pos || '').toUpperCase().includes('P') && !row['Stat Type'].toLowerCase().includes('pitcher');
+                        const playerLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', row['Player Name']));
+                        const recent5 = playerLogs.slice(0, 5);
+                        let hits = 0;
+                        const lineScore = parseFloat(row['Line Score']) || 1.5;
+                        recent5.forEach(log => {
+                            if (calculateFantasyScore(log, isHitter) > lineScore) hits++;
+                        });
+                        l5HitTd.textContent = recent5.length ? ((hits / recent5.length) * 100).toFixed(0) + '%' : '0%';
+                        tr.appendChild(l5HitTd);
                         const actionsTd = document.createElement('td');
-                        actionsTd.setAttribute('data-label', 'Actions');
                         const buttonsDiv = document.createElement('div');
                         buttonsDiv.classList.add('buttons');
                         let lessClass = 'button less';
