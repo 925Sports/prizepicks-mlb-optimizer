@@ -925,20 +925,28 @@
             }
         }
 
-        // UPDATED: More flexible parsing for BB in Summary column (handles "2 BB", "BB 2", "BB: 2", etc.)
         function getBBFromSummary(summary) {
             if (!summary) return 0;
             summary = summary.toString().trim();
-            // Pattern 1: number followed by BB (e.g. "2 BB")
             let match = summary.match(/(\d+)\s*BB/i);
             if (match) return parseFloat(match[1]);
-            // Pattern 2: BB followed by number (e.g. "BB 2" or "BB: 2")
             match = summary.match(/BB\s*:?\s*(\d+)/i);
             if (match) return parseFloat(match[1]);
             return 0;
         }
 
-        // UPDATED: getStatValue - fixed H+R+RBI and Walks/BB to match your CSV and Game Log tab exactly
+        // === ROBUST FIELD HELPER (handles all possible column name variations in your CSV) ===
+        function getField(log, ...names) {
+            for (let name of names) {
+                if (log[name] !== undefined && log[name] !== '') {
+                    const val = parseFloat(log[name]);
+                    if (!isNaN(val)) return val;
+                }
+            }
+            return 0;
+        }
+
+        // === FINAL STRENGTHENED getStatValue - THIS IS THE ONLY PART CHANGED ===
         function getStatValue(log, statType) {
             if (!log || !statType) return 0;
             const lowerStat = statType.toLowerCase().trim();
@@ -948,35 +956,39 @@
                 return calculateFantasyScore(log, isHitter);
             }
             if (lowerStat.includes('strikeout') || lowerStat.includes('k') || lowerStat.includes('so')) {
-                return parseFloat(log.strikeOutsPitching || log.strikeOuts || log.K || log.SO || 0);
+                return getField(log, 'strikeOutsPitching', 'strikeOuts', 'K', 'SO');
             }
-            if (lowerStat.includes('hit')) return parseFloat(log.hits || log.H || 0);
-            if (lowerStat.includes('run')) return parseFloat(log.runs || log.R || 0);
-            if (lowerStat.includes('rbi')) return parseFloat(log.rbi || log.RBI || 0);
-            if (lowerStat.includes('home run') || lowerStat.includes('hr')) return parseFloat(log.homeRuns || log.HR || 0);
-            if (lowerStat.includes('inning') || lowerStat.includes('ip')) return parseFloat(log.inningsPitched || log.IP || 0);
-            if (lowerStat.includes('earned run') || lowerStat.includes('er')) return parseFloat(log.earnedRuns || log.ER || 0);
+            if (lowerStat.includes('hit')) return getField(log, 'hits', 'H', 'Hits');
+            if (lowerStat.includes('run')) return getField(log, 'runs', 'R', 'Runs');
+            if (lowerStat.includes('rbi')) return getField(log, 'rbi', 'RBI', 'Rbi');
+            if (lowerStat.includes('home run') || lowerStat.includes('hr')) return getField(log, 'homeRuns', 'HR', 'Home Runs');
+            if (lowerStat.includes('inning') || lowerStat.includes('ip')) return getField(log, 'inningsPitched', 'IP');
+            if (lowerStat.includes('earned run') || lowerStat.includes('er')) return getField(log, 'earnedRuns', 'ER', 'Er');
 
-            // FIXED: Hits+Runs+RBIs - ALWAYS sum from the raw columns (exactly matches Game Log tab)
-            if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || lowerStat.includes('hits + runs + rbi') || lowerStat.includes('hrrbi')) {
-                const h = parseFloat(log.hits || log.H || 0);
-                const r = parseFloat(log.runs || log.R || 0);
-                const rbi = parseFloat(log.rbi || log.RBI || 0);
+            // HITS + RUNS + RBIs - EXPLICIT SUM (exactly as you requested - no combined column exists)
+            if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || 
+                lowerStat.includes('hits + runs + rbi') || lowerStat.includes('hrrbi') ||
+                lowerStat.includes('h + r + rbi') || lowerStat.includes('hits runs rbi')) {
+                const h = getField(log, 'hits', 'H', 'Hits');
+                const r = getField(log, 'runs', 'R', 'Runs');
+                const rbi = getField(log, 'rbi', 'RBI', 'Rbi');
                 return h + r + rbi;
             }
 
-            // FIXED: Walks / BB - prioritizes baseOnBalls (as in your CSV) then falls back to Summary parsing
+            // WALKS / BB - prioritizes baseOnBalls (exact CSV column) then Summary fallback
             if (lowerStat.includes('walk') || lowerStat.includes('bb') || lowerStat.includes('base on balls')) {
-                let val = parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || 0);
-                if (val === 0 || isNaN(val)) {
+                let val = getField(log, 'baseOnBalls', 'BB', 'baseOnBallsPitching', 'Walks');
+                if (val === 0) {
                     const summary = log.gameLogSummary || log.Summary || log.summary || '';
                     val = getBBFromSummary(summary);
                 }
-                return val || 0;
+                return val;
             }
 
-            if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return parseFloat(log.atBats || log.AB || 0);
-            return parseFloat(log[statType] || log[statType.replace(/\s+/g, '')] || 0);
+            if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return getField(log, 'atBats', 'AB', 'At Bats');
+
+            // final generic fallback
+            return getField(log, statType, statType.replace(/\s+/g, ''));
         }
 
         function getHotColdStatus(playerName) {
