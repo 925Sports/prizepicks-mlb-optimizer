@@ -359,14 +359,14 @@
         #prevPlayer { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
         #nextPlayer { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 51; background: #222; color: #f0f0f0; border: none; padding: 10px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
         #prevPlayer:hover, #nextPlayer:hover { background: #333; }
-        .popup-buttons {
-            display: flex;
-            margin-top: 10px;
-            background: #121212;
-            border-radius: 9999px;
-            overflow: hidden;
-            width: fit-content;
-            margin: 10px auto 10px;
+        .popup-buttons { 
+            display: flex; 
+            margin-top: 10px; 
+            background: #121212; 
+            border-radius: 9999px; 
+            overflow: hidden; 
+            width: fit-content; 
+            margin: 10px auto 10px; 
             position: relative;
         }
         .popup-buttons .button { flex: 1; padding: 4px 40px; font-size: 14px; font-weight: 600; white-space: nowrap; }
@@ -924,24 +924,13 @@
                 return win + qs + outs + (k * 3) - (er * 3);
             }
         }
-
-        // UPDATED: More robust BB parsing that matches the CSV's Summary column exactly
         function getBBFromSummary(summary) {
             if (!summary) return 0;
-            summary = summary.toString().trim();
-            // Pattern 1: number before BB (most common in CSV)
-            let match = summary.match(/(\d+)\s*BB/i);
+            const match = summary.match(/(\d+)\s*BB/i);
             if (match) return parseFloat(match[1]);
-            // Pattern 2: BB followed by number (e.g. "BB 2" or "BB:2")
-            match = summary.match(/BB\s*:?\s*(\d+)/i);
-            if (match) return parseFloat(match[1]);
-            // Pattern 3: "2 BB" or similar anywhere
-            match = summary.match(/(\d+)\s*BB/i);
-            if (match) return parseFloat(match[1]);
+            if (/BB/i.test(summary)) return 1;
             return 0;
         }
-
-        // UPDATED: Only changed the H+R+RBI and Walks sections (as requested)
         function getStatValue(log, statType) {
             if (!log || !statType) return 0;
             const lowerStat = statType.toLowerCase().trim();
@@ -958,30 +947,22 @@
             if (lowerStat.includes('home run') || lowerStat.includes('hr')) return parseFloat(log.homeRuns || log.HR || 0);
             if (lowerStat.includes('inning') || lowerStat.includes('ip')) return parseFloat(log.inningsPitched || log.IP || 0);
             if (lowerStat.includes('earned run') || lowerStat.includes('er')) return parseFloat(log.earnedRuns || log.ER || 0);
-
-            // FIXED: H+R+RBI - ALWAYS calculate from the actual columns (matches Game Log tab)
-            if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || lowerStat.includes('hits + runs + rbi') || lowerStat.includes('hrrbi')) {
-                const h = parseFloat(log.hits || log.H || 0);
-                const r = parseFloat(log.runs || log.R || 0);
-                const rbi = parseFloat(log.rbi || log.RBI || 0);
-                return h + r + rbi;
+            // FIXED: Hits+Runs+RBIs - prioritize direct CSV column (H+R+RBI) then fallback calculation
+            if (lowerStat.includes('hits+runs+rbi') || lowerStat.includes('h+r+rbi') || lowerStat.includes('hits + runs + rbi')) {
+                return parseFloat(log['H+R+RBI'] || log.hrrbi || 0) ||
+                       (parseFloat(log.hits || log.H || 0) + parseFloat(log.runs || log.R || 0) + parseFloat(log.rbi || log.RBI || 0));
             }
-
-            // FIXED: Walks / BB - uses baseOnBalls first, then falls back to Summary column (exactly as you described)
+            // FIXED: Walks - prioritize direct baseOnBalls column from CSV, then Summary column (BB)
             if (lowerStat.includes('walk') || lowerStat.includes('bb') || lowerStat.includes('base on balls')) {
-                let val = parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || log.bb || 0);
-                // If baseOnBalls is 0 or missing, use Summary column (this fixes Max Muncy and others)
-                if (val === 0 || isNaN(val)) {
-                    const summary = log.gameLogSummary || log.Summary || log.summary || '';
-                    val = getBBFromSummary(summary);
+                let val = parseFloat(log.baseOnBalls || log.BB || log.baseOnBallsPitching || 0);
+                if (val === 0 && (log.gameLogSummary || log.Summary)) {
+                    val = getBBFromSummary(log.gameLogSummary || log.Summary);
                 }
-                return val || 0;
+                return val;
             }
-
             if (lowerStat.includes('at bat') || lowerStat.includes('ab')) return parseFloat(log.atBats || log.AB || 0);
             return parseFloat(log[statType] || log[statType.replace(/\s+/g, '')] || 0);
         }
-
         function getHotColdStatus(playerName) {
             const matchingLogs = gameLogs.filter(log => nameMatches(log.fullName || log['fullName'] || log['Player Name'] || '', playerName));
             if (matchingLogs.length === 0) return 'Neutral';
@@ -1187,25 +1168,25 @@
             document.getElementById('popupTeamPos').textContent = `${row.Team || ''} | ${row.Position || ''}`;
             document.getElementById('popupGame').textContent = `${row.Team || ''} @ ${row.Opp || row['Opponent'] || ''}`;
             document.getElementById('popupScheduledAt').textContent = row['Scheduled At'] ? new Date(row['Scheduled At']).toLocaleString() : '';
-          
+           
             const ou = parseFloat(row['O/U'] || 0);
             let ouColor = ou >= 9.6 ? 'ou-green' : ou <= 8.4 ? 'ou-red' : 'ou-yellow';
             let ouText = ou >= 9.6 ? 'High' : ou <= 8.4 ? 'Low' : 'Normal';
-          
+           
             const spread = parseFloat(row.Spread || 0);
             let spreadColor = '';
             if (spread < 0) spreadColor = 'spread-green';
             else if (Math.abs(spread) <= 0.9) spreadColor = 'spread-yellow';
             else spreadColor = 'spread-red';
-          
+           
             const dvpRank = parseFloat(row['DVP Rank'] || 999);
             let dvpColor = dvpRank <= 9 ? 'dvp-green' : dvpRank <= 19 ? 'dvp-yellow' : 'dvp-red';
-          
+           
             document.getElementById('popupSpreadOU').innerHTML = `
                 <span class="${spreadColor}">Spread: ${spread}</span>
                 <span class="${ouColor}">O/U: ${ou} (${ouText})</span>
             `;
-          
+           
             const statsBoxes = document.getElementById('statsBoxes');
             statsBoxes.innerHTML = '';
             const stats = [
@@ -1221,7 +1202,7 @@
                 `;
                 statsBoxes.appendChild(box);
             });
-          
+           
             const popupTabs = document.getElementById('popupTabs');
             popupTabs.innerHTML = '';
             const tabNames = ['Overview', 'Game Log', 'Splits', 'News', 'Other Bets', 'Matchup'];
@@ -1258,7 +1239,7 @@
             content.innerHTML = '';
             const playerName = row['Player Name'];
             const isHitter = !(row.Position || row.Pos || '').toUpperCase().includes('P') && !row['Stat Type'].toLowerCase().includes('pitcher');
-          
+           
             if (tab === 'Overview') {
                 const recentAvg = getGameLogStats(row['Player Name'], row['Stat Type']);
                 const recentText = recentAvg !== null ? `Recent Avg from Game Logs: ${parseFloat(recentAvg).toFixed(2)}` : 'Recent Avg from Game Logs: N/A';
@@ -1268,7 +1249,7 @@
                 canvas.id = 'projectionChart';
                 chartContainer.appendChild(canvas);
                 content.appendChild(chartContainer);
-              
+               
                 const avgProjected = parseFloat(row['Average Projected'] || row['Proj'] || 0);
                 const dvpAdjusted = parseFloat(row['DVP Adjusted'] || row['DVP'] || 0);
                 const totalProjection = parseFloat(row['Total Projection'] || row['Total'] || 0);
@@ -1339,7 +1320,7 @@
                     },
                     plugins: [ChartDataLabels]
                 });
-              
+               
                 const recentDiv = document.createElement('div');
                 recentDiv.style.marginTop = '20px';
                 recentDiv.style.padding = '12px';
@@ -1350,7 +1331,7 @@
                 recentDiv.style.color = '#00ffcc';
                 recentDiv.textContent = recentText;
                 content.appendChild(recentDiv);
-              
+               
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.classList.add('popup-buttons');
                 const betTagLower = (row['Bet Tag'] || '').toLowerCase();
@@ -1369,7 +1350,7 @@
                     <button id="popupMore" class="${moreClass}" data-choice="More">↑ More</button>
                 `;
                 content.appendChild(buttonsDiv);
-              
+               
                 setTimeout(() => {
                     const lessBtn = document.getElementById('popupLess');
                     const moreBtn = document.getElementById('popupMore');
