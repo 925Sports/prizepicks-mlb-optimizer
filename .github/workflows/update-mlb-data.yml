@@ -1,37 +1,29 @@
-name: Update MLB Props CSV
+name: Update MLB PrizePicks Data
 
 on:
-  workflow_dispatch:     # Manual only for now
-
-permissions:
-  contents: write
+  schedule:
+    - cron: '*/15 * * * *'   # Every 15 minutes
+  workflow_dispatch:         # Manual trigger button
 
 jobs:
-  update-csv:
+  update-data:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # Explicitly grant write permission
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0     # Important fix
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Generate fresh props.csv
-        run: node scripts/update-props.js
-        env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-
-      - name: Commit & push updated CSV
+      - name: Fetch latest CSV from Google Sheets
         run: |
-          git config user.name "925Sports Bot"
-          git config user.email "bot@925sports.com"
-          
-          # Pull first to avoid conflicts
-          git pull --rebase origin main || echo "No previous commits"
-          
-          git add data/props.csv
-          git commit -m "Auto-update props.csv - $(date)" || echo "No changes"
-          git push
+          mkdir -p data
+          curl -L -o data/prizepicks-mlb.csv \
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vSLw3UZqoWqheDXCENlKhAGk8adRqvYH8LFik2LFAhKV4785KLw3a4e6jACDYPoKzqfquYDn5Tg1pB0/pub?gid=0&single=true&output=csv"
+
+      - name: Commit and push if changed
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "Auto-update MLB PrizePicks data"
+          file_pattern: data/prizepicks-mlb.csv
+          branch: main
