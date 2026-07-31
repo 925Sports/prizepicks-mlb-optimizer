@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PrizePicks MLB Optimizer</title>
+    <title>MLB Optimizer (PrizePicks + Underdog)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -384,11 +384,15 @@
 <body>
     <div id="overlay"></div>
     <div class="title-header">
-        <h1>PrizePicks MLB Optimizer</h1>
+        <h1>MLB Optimizer</h1>
         <span class="info-icon" id="tool-info">ℹ️</span>
     </div>
     <div class="controls">
         <input id="search" type="text" placeholder="Search players or stats...">
+        <div class="toggle" id="bookToggle">
+            <button class="toggle-btn active" data-book="prizepicks">PrizePicks</button>
+            <button class="toggle-btn" data-book="underdog">Underdog</button>
+        </div>
         <button id="filterBtn" class="filter-btn">Filter Games/Teams</button>
         <button id="calloutFilterBtn" class="filter-btn">Filter Callouts</button>
         <button id="advancedFilterBtn" class="filter-btn">Filter Bet Tag / Fav / O/U</button>
@@ -399,7 +403,7 @@
             <option value="cards">Cards</option>
             <option value="table">Table</option>
         </select>
-        <div class="toggle">
+        <div class="toggle" id="oddsToggle">
             <button class="toggle-btn active" data-type="all">All</button>
             <button class="toggle-btn" data-type="standard">Standard</button>
             <button class="toggle-btn" data-type="demon">Demon</button>
@@ -504,12 +508,13 @@
     <!-- Tool Info Popup -->
     <div id="toolInfoPopup" class="popup">
         <button id="closeToolInfo">Close</button>
-        <h3>How to Use PrizePicks MLB Optimizer</h3>
-        <p>This tool helps you optimize your MLB bets on PrizePicks.</p>
+        <h3>How to Use MLB Optimizer (PrizePicks + Underdog)</h3>
+        <p>This tool helps you optimize your MLB bets on PrizePicks and Underdog.</p>
         <ul>
+            <li>Use the <strong>PrizePicks / Underdog</strong> toggle at the top to switch books. Data refreshes independently for each.</li>
             <li>Use the search bar to find players or stats.</li>
             <li>Filter by games, teams, callouts, bet tags, fav status, game scoring, or hot/cold batters using the buttons.</li>
-            <li>Select odds type: All, Standard, Demon, or Goblin.</li>
+            <li>Select odds type: All, Standard, Demon, or Goblin (mainly applies to PrizePicks).</li>
             <li>Switch tabs to view different stat categories.</li>
             <li>On each player card, click 'More' or 'Less' to add bets to your slip.</li>
             <li>View and filter generated bet slips with calculated edges and payouts.</li>
@@ -518,10 +523,13 @@
     </div>
     <script>
         let allData = [];
+        let prizePicksData = [];
+        let underdogData = [];
         let gameLogs = [];
         let currentFiltered = [];
         let currentTab = 'All';
-        let currentOddsType = 'standard';
+        let currentBook = 'prizepicks';
+        let currentOddsType = 'all';
         let currentView = 'cards';
         let searchTerm = '';
         let uniqueGames = [];
@@ -546,8 +554,9 @@
         let gameToTime = new Map();
         let showSelectedOnly = false;
         const contentDiv = document.getElementById('content');
-        contentDiv.innerHTML = '<div class="loading">Loading MLB data + game logs...</div>';
+        contentDiv.innerHTML = '<div class="loading">Loading PrizePicks + Underdog data + game logs...</div>';
         const prizePicksUrl = './data/prizepicks-mlb.csv';
+        const underdogUrl = './data/underdog-mlb.csv';
         const gameLogUrl = "https://raw.githubusercontent.com/925Sports/mlb-player-game-logs/refs/heads/main/mlb_2026_season_game_logs.csv";
         const predefinedCombinations = {
             2: [[1,2], [1,3], [1,4], [1,5], [1,6], [1,7], [1,8], [1,9], [1,10],
@@ -595,75 +604,123 @@
                 [4,5,6,7,8,10], [4,5,6,7,9,10], [4,5,7,8,9,10], [5,6,7,8,9,10]]
         };
         Promise.all([
-            fetch(prizePicksUrl).then(res => res.text()),
-            fetch(gameLogUrl).then(res => res.text())
+            fetch(prizePicksUrl).then(res => res.text()).catch(() => ''),
+            fetch(underdogUrl).then(res => res.text()).catch(() => ''),
+            fetch(gameLogUrl).then(res => res.text()).catch(() => '')
         ])
-        .then(([ppCsv, logCsv]) => {
-            allData = Papa.parse(ppCsv, { header: true, skipEmptyLines: true }).data;
-            gameLogs = Papa.parse(logCsv, { header: true, skipEmptyLines: true }).data;
-            allData.forEach(row => {
-                if (row['Game Short Title'] && row['Scheduled At'] && !gameToTime.has(row['Game Short Title'])) {
-                    gameToTime.set(row['Game Short Title'], row['Scheduled At']);
-                }
+        .then(([ppCsv, udCsv, logCsv]) => {
+            prizePicksData = ppCsv ? Papa.parse(ppCsv, { header: true, skipEmptyLines: true }).data : [];
+            underdogData = udCsv ? Papa.parse(udCsv, { header: true, skipEmptyLines: true }).data : [];
+            gameLogs = logCsv ? Papa.parse(logCsv, { header: true, skipEmptyLines: true }).data : [];
+            // Default to PrizePicks (original behavior). Fall back to Underdog only if PP is empty.
+            allData = prizePicksData.length > 0 ? prizePicksData : underdogData;
+            currentBook = prizePicksData.length > 0 ? 'prizepicks' : 'underdog';
+            // Sync the visual toggle
+            document.querySelectorAll('#bookToggle .toggle-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.book === currentBook);
             });
-            uniqueGames = Array.from(gameToTime.entries()).sort((a, b) => new Date(a[1]) - new Date(b[1])).map(entry => entry[0]);
-            uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
-            uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
-            uniqueBetTags = [...new Set(allData.map(row => row['Bet Tag']).filter(Boolean))].sort();
-            selectedGames = new Set(uniqueGames);
-            selectedTeams = new Set(uniqueTeams);
-            selectedCallouts = new Set(uniqueCallouts);
-            selectedBetTags = new Set(uniqueBetTags);
-            selectedFav = new Set(['Yes', 'No']);
-            selectedGameTypes = new Set(['High', 'Normal', 'Low']);
-            selectedHotCold = new Set(['Hot', 'Cold', 'Neutral']);
-            let uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
-            if (!uniqueStatTypes.includes('Hitter Fantasy Score')) uniqueStatTypes.push('Hitter Fantasy Score');
-            if (!uniqueStatTypes.includes('Pitcher Fantasy Score')) uniqueStatTypes.push('Pitcher Fantasy Score');
-            uniqueStatTypes.sort();
-            const tabsDiv = document.querySelector('.tabs');
-            tabsDiv.innerHTML = '';
-            uniqueStatTypes.forEach((tab, index) => {
-                const btn = document.createElement('div');
-                btn.classList.add('tab');
-                if (index === 0) btn.classList.add('active');
-                btn.textContent = tab;
-                btn.onclick = () => {
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentTab = tab;
-                    document.getElementById('betTypeSelect').value = tab;
+
+            function rebuildFromCurrentData() {
+                gameToTime.clear();
+                allData.forEach(row => {
+                    if (row['Game Short Title'] && row['Scheduled At'] && !gameToTime.has(row['Game Short Title'])) {
+                        gameToTime.set(row['Game Short Title'], row['Scheduled At']);
+                    }
+                });
+                uniqueGames = Array.from(gameToTime.entries()).sort((a, b) => new Date(a[1]) - new Date(b[1])).map(entry => entry[0]);
+                uniqueTeams = [...new Set(allData.map(row => row.Team).filter(Boolean))].sort();
+                uniqueCallouts = [...new Set(allData.map(row => row['Callout Bet Tag']).filter(Boolean))].sort();
+                uniqueBetTags = [...new Set(allData.map(row => row['Bet Tag']).filter(Boolean))].sort();
+                selectedGames = new Set(uniqueGames);
+                selectedTeams = new Set(uniqueTeams);
+                selectedCallouts = new Set(uniqueCallouts);
+                selectedBetTags = new Set(uniqueBetTags);
+                selectedFav = new Set(['Yes', 'No']);
+                selectedGameTypes = new Set(['High', 'Normal', 'Low']);
+                selectedHotCold = new Set(['Hot', 'Cold', 'Neutral']);
+                currentTab = 'All';
+                let uniqueStatTypes = ['All', ...new Set(allData.map(row => (row['Stat Type'] || '').trim()).filter(Boolean))].sort();
+                if (!uniqueStatTypes.includes('Hitter Fantasy Score')) uniqueStatTypes.push('Hitter Fantasy Score');
+                if (!uniqueStatTypes.includes('Pitcher Fantasy Score')) uniqueStatTypes.push('Pitcher Fantasy Score');
+                uniqueStatTypes.sort();
+                const tabsDiv = document.querySelector('.tabs');
+                tabsDiv.innerHTML = '';
+                uniqueStatTypes.forEach((tab, index) => {
+                    const btn = document.createElement('div');
+                    btn.classList.add('tab');
+                    if (index === 0) btn.classList.add('active');
+                    btn.textContent = tab;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentTab = tab;
+                        document.getElementById('betTypeSelect').value = tab;
+                        renderContent();
+                    };
+                    tabsDiv.appendChild(btn);
+                });
+                // Always re-add a clean view switch after clearing tabs
+                const viewSwitch = document.createElement('div');
+                viewSwitch.classList.add('view-switch');
+                viewSwitch.innerHTML = `
+                    <span>Cards</span>
+                    <label class="switch">
+                        <input type="checkbox" id="viewToggle" ${currentView === 'table' ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Table</span>
+                `;
+                tabsDiv.appendChild(viewSwitch);
+                document.getElementById('viewToggle').addEventListener('change', (e) => {
+                    currentView = e.target.checked ? 'table' : 'cards';
+                    document.getElementById('viewSelect').value = currentView;
                     renderContent();
-                };
-                tabsDiv.appendChild(btn);
-            });
-            const viewSwitch = document.createElement('div');
-            viewSwitch.classList.add('view-switch');
-            viewSwitch.innerHTML = `
-                <span>Cards</span>
-                <label class="switch">
-                    <input type="checkbox" id="viewToggle">
-                    <span class="slider"></span>
-                </label>
-                <span>Table</span>
-            `;
-            tabsDiv.appendChild(viewSwitch);
-            const betTypeSelect = document.getElementById('betTypeSelect');
-            betTypeSelect.innerHTML = '';
-            uniqueStatTypes.forEach(tab => {
-                const option = document.createElement('option');
-                option.value = tab;
-                option.textContent = tab;
-                if (tab === 'All') option.selected = true;
-                betTypeSelect.appendChild(option);
-            });
-            betTypeSelect.addEventListener('change', () => {
-                currentTab = betTypeSelect.value;
+                });
+                const betTypeSelect = document.getElementById('betTypeSelect');
+                betTypeSelect.innerHTML = '';
+                uniqueStatTypes.forEach(tab => {
+                    const option = document.createElement('option');
+                    option.value = tab;
+                    option.textContent = tab;
+                    if (tab === 'All') option.selected = true;
+                    betTypeSelect.appendChild(option);
+                });
+            }
+
+            rebuildFromCurrentData();
+
+            // betTypeSelect change listener (options rebuilt on book switch)
+            document.getElementById('betTypeSelect').addEventListener('change', () => {
+                currentTab = document.getElementById('betTypeSelect').value;
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.textContent === currentTab);
                 if (activeTab) activeTab.classList.add('active');
                 renderContent();
             });
+
+            // Book switcher
+            document.querySelectorAll('#bookToggle .toggle-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#bookToggle .toggle-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const newBook = btn.dataset.book;
+                    if (newBook === currentBook) return;
+                    currentBook = newBook;
+                    allData = currentBook === 'prizepicks' ? prizePicksData : underdogData;
+                    selectedBets = []; // clear slip on book switch to avoid mismatched lines
+                    if (typeof updateBetSlip === 'function') updateBetSlip();
+                    rebuildFromCurrentData();
+                    // reset odds type to All when switching books
+                    currentOddsType = 'all';
+                    document.querySelectorAll('#oddsToggle .toggle-btn').forEach(b => b.classList.remove('active'));
+                    const allBtn = document.querySelector('#oddsToggle .toggle-btn[data-type="all"]');
+                    if (allBtn) allBtn.classList.add('active');
+                    const oddsSelect = document.getElementById('oddsSelect');
+                    if (oddsSelect) oddsSelect.value = 'all';
+                    renderContent();
+                });
+            });
+
             const oddsOptions = ['all', 'standard', 'demon', 'goblin'];
             const oddsSelect = document.getElementById('oddsSelect');
             oddsSelect.innerHTML = '';
@@ -671,13 +728,13 @@
                 const option = document.createElement('option');
                 option.value = opt;
                 option.textContent = opt.charAt(0).toUpperCase() + opt.slice(1);
-                if (opt === 'standard') option.selected = true;
+                if (opt === 'all') option.selected = true;
                 oddsSelect.appendChild(option);
             });
             oddsSelect.addEventListener('change', () => {
                 currentOddsType = oddsSelect.value;
-                document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                const activeBtn = document.querySelector(`.toggle-btn[data-type="${currentOddsType}"]`);
+                document.querySelectorAll('#oddsToggle .toggle-btn').forEach(b => b.classList.remove('active'));
+                const activeBtn = document.querySelector(`#oddsToggle .toggle-btn[data-type="${currentOddsType}"]`);
                 if (activeBtn) activeBtn.classList.add('active');
                 renderContent();
             });
@@ -685,26 +742,22 @@
             viewSelect.value = 'cards';
             viewSelect.addEventListener('change', () => {
                 currentView = viewSelect.value;
-                document.getElementById('viewToggle').checked = currentView === 'table';
+                const vt = document.getElementById('viewToggle');
+                if (vt) vt.checked = currentView === 'table';
                 renderContent();
             });
             document.getElementById('search').addEventListener('input', (e) => {
                 searchTerm = e.target.value.toLowerCase();
                 renderContent();
             });
-            document.querySelectorAll('.toggle-btn').forEach(btn => {
+            document.querySelectorAll('#oddsToggle .toggle-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('#oddsToggle .toggle-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentOddsType = btn.dataset.type;
                     oddsSelect.value = currentOddsType;
                     renderContent();
                 });
-            });
-            document.getElementById('viewToggle').addEventListener('change', (e) => {
-                currentView = e.target.checked ? 'table' : 'cards';
-                viewSelect.value = currentView;
-                renderContent();
             });
             document.getElementById('selectedToggle').addEventListener('change', (e) => {
                 showSelectedOnly = e.target.checked;
@@ -1711,15 +1764,17 @@
                 filtered = filtered.filter(row => {
                     const statType = (row['Stat Type'] || '').trim();
                     const isFantasyScore = statType === 'Hitter Fantasy Score' || statType === 'Pitcher Fantasy Score';
+                    // Allow rows with blank Team (common in the Underdog sheet)
+                    const teamOk = !row.Team || selectedTeams.has(row.Team);
                     if (isFantasyScore) {
-                        return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team);
+                        return selectedGames.has(row['Game Short Title']) && teamOk;
                     } else {
-                        return selectedGames.has(row['Game Short Title']) && selectedTeams.has(row.Team) &&
+                        return selectedGames.has(row['Game Short Title']) && teamOk &&
                                selectedCallouts.has(row['Callout Bet Tag']);
                     }
                 });
                 if (selectedBetTags.size > 0) {
-                    filtered = filtered.filter(row => selectedBetTags.has(row['Bet Tag']));
+                    filtered = filtered.filter(row => !row['Bet Tag'] || selectedBetTags.has(row['Bet Tag']));
                 }
                 if (selectedFav.size > 0) {
                     filtered = filtered.filter(row => selectedFav.has(row['Fav'] || 'No'));
